@@ -206,18 +206,18 @@
 ### Backend
 | Item | Status | Observação |
 |------|--------|------------|
-| `BalanceSummaryService.ts` | ⬜ | CTE |
-| `ExpensesByCategoryService.ts` | ⬜ | CTE |
-| `MonthlyEvolutionService.ts` | ⬜ | CTE |
-| `ReportController.ts` | ⬜ | |
-| `report/routes.ts` | ⬜ | |
-| Testes report | ⬜ | |
+| `ReportRepository.ts` | ✅ | SQL Puro + CTEs (Dashboard & Category) |
+| `GetDashboardOverviewService.ts` | ✅ | Métricas Financeiras Principais |
+| `GetExpensesByCategoryService.ts` | ✅ | Agrupamento por categoria |
+| `ReportController.ts` | ✅ | |
+| `report/routes.ts` | ✅ | |
+| Testes report | ✅ | Dashboard Overview Service |
 
 ### Frontend
 | Item | Status | Observação |
 |------|--------|------------|
-| Dashboard (Widgets) | ⬜ | |
-| Gráfico de Gastos por Categoria | ⬜ | Pie Chart |
+| Dashboard (Widgets) | ✅ | Saldo, Receita, Despesa |
+| Gráfico de Gastos por Categoria | ✅ | Barras de Progresso Animadas |
 | Gráfico de Evolução Mensal | ⬜ | Area/Line Chart |
 | Filtros de Relatórios | ⬜ | |
 
