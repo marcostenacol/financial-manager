@@ -40,8 +40,10 @@ app.setErrorHandler(errorHandler);
 
 // Routes
 import { authRoutes } from '@/modules/auth/routes';
+import { profileRoutes } from '@/modules/profile/routes';
 
 app.register(authRoutes, { prefix: '/api/v1/auth' });
+app.register(profileRoutes, { prefix: '/api/v1/profile' });
 
 // Health Check
 app.get('/health', async () => {
