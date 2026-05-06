@@ -138,6 +138,9 @@
 | `transaction/routes.ts` | ✅ | |
 | Testes transaction | ⬜ | |
 
+> [!NOTE]
+> **Transferências Financeiras**: Requer o `TransferService` para criar duas transações atômicas (saída da origem e entrada no destino) com status de transferência. Pendente integração no frontend.
+
 ### Frontend
 | Item | Status | Observação |
 |------|--------|------------|
@@ -153,22 +156,22 @@
 ### Backend
 | Item | Status | Observação |
 |------|--------|------------|
-| Tabela `categories` no schema | ⬜ | |
-| DTOs de categoria | ⬜ | |
-| `CategoryRepository.ts` | ⬜ | |
-| `ListCategoriesService.ts` | ⬜ | Sistema + do usuário |
-| `CreateCategoryService.ts` | ⬜ | |
+| Tabela `categories` no schema | ✅ | |
+| DTOs de categoria | ✅ | |
+| `CategoryRepository.ts` | ✅ | |
+| `ListCategoriesService.ts` | ✅ | Sistema + do usuário |
+| `CreateCategoryService.ts` | ✅ | |
 | `UpdateCategoryService.ts` | ⬜ | |
 | `DeleteCategoryService.ts` | ⬜ | |
-| `CategoryController.ts` | ⬜ | |
-| `category/routes.ts` | ⬜ | |
+| `CategoryController.ts` | ✅ | |
+| `category/routes.ts` | ✅ | |
 | Testes category | ⬜ | |
 
 ### Frontend
 | Item | Status | Observação |
 |------|--------|------------|
-| Listagem de Categorias | ⬜ | |
-| Modal Criar/Editar | ⬜ | Seleção de cor/ícone |
+| Listagem de Categorias | ✅ | Grid de cards coloridos |
+| Modal Criar/Editar | ✅ | Seletor de Cores + Tipo |
 
 ---
 
@@ -217,3 +220,6 @@
 | Gráfico de Gastos por Categoria | ⬜ | Pie Chart |
 | Gráfico de Evolução Mensal | ⬜ | Area/Line Chart |
 | Filtros de Relatórios | ⬜ | |
+
+> [!IMPORTANT]
+> **Dashboard Overview**: A página inicial do sistema deve integrar todos os widgets de relatórios (Saldo Total, Evolução Mensal e Gastos por Categoria) utilizando as CTEs otimizadas.

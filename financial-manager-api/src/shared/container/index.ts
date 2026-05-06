@@ -14,11 +14,14 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { WalletRepository } from '@/modules/wallets/repositories/WalletRepository';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { TransactionRepository } from '@/modules/transactions/repositories/TransactionRepository';
+import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
+import { CategoryRepository } from '@/modules/categories/repositories/CategoryRepository';
 
 container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepository);
 container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', ProfileRepository);
 container.registerSingleton<WalletRepositoryInterface>('WalletRepository', WalletRepository);
 container.registerSingleton<TransactionRepositoryInterface>('TransactionRepository', TransactionRepository);
+container.registerSingleton<CategoryRepositoryInterface>('CategoryRepository', CategoryRepository);
 
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
@@ -39,6 +42,8 @@ import { ListTransactionsService } from '@/modules/transactions/services/ListTra
 import { DetailTransactionService } from '@/modules/transactions/services/DetailTransactionService';
 import { UpdateTransactionService } from '@/modules/transactions/services/UpdateTransactionService';
 import { DeleteTransactionService } from '@/modules/transactions/services/DeleteTransactionService';
+import { CreateCategoryService } from '@/modules/categories/services/CreateCategoryService';
+import { ListCategoriesService } from '@/modules/categories/services/ListCategoriesService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -58,3 +63,5 @@ container.registerSingleton<ListTransactionsService>('ListTransactionsService', 
 container.registerSingleton<DetailTransactionService>('DetailTransactionService', DetailTransactionService);
 container.registerSingleton<UpdateTransactionService>('UpdateTransactionService', UpdateTransactionService);
 container.registerSingleton<DeleteTransactionService>('DeleteTransactionService', DeleteTransactionService);
+container.registerSingleton<CreateCategoryService>('CreateCategoryService', CreateCategoryService);
+container.registerSingleton<ListCategoriesService>('ListCategoriesService', ListCategoriesService);
