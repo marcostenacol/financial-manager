@@ -1,0 +1,22 @@
+# AI Agent rules and docs
+.agents/
+GEMINI.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+
+# Build
+dist/
+build/
