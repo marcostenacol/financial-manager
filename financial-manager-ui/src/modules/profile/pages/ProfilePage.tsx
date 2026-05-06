@@ -1,0 +1,158 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useAuth } from '../../../contexts/AuthContext';
+import { api } from '../../../services/api';
+import { User, Mail, Shield, Save, UserCircle } from 'lucide-react';
+
+export const ProfilePage = () => {
+  const { user, signOut } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [name, setName] = useState('');
+  const [type, setType] = useState('personal');
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      // Aqui poderíamos buscar dados extras do perfil se necessário
+      // api.get('/profile').then(res => setType(res.data.data.type))
+    }
+  }, [user]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setSuccess(false);
+
+    try {
+      await api.put('/profile', { name });
+      setSuccess(true);
+      // Opcional: atualizar o user no context se o backend retornar o novo user
+    } catch (error) {
+      console.error('Erro ao atualizar perfil', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0f172a] p-4 md:p-8">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-2xl mx-auto"
+      >
+        <div className="flex items-center gap-4 mb-8">
+          <div className="p-3 bg-blue-500/20 rounded-2xl border border-blue-500/30">
+            <UserCircle className="w-8 h-8 text-blue-400" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-white">Meu Perfil</h1>
+            <p className="text-slate-400">Gerencie suas informações pessoais</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+            <div className="space-y-6">
+              {/* Nome */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-400 ml-1">Nome Completo</label>
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    placeholder="Seu nome"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* E-mail (Read Only) */}
+              <div className="space-y-2 opacity-60">
+                <label className="text-sm font-medium text-slate-400 ml-1">E-mail (Não alterável)</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                  <input
+                    type="email"
+                    value={user?.email || ''}
+                    disabled
+                    className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-slate-400 cursor-not-allowed"
+                  />
+                </div>
+              </div>
+
+              {/* Tipo de Perfil */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-400 ml-1">Tipo de Conta</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setType('personal')}
+                    className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${
+                      type === 'personal' 
+                        ? 'bg-blue-500/20 border-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.2)]' 
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                    }`}
+                  >
+                    <User className="w-6 h-6" />
+                    <span className="font-medium">Pessoal</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setType('business')}
+                    className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${
+                      type === 'business' 
+                        ? 'bg-purple-500/20 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                    }`}
+                  >
+                    <Shield className="w-6 h-6" />
+                    <span className="font-medium">Empresarial</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {success && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-6 p-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-2xl text-center font-medium"
+              >
+                Perfil atualizado com sucesso!
+              </motion.div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+            >
+              {loading ? (
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Salvar Alterações
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={signOut}
+            className="text-slate-500 hover:text-red-400 font-medium transition-colors p-2"
+          >
+            Sair da conta
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};

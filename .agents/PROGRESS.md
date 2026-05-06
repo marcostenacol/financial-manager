@@ -87,7 +87,7 @@
 ### Frontend
 | Item | Status | Observação |
 |------|--------|------------|
-| Página de Perfil | ⬜ | |
+| Página de Perfil | ✅ | Design Premium + Layout |
 | Upload de Avatar | ⬜ | |
 
 ---
