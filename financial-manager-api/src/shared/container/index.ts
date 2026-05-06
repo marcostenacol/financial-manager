@@ -56,6 +56,12 @@ import { DeleteCategoryService } from '@/modules/categories/services/DeleteCateg
 import { CreateRecurrenceService } from '@/modules/recurrences/services/CreateRecurrenceService';
 import { ListRecurrencesService } from '@/modules/recurrences/services/ListRecurrencesService';
 import { ProcessRecurrenceService } from '@/modules/recurrences/services/ProcessRecurrenceService';
+import { CreateSavingsGoalService } from '@/modules/savings-goals/services/CreateSavingsGoalService';
+import { ListSavingsGoalsService } from '@/modules/savings-goals/services/ListSavingsGoalsService';
+import { UpdateSavingsGoalService } from '@/modules/savings-goals/services/UpdateSavingsGoalService';
+import { DeleteSavingsGoalService } from '@/modules/savings-goals/services/DeleteSavingsGoalService';
+import { SavingsGoalRepository } from '@/modules/savings-goals/repositories/SavingsGoalRepository';
+import { SavingsGoalRepositoryInterface } from '@/modules/savings-goals/repositories/contracts/SavingsGoalRepositoryInterface';
 import { GetDashboardOverviewService } from '@/modules/reports/services/GetDashboardOverviewService';
 import { GetExpensesByCategoryService } from '@/modules/reports/services/GetExpensesByCategoryService';
 import { GetMonthlyEvolutionService } from '@/modules/reports/services/GetMonthlyEvolutionService';
@@ -86,6 +92,11 @@ container.registerSingleton<DeleteCategoryService>('DeleteCategoryService', Dele
 container.registerSingleton<CreateRecurrenceService>('CreateRecurrenceService', CreateRecurrenceService);
 container.registerSingleton<ListRecurrencesService>('ListRecurrencesService', ListRecurrencesService);
 container.registerSingleton<ProcessRecurrenceService>('ProcessRecurrenceService', ProcessRecurrenceService);
+container.registerSingleton<SavingsGoalRepositoryInterface>('SavingsGoalRepository', SavingsGoalRepository);
+container.registerSingleton<CreateSavingsGoalService>('CreateSavingsGoalService', CreateSavingsGoalService);
+container.registerSingleton<ListSavingsGoalsService>('ListSavingsGoalsService', ListSavingsGoalsService);
+container.registerSingleton<UpdateSavingsGoalService>('UpdateSavingsGoalService', UpdateSavingsGoalService);
+container.registerSingleton<DeleteSavingsGoalService>('DeleteSavingsGoalService', DeleteSavingsGoalService);
 container.registerSingleton<GetDashboardOverviewService>('GetDashboardOverviewService', GetDashboardOverviewService);
 container.registerSingleton<GetExpensesByCategoryService>('GetExpensesByCategoryService', GetExpensesByCategoryService);
 container.registerSingleton<GetMonthlyEvolutionService>('GetMonthlyEvolutionService', GetMonthlyEvolutionService);

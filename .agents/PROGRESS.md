@@ -202,6 +202,29 @@
 
 ---
 
+## 🎯 Módulo Savings Goals (Metas)
+
+### Backend
+| Item | Status | Observação |
+|------|--------|------------|
+| Tabela `savings_goals` no schema | ✅ | Prisma 7 |
+| `SavingsGoalRepository.ts` | ✅ | |
+| `CreateSavingsGoalService.ts` | ✅ | |
+| `ListSavingsGoalsService.ts` | ✅ | Cache-Aside |
+| `UpdateSavingsGoalService.ts` | ✅ | |
+| `DeleteSavingsGoalService.ts` | ✅ | |
+| `SavingsGoalController.ts` | ✅ | |
+| `savings-goals/routes.ts` | ✅ | |
+
+### Frontend
+| Item | Status | Observação |
+|------|--------|------------|
+| Página de Metas | ✅ | Progress Bars Animadas |
+| Modal Criar/Editar | ✅ | Seletor de Cores |
+| Widget no Dashboard | ✅ | Resumo visual de progresso |
+
+---
+
 ## 📊 Módulo Report
 
 ### Backend

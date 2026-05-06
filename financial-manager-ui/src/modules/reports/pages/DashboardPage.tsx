@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity, Target } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
 
@@ -26,10 +26,19 @@ interface MonthlyEvolution {
   balance: number;
 }
 
+interface SavingsGoal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentAmount: number;
+  color: string;
+}
+
 export const DashboardPage = () => {
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [expensesByCategory, setExpensesByCategory] = useState<ExpenseByCategory[]>([]);
   const [evolution, setEvolution] = useState<MonthlyEvolution[]>([]);
+  const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,14 +47,16 @@ export const DashboardPage = () => {
 
   const loadDashboardData = async () => {
     try {
-      const [overviewRes, expensesRes, evolutionRes] = await Promise.all([
+      const [overviewRes, expensesRes, evolutionRes, goalsRes] = await Promise.all([
         api.get('/reports/overview'),
         api.get('/reports/expenses-by-category'),
         api.get('/reports/evolution'),
+        api.get('/savings-goals'),
       ]);
       setOverview(overviewRes.data.data);
       setExpensesByCategory(expensesRes.data.data);
       setEvolution(evolutionRes.data.data);
+      setGoals(goalsRes.data.data.slice(0, 3)); // Mostrar apenas as 3 primeiras
     } catch (error) {
       console.error('Erro ao carregar dashboard', error);
     } finally {
@@ -266,6 +277,56 @@ export const DashboardPage = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Metas de Economia - Resumo */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="mt-8 bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+      >
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <Target className="w-5 h-5 text-emerald-400" />
+            Progresso das Metas
+          </h3>
+          <button className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+            Ver todas as metas
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {goals.map((goal) => {
+            const progress = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100);
+            return (
+              <div key={goal.id} className="space-y-4">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <p className="text-white font-bold">{goal.name}</p>
+                    <p className="text-slate-500 text-xs">Faltam {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount - goal.currentAmount)}</p>
+                  </div>
+                  <span className="text-white font-bold text-lg">{progress}%</span>
+                </div>
+                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: goal.color, boxShadow: `0 0 15px ${goal.color}40` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+
+          {goals.length === 0 && (
+            <div className="col-span-full text-center py-4 text-slate-500">
+              Você ainda não definiu metas de economia.
+            </div>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 };
