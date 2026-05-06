@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../../contexts/AuthContext';
 import { api } from '../../../services/api';
-import { User, Mail, Shield, Save, UserCircle } from 'lucide-react';
+import { User, Mail, Shield, Save, UserCircle, Camera } from 'lucide-react';
 
 export const ProfilePage = () => {
   const { user, signOut } = useAuth();
@@ -10,14 +10,29 @@ export const ProfilePage = () => {
   const [success, setSuccess] = useState(false);
   const [name, setName] = useState('');
   const [type, setType] = useState('personal');
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (user) {
       setName(user.name);
-      // Aqui poderíamos buscar dados extras do perfil se necessário
-      // api.get('/profile').then(res => setType(res.data.data.type))
+      if (user.avatar) {
+        setAvatar(`${import.meta.env.VITE_API_URL || 'http://localhost:3333/api/v1'}/../../uploads/${user.avatar}`);
+      }
     }
   }, [user]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +41,17 @@ export const ProfilePage = () => {
 
     try {
       await api.put('/profile', { name });
+
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append('avatar', avatarFile);
+        await api.patch('/profile/me/avatar', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      }
+
       setSuccess(true);
       // Opcional: atualizar o user no context se o backend retornar o novo user
     } catch (error) {
@@ -54,6 +80,30 @@ export const ProfilePage = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+            {/* Avatar Section */}
+            <div className="flex flex-col items-center mb-10">
+              <div className="relative group">
+                <div className="w-32 h-32 rounded-full border-2 border-white/10 overflow-hidden bg-slate-900 flex items-center justify-center relative">
+                  {avatar ? (
+                    <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="w-12 h-12 text-slate-700" />
+                  )}
+                  
+                  <label className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                    <Camera className="w-6 h-6 text-white mb-1" />
+                    <span className="text-[10px] text-white font-bold uppercase tracking-wider">Alterar</span>
+                    <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
+                  </label>
+                </div>
+                
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border-4 border-[#0f172a] shadow-lg">
+                  <Camera className="w-3.5 h-3.5 text-white" />
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 mt-4 uppercase tracking-widest font-bold">Foto do Perfil</p>
+            </div>
+
             <div className="space-y-6">
               {/* Nome */}
               <div className="space-y-2">

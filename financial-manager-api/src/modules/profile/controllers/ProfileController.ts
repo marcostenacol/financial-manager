@@ -1,7 +1,14 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { injectable, inject } from 'tsyringe';
 import { BaseController } from '@/base/http/BaseController';
+import { AppError } from '@/shared/errors/AppError';
 import { DetailProfileService } from '../services/DetailProfileService';
+import fs from 'fs';
+import path from 'path';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+
+const pump = promisify(pipeline);
 import { UpdateProfileService } from '../services/UpdateProfileService';
 import { ChangeProfileTypeService } from '../services/ChangeProfileTypeService';
 import { UpdateAvatarService } from '../services/UpdateAvatarService';
@@ -38,8 +45,19 @@ export class ProfileController extends BaseController {
   }
 
   async avatar(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { avatar } = request.body as { avatar: string };
-    const profile = await this.update_avatar.execute((request.user as any).sub, avatar);
+    const data = await request.file();
+    if (!data) {
+      throw new AppError('Arquivo não enviado', 400);
+    }
+
+    const userId = (request.user as any).sub;
+    const extension = path.extname(data.filename);
+    const fileName = `${userId}${extension}`;
+    const filePath = path.resolve(__dirname, '..', '..', '..', '..', 'tmp', 'uploads', fileName);
+
+    await pump(data.file, fs.createWriteStream(filePath));
+
+    const profile = await this.update_avatar.execute(userId, fileName);
     return this.success(reply, profile, 'Avatar atualizado com sucesso');
   }
 }
