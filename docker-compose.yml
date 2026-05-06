@@ -1,0 +1,53 @@
+services:
+  api:
+    build:
+      context: ./financial-manager-api
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://financial:financial@db:5432/financial
+      REDIS_URL: redis://cache:6379
+      JWT_SECRET: ${JWT_SECRET:-super-secret-key}
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+
+  ui:
+    build:
+      context: ./financial-manager-ui
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: financial
+      POSTGRES_USER: financial
+      POSTGRES_PASSWORD: financial
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U financial -d financial"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  cache:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
