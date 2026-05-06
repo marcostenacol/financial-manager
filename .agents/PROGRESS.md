@@ -58,7 +58,7 @@
 | `RefreshTokenService.ts` | ✅ | |
 | `AuthController.ts` | ✅ | |
 | `auth/routes.ts` | ✅ | |
-| Testes auth | ⬜ | `tests/auth/` |
+| Testes auth | ✅ | Unitários e Feature (Mocked) |
 
 ### Frontend
 | Item | Status | Observação |
@@ -82,7 +82,7 @@
 | `ChangeProfileTypeService.ts` | ✅ | |
 | `ProfileController.ts` | ✅ | |
 | `profile/routes.ts` | ✅ | |
-| Testes profile | ⬜ | `tests/profile/` |
+| Testes profile | ✅ | Unitários |
 
 ### Frontend
 | Item | Status | Observação |
@@ -108,7 +108,7 @@
 | `DeleteWalletService.ts` | ✅ | |
 | `WalletController.ts` | ✅ | |
 | `wallet/routes.ts` | ✅ | |
-| Testes wallet | ⬜ | `tests/wallet/` |
+| Testes wallet | ✅ | Unitários |
 
 ### Frontend
 | Item | Status | Observação |
@@ -138,6 +138,14 @@
 | `transaction/routes.ts` | ⬜ | |
 | Testes transaction | ⬜ | `tests/transaction/` |
 
+### Frontend
+| Item | Status | Observação |
+|------|--------|------------|
+| Listagem de Transações | ⬜ | Filtros de data/carteira |
+| Modal Nova Transação | ⬜ | Entrada, Saída, Transferência |
+| Edição/Exclusão | ⬜ | |
+| Detalhes da Transação | ⬜ | |
+
 ---
 
 ## 🏷️ Módulo Category
@@ -155,6 +163,12 @@
 | `CategoryController.ts` | ⬜ | |
 | `category/routes.ts` | ⬜ | |
 | Testes category | ⬜ | |
+
+### Frontend
+| Item | Status | Observação |
+|------|--------|------------|
+| Listagem de Categorias | ⬜ | |
+| Modal Criar/Editar | ⬜ | Seleção de cor/ícone |
 
 ---
 
@@ -175,6 +189,13 @@
 | `recurrence/routes.ts` | ⬜ | |
 | Testes recurrence | ⬜ | |
 
+### Frontend
+| Item | Status | Observação |
+|------|--------|------------|
+| Listagem de Recorrências | ⬜ | |
+| Modal Criar/Editar | ⬜ | Seleção de período |
+| Toggle Ativar/Desativar | ⬜ | |
+
 ---
 
 ## 📊 Módulo Report
@@ -188,3 +209,11 @@
 | `ReportController.ts` | ⬜ | |
 | `report/routes.ts` | ⬜ | |
 | Testes report | ⬜ | |
+
+### Frontend
+| Item | Status | Observação |
+|------|--------|------------|
+| Dashboard (Widgets) | ⬜ | |
+| Gráfico de Gastos por Categoria | ⬜ | Pie Chart |
+| Gráfico de Evolução Mensal | ⬜ | Area/Line Chart |
+| Filtros de Relatórios | ⬜ | |

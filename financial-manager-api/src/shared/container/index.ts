@@ -12,10 +12,13 @@ import { ProfileRepositoryInterface } from '@/modules/profile/repositories/contr
 import { ProfileRepository } from '@/modules/profile/repositories/ProfileRepository';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { WalletRepository } from '@/modules/wallets/repositories/WalletRepository';
+import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
+import { TransactionRepository } from '@/modules/transactions/repositories/TransactionRepository';
 
 container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepository);
 container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', ProfileRepository);
 container.registerSingleton<WalletRepositoryInterface>('WalletRepository', WalletRepository);
+container.registerSingleton<TransactionRepositoryInterface>('TransactionRepository', TransactionRepository);
 
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
@@ -31,6 +34,7 @@ import { ListWalletsService } from '@/modules/wallets/services/ListWalletsServic
 import { UpdateWalletService } from '@/modules/wallets/services/UpdateWalletService';
 import { DeleteWalletService } from '@/modules/wallets/services/DeleteWalletService';
 import { DetailWalletService } from '@/modules/wallets/services/DetailWalletService';
+import { CreateTransactionService } from '@/modules/transactions/services/CreateTransactionService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -45,3 +49,4 @@ container.registerSingleton<ListWalletsService>('ListWalletsService', ListWallet
 container.registerSingleton<UpdateWalletService>('UpdateWalletService', UpdateWalletService);
 container.registerSingleton<DeleteWalletService>('DeleteWalletService', DeleteWalletService);
 container.registerSingleton<DetailWalletService>('DetailWalletService', DetailWalletService);
+container.registerSingleton<CreateTransactionService>('CreateTransactionService', CreateTransactionService);
