@@ -1,0 +1,10 @@
+import { Category, Prisma } from '@prisma/client';
+
+export interface CategoryRepositoryInterface {
+  create(data: Prisma.CategoryUncheckedCreateInput): Promise<Category>;
+  update(id: string, data: Prisma.CategoryUncheckedUpdateInput): Promise<Category>;
+  delete(id: string): Promise<void>;
+  findById(id: string): Promise<Category | null>;
+  findAllByUserId(userId: string): Promise<Category[]>;
+  findByName(name: string, userId: string | null): Promise<Category | null>;
+}
