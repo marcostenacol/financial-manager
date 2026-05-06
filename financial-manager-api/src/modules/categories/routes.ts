@@ -10,4 +10,6 @@ export async function categoryRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.get('/', (request, reply) => controller.index(request, reply));
   fastify.post('/', (request, reply) => controller.store(request, reply));
+  fastify.put('/:id', (request, reply) => controller.update(request, reply));
+  fastify.delete('/:id', (request, reply) => controller.delete(request, reply));
 }

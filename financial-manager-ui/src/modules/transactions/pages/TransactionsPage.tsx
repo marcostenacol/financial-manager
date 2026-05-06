@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateTransactionModal } from '../components/CreateTransactionModal';
+import { UpdateTransactionModal } from '../components/UpdateTransactionModal';
 
 interface Transaction {
   id: string;
@@ -24,6 +25,8 @@ interface Transaction {
   occurredAt: string;
   category?: { name: string; color: string };
   wallet?: { name: string };
+  walletId: string;
+  categoryId?: string;
 }
 
 export const TransactionsPage = () => {
@@ -31,6 +34,8 @@ export const TransactionsPage = () => {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
   useEffect(() => {
     loadTransactions();
@@ -47,6 +52,11 @@ export const TransactionsPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsUpdateModalOpen(true);
   };
 
   const formatDate = (dateString: string) => {
@@ -126,6 +136,7 @@ export const TransactionsPage = () => {
                   key={transaction.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
+                  onClick={() => handleEdit(transaction)}
                   className="p-6 flex items-center justify-between group hover:bg-white/[0.02] transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
@@ -182,6 +193,13 @@ export const TransactionsPage = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={loadTransactions}
+      />
+
+      <UpdateTransactionModal 
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+        onSuccess={loadTransactions}
+        transaction={selectedTransaction}
       />
     </div>
   );

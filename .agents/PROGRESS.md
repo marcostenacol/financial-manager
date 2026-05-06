@@ -114,7 +114,7 @@
 | Item | Status | Observação |
 |------|--------|------------|
 | Dashboard de Carteiras | ✅ | Cards Premium com Glassmorphism |
-| Modal Criar/Editar Carteira | ✅ | Modal com Seleção de Ícones |
+| Modal Criar/Editar Carteira | ✅ | Modal com Seleção de Ícones e Exclusão |
 
 ---
 
@@ -147,7 +147,7 @@
 | Listagem de Transações | ✅ | Filtros Rápidos + Design Premium |
 | Modal Nova Transação | ✅ | Entrada/Saída + Seleção de Carteira |
 | Modal de Transferência | ✅ | Seleção de origem/destino e categoria |
-| Edição/Exclusão | ⬜ | |
+| Edição/Exclusão | ✅ | Modal de edição e remoção atômica |
 | Detalhes da Transação | ⬜ | |
 
 ---
@@ -162,8 +162,8 @@
 | `CategoryRepository.ts` | ✅ | |
 | `ListCategoriesService.ts` | ✅ | Sistema + do usuário |
 | `CreateCategoryService.ts` | ✅ | |
-| `UpdateCategoryService.ts` | ⬜ | |
-| `DeleteCategoryService.ts` | ⬜ | |
+| `UpdateCategoryService.ts` | ✅ | |
+| `DeleteCategoryService.ts` | ✅ | |
 | `CategoryController.ts` | ✅ | |
 | `category/routes.ts` | ✅ | |
 | Testes category | ✅ | Create Service |
