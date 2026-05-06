@@ -86,14 +86,14 @@
 | Tabela `wallets` no schema | ⬜ | |
 | `CreateWalletDTO.ts` + `UpdateWalletDTO.ts` | ⬜ | |
 | `WalletTypeEnum.ts` | ⬜ | personal, business |
-| `WalletRepository.ts` | ⬜ | |
-| `CreateWalletService.ts` | ⬜ | |
-| `ListWalletsService.ts` | ⬜ | Cache Redis |
+| `WalletRepository.ts` | ✅ | |
+| `CreateWalletService.ts` | ✅ | |
+| `ListWalletsService.ts` | ✅ | |
 | `DetailWalletService.ts` | ⬜ | saldo + últimas transações |
-| `UpdateWalletService.ts` | ⬜ | |
-| `DeleteWalletService.ts` | ⬜ | Soft delete |
-| `WalletController.ts` | ⬜ | |
-| `wallet/routes.ts` | ⬜ | |
+| `UpdateWalletService.ts` | ✅ | |
+| `DeleteWalletService.ts` | ✅ | |
+| `WalletController.ts` | ✅ | |
+| `wallet/routes.ts` | ✅ | |
 | Testes wallet | ⬜ | `tests/wallet/` |
 
 ---
