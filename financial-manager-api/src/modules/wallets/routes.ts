@@ -9,6 +9,7 @@ export async function walletRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.addHook('preHandler', authMiddleware);
 
   fastify.get('/', controller.index.bind(controller));
+  fastify.get('/:id', controller.show.bind(controller));
   fastify.post('/', controller.store.bind(controller));
   fastify.put('/:id', controller.update.bind(controller));
   fastify.delete('/:id', controller.delete.bind(controller));

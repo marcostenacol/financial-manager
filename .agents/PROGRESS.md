@@ -46,9 +46,9 @@
 ### Backend
 | Item | Status | Observação |
 |------|--------|------------|
-| `prisma/schema.prisma` — tabelas auth | ⬜ | users, roles, user_statuses, user_has_statuses, refresh_tokens |
-| Migration auth | ⬜ | |
-| Seeder roles e user_statuses | ⬜ | |
+| `prisma/schema.prisma` — tabelas auth | ✅ | |
+| Migration auth | ✅ | |
+| Seeder roles e user_statuses | ✅ | |
 | `LoginDTO.ts` + `RegisterDTO.ts` | ✅ | |
 | `RoleEnum.ts` | ✅ | |
 | `AuthRepositoryInterface.ts` + `AuthRepository.ts` | ✅ | |
@@ -67,10 +67,10 @@
 ### Backend
 | Item | Status | Observação |
 |------|--------|------------|
-| Tabela `profiles` no schema | ⬜ | |
+| Tabela `profiles` no schema | ✅ | |
 | `DetailProfileService.ts` | ✅ | |
 | `UpdateProfileService.ts` | ✅ | |
-| `UpdateAvatarService.ts` | ⬜ | |
+| `UpdateAvatarService.ts` | ✅ | |
 | `ChangeProfileTypeService.ts` | ✅ | |
 | `ProfileController.ts` | ✅ | |
 | `profile/routes.ts` | ✅ | |
@@ -83,13 +83,13 @@
 ### Backend
 | Item | Status | Observação |
 |------|--------|------------|
-| Tabela `wallets` no schema | ⬜ | |
-| `CreateWalletDTO.ts` + `UpdateWalletDTO.ts` | ⬜ | |
-| `WalletTypeEnum.ts` | ⬜ | personal, business |
+| Tabela `wallets` no schema | ✅ | |
+| `CreateWalletDTO.ts` + `UpdateWalletDTO.ts` | ✅ | |
+| `WalletTypeEnum.ts` | ✅ | |
 | `WalletRepository.ts` | ✅ | |
 | `CreateWalletService.ts` | ✅ | |
 | `ListWalletsService.ts` | ✅ | |
-| `DetailWalletService.ts` | ⬜ | saldo + últimas transações |
+| `DetailWalletService.ts` | ✅ | |
 | `UpdateWalletService.ts` | ✅ | |
 | `DeleteWalletService.ts` | ✅ | |
 | `WalletController.ts` | ✅ | |
