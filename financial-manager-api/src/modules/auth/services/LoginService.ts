@@ -1,6 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 import { compare } from 'bcrypt';
 import { FastifyInstance } from 'fastify';
+import crypto from 'crypto';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { AuthRepositoryInterface } from '../repositories/contracts/AuthRepositoryInterface';
@@ -13,6 +14,7 @@ interface LoginResponse {
     name: string;
   };
   token: string;
+  refresh_token: string;
 }
 
 @injectable()
@@ -39,14 +41,21 @@ export class LoginService {
       throw new AppError('E-mail ou senha incorretos', 401);
     }
 
-    // Gerar JWT
+    // Gerar Access Token (JWT)
     const token = this.fastify.jwt.sign(
-      { role: 'user' }, // Payload simples por enquanto
-      { sub: user.id, expiresIn: '1d' },
+      { role: 'user' },
+      { sub: user.id, expiresIn: '15m' }, // Token curto: 15 min
     );
 
-    // Salvar no Redis para validação rápida no middleware
-    await this.cache.set(`auth:token:${user.id}`, { user_id: user.id }, 86400);
+    // Gerar Refresh Token
+    const refresh_token = crypto.randomBytes(40).toString('hex');
+    const expires_at = new Date();
+    expires_at.setDate(expires_at.getDate() + 30); // Expira em 30 dias
+
+    await this.auth_repository.createRefreshToken(user.id, refresh_token, expires_at);
+
+    // Salvar no Redis para validação rápida no middleware (Access Token)
+    await this.cache.set(`auth:token:${user.id}`, { user_id: user.id }, 900); // 15 min
 
     return {
       user: {
@@ -55,6 +64,7 @@ export class LoginService {
         name: (user as any).profile?.name || 'Usuário',
       },
       token,
+      refresh_token,
     };
   }
 }

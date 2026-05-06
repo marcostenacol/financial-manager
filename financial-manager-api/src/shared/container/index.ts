@@ -14,6 +14,10 @@ container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepos
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
 import { LoginService } from '@/modules/auth/services/LoginService';
+import { RefreshTokenService } from '@/modules/auth/services/RefreshTokenService';
+import { LogoutService } from '@/modules/auth/services/LogoutService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
+container.registerSingleton<RefreshTokenService>('RefreshTokenService', RefreshTokenService);
+container.registerSingleton<LogoutService>('LogoutService', LogoutService);

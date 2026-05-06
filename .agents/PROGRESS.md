@@ -54,8 +54,8 @@
 | `AuthRepositoryInterface.ts` + `AuthRepository.ts` | ✅ | |
 | `RegisterService.ts` | ✅ | |
 | `LoginService.ts` | ✅ | |
-| `LogoutService.ts` | ⬜ | |
-| `RefreshTokenService.ts` | ⬜ | |
+| `LogoutService.ts` | ✅ | |
+| `RefreshTokenService.ts` | ✅ | |
 | `AuthController.ts` | ✅ | |
 | `auth/routes.ts` | ✅ | |
 | Testes auth | ⬜ | `tests/auth/` |
