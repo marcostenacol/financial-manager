@@ -49,6 +49,7 @@ import { CreateCategoryService } from '@/modules/categories/services/CreateCateg
 import { ListCategoriesService } from '@/modules/categories/services/ListCategoriesService';
 import { CreateRecurrenceService } from '@/modules/recurrences/services/CreateRecurrenceService';
 import { ListRecurrencesService } from '@/modules/recurrences/services/ListRecurrencesService';
+import { ProcessRecurrenceService } from '@/modules/recurrences/services/ProcessRecurrenceService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -72,3 +73,4 @@ container.registerSingleton<CreateCategoryService>('CreateCategoryService', Crea
 container.registerSingleton<ListCategoriesService>('ListCategoriesService', ListCategoriesService);
 container.registerSingleton<CreateRecurrenceService>('CreateRecurrenceService', CreateRecurrenceService);
 container.registerSingleton<ListRecurrencesService>('ListRecurrencesService', ListRecurrencesService);
+container.registerSingleton<ProcessRecurrenceService>('ProcessRecurrenceService', ProcessRecurrenceService);

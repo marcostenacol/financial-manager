@@ -6,5 +6,6 @@ export interface RecurrenceRepositoryInterface {
   delete(id: string): Promise<void>;
   findById(id: string): Promise<Recurrence | null>;
   findByUserId(userId: string): Promise<Recurrence[]>;
+  findAllActive(): Promise<Recurrence[]>;
   findActiveByUserId(userId: string): Promise<Recurrence[]>;
 }

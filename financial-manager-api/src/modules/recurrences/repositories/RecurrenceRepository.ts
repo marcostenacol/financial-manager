@@ -51,6 +51,21 @@ export class RecurrenceRepository implements RecurrenceRepositoryInterface {
     });
   }
 
+  async findAllActive(): Promise<Recurrence[]> {
+    return prisma.recurrence.findMany({
+      where: {
+        OR: [
+          { endsAt: null },
+          { endsAt: { gt: new Date() } },
+        ],
+      },
+      include: {
+        wallet: true,
+        category: true,
+      },
+    });
+  }
+
   async findActiveByUserId(userId: string): Promise<Recurrence[]> {
     return prisma.recurrence.findMany({
       where: {
