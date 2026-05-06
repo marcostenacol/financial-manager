@@ -68,12 +68,12 @@
 | Item | Status | Observação |
 |------|--------|------------|
 | Tabela `profiles` no schema | ⬜ | |
-| `DetailProfileService.ts` | ⬜ | Cache Redis |
-| `UpdateProfileService.ts` | ⬜ | Invalida cache |
-| `UpdateAvatarService.ts` | ⬜ | Storage local |
-| `ChangeProfileTypeService.ts` | ⬜ | personal ↔ business |
-| `ProfileController.ts` | ⬜ | |
-| `profile/routes.ts` | ⬜ | |
+| `DetailProfileService.ts` | ✅ | |
+| `UpdateProfileService.ts` | ✅ | |
+| `UpdateAvatarService.ts` | ⬜ | |
+| `ChangeProfileTypeService.ts` | ✅ | |
+| `ProfileController.ts` | ✅ | |
+| `profile/routes.ts` | ✅ | |
 | Testes profile | ⬜ | `tests/profile/` |
 
 ---
