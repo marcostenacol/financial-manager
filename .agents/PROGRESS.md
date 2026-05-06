@@ -49,15 +49,15 @@
 | `prisma/schema.prisma` — tabelas auth | ⬜ | users, roles, user_statuses, user_has_statuses, refresh_tokens |
 | Migration auth | ⬜ | |
 | Seeder roles e user_statuses | ⬜ | |
-| `LoginDTO.ts` + `RegisterDTO.ts` | ⬜ | Validação Zod |
-| `RoleEnum.ts` | ⬜ | |
-| `AuthRepositoryInterface.ts` + `AuthRepository.ts` | ⬜ | |
-| `RegisterService.ts` | ⬜ | Hash bcrypt |
-| `LoginService.ts` | ⬜ | JWT access + refresh |
-| `LogoutService.ts` | ⬜ | expires_at = now() |
+| `LoginDTO.ts` + `RegisterDTO.ts` | ✅ | |
+| `RoleEnum.ts` | ✅ | |
+| `AuthRepositoryInterface.ts` + `AuthRepository.ts` | ✅ | |
+| `RegisterService.ts` | ✅ | |
+| `LoginService.ts` | ✅ | |
+| `LogoutService.ts` | ⬜ | |
 | `RefreshTokenService.ts` | ⬜ | |
-| `AuthController.ts` | ⬜ | |
-| `auth/routes.ts` | ⬜ | |
+| `AuthController.ts` | ✅ | |
+| `auth/routes.ts` | ✅ | |
 | Testes auth | ⬜ | `tests/auth/` |
 
 ---

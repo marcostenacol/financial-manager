@@ -5,12 +5,16 @@ import fastifyJwt from '@fastify/jwt';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 
+import { container } from 'tsyringe';
+
 import '@/shared/container';
 import { errorHandler } from '@/shared/errors/ErrorHandler';
 
 const app: FastifyInstance = fastify({
   logger: process.env.NODE_ENV === 'development',
 });
+
+container.registerInstance<FastifyInstance>('Fastify', app);
 
 // Plugins
 app.register(fastifyJwt, {
@@ -34,7 +38,12 @@ app.register(fastifySwaggerUi, {
 // Error Handler
 app.setErrorHandler(errorHandler);
 
-// Routes Placeholder
+// Routes
+import { authRoutes } from '@/modules/auth/routes';
+
+app.register(authRoutes, { prefix: '/api/v1/auth' });
+
+// Health Check
 app.get('/health', async () => {
   return { status: 'ok' };
 });
