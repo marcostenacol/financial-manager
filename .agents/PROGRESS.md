@@ -180,23 +180,23 @@
 ### Backend
 | Item | Status | Observação |
 |------|--------|------------|
-| Tabela `recurrences` no schema | ⬜ | |
-| `RecurrencePeriodEnum.ts` | ⬜ | daily, weekly, monthly, yearly |
-| DTOs de recorrência | ⬜ | |
-| `RecurrenceRepository.ts` | ⬜ | |
-| `CreateRecurrenceService.ts` | ⬜ | |
-| `ListRecurrencesService.ts` | ⬜ | |
+| Tabela `recurrences` no schema | ✅ | |
+| `RecurrencePeriodEnum.ts` | ✅ | daily, weekly, monthly, yearly |
+| DTOs de recorrência | ✅ | |
+| `RecurrenceRepository.ts` | ✅ | |
+| `CreateRecurrenceService.ts` | ✅ | |
+| `ListRecurrencesService.ts` | ✅ | |
 | `ProcessRecurrenceService.ts` | ⬜ | Job node-cron |
 | `CancelRecurrenceService.ts` | ⬜ | |
-| `RecurrenceController.ts` | ⬜ | |
-| `recurrence/routes.ts` | ⬜ | |
-| Testes recurrence | ⬜ | |
+| `RecurrenceController.ts` | ✅ | |
+| `recurrence/routes.ts` | ✅ | |
+| Testes recurrence | ✅ | Create Service |
 
 ### Frontend
 | Item | Status | Observação |
 |------|--------|------------|
-| Listagem de Recorrências | ⬜ | |
-| Modal Criar/Editar | ⬜ | Seleção de período |
+| Listagem de Recorrências | ✅ | Cards com periodicidade |
+| Modal Criar/Editar | ✅ | Seleção de período |
 | Toggle Ativar/Desativar | ⬜ | |
 
 ---
