@@ -35,6 +35,10 @@ import { UpdateWalletService } from '@/modules/wallets/services/UpdateWalletServ
 import { DeleteWalletService } from '@/modules/wallets/services/DeleteWalletService';
 import { DetailWalletService } from '@/modules/wallets/services/DetailWalletService';
 import { CreateTransactionService } from '@/modules/transactions/services/CreateTransactionService';
+import { ListTransactionsService } from '@/modules/transactions/services/ListTransactionsService';
+import { DetailTransactionService } from '@/modules/transactions/services/DetailTransactionService';
+import { UpdateTransactionService } from '@/modules/transactions/services/UpdateTransactionService';
+import { DeleteTransactionService } from '@/modules/transactions/services/DeleteTransactionService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -50,3 +54,7 @@ container.registerSingleton<UpdateWalletService>('UpdateWalletService', UpdateWa
 container.registerSingleton<DeleteWalletService>('DeleteWalletService', DeleteWalletService);
 container.registerSingleton<DetailWalletService>('DetailWalletService', DetailWalletService);
 container.registerSingleton<CreateTransactionService>('CreateTransactionService', CreateTransactionService);
+container.registerSingleton<ListTransactionsService>('ListTransactionsService', ListTransactionsService);
+container.registerSingleton<DetailTransactionService>('DetailTransactionService', DetailTransactionService);
+container.registerSingleton<UpdateTransactionService>('UpdateTransactionService', UpdateTransactionService);
+container.registerSingleton<DeleteTransactionService>('DeleteTransactionService', DeleteTransactionService);

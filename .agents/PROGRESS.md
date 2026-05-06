@@ -123,20 +123,20 @@
 ### Backend
 | Item | Status | Observação |
 |------|--------|------------|
-| Tabela `transactions` no schema | ⬜ | |
-| `TransactionTypeEnum.ts` | ⬜ | income, expense, transfer |
-| `TransactionStatusEnum.ts` | ⬜ | pending, completed, cancelled |
-| DTOs de transação | ⬜ | |
-| `TransactionRepository.ts` | ⬜ | |
-| `CreateTransactionService.ts` | ⬜ | Atualiza balance da wallet |
-| `ListTransactionsService.ts` | ⬜ | Filtros + paginação + cache |
-| `DetailTransactionService.ts` | ⬜ | |
-| `UpdateTransactionService.ts` | ⬜ | Recalcula balance |
-| `DeleteTransactionService.ts` | ⬜ | Recalcula balance |
-| `TransferService.ts` | ⬜ | Duas transações atômicas |
-| `TransactionController.ts` | ⬜ | |
-| `transaction/routes.ts` | ⬜ | |
-| Testes transaction | ⬜ | `tests/transaction/` |
+| Tabela `transactions` no schema | ✅ | |
+| `TransactionTypeEnum.ts` | ✅ | income, expense, transfer |
+| `TransactionStatusEnum.ts` | ✅ | pending, completed, cancelled |
+| DTOs de transação | ✅ | |
+| `TransactionRepository.ts` | ✅ | |
+| `CreateTransactionService.ts` | ✅ | Atualiza balance da wallet |
+| `ListTransactionsService.ts` | ✅ | Filtros + paginação + cache |
+| `DetailTransactionService.ts` | ✅ | |
+| `UpdateTransactionService.ts` | ✅ | Recalcula balance |
+| `DeleteTransactionService.ts` | ✅ | Recalcula balance |
+| `TransferService.ts` | ⬜ | Pendente (Duas transações atômicas) |
+| `TransactionController.ts` | ✅ | |
+| `transaction/routes.ts` | ✅ | |
+| Testes transaction | ⬜ | |
 
 ### Frontend
 | Item | Status | Observação |
