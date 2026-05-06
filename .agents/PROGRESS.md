@@ -113,8 +113,8 @@
 ### Frontend
 | Item | Status | Observação |
 |------|--------|------------|
-| Dashboard de Carteiras | ⬜ | |
-| Modal Criar/Editar Carteira | ⬜ | |
+| Dashboard de Carteiras | ✅ | Cards Premium com Glassmorphism |
+| Modal Criar/Editar Carteira | ✅ | Modal com Seleção de Ícones |
 
 ---
 

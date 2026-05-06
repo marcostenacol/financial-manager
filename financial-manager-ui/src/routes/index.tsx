@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LoginPage } from '../modules/auth/pages/LoginPage';
 import { RegisterPage } from '../modules/auth/pages/RegisterPage';
 import { ProfilePage } from '../modules/profile/pages/ProfilePage';
+import { WalletsPage } from '../modules/wallets/pages/WalletsPage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
@@ -37,6 +38,15 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/wallets" 
+        element={
+          <ProtectedRoute>
+            <WalletsPage />
           </ProtectedRoute>
         } 
       />
