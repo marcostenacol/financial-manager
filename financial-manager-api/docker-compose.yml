@@ -1,8 +1,6 @@
 services:
   api:
-    build:
-      context: ./financial-manager-api
-      dockerfile: Dockerfile
+    build: .
     ports:
       - "3000:3000"
     environment:
@@ -14,15 +12,8 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
-
-  ui:
-    build:
-      context: ./financial-manager-ui
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - api
+    networks:
+      - financial-network
 
   db:
     image: postgres:16-alpine
@@ -36,8 +27,10 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./financial-manager-api/docker/postgres:/docker-entrypoint-initdb.d
+      - ./docker/postgres:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - financial-network
 
   cache:
     image: redis:7-alpine
@@ -47,8 +40,14 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./financial-manager-api/docker/redis:/usr/local/etc/redis
+      - ./docker/redis:/usr/local/etc/redis
       - redis_data:/data
+    networks:
+      - financial-network
+
+networks:
+  financial-network:
+    driver: bridge
 
 volumes:
   postgres_data:
