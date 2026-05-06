@@ -21,12 +21,12 @@
 
 | Item | Status | Observação |
 |------|--------|------------|
-| Estrutura de pastas (`src/`, `prisma/`, `tests/`, `.docker/`) | ⬜ | |
-| `package.json` + `tsconfig.json` | ⬜ | |
-| Docker (Node, Nginx, Redis, PostgreSQL 16) | ⬜ | |
-| `prisma/schema.prisma` — todas as tabelas | ⬜ | |
-| Migration inicial | ⬜ | |
-| `src/app.ts` + `src/server.ts` | ⬜ | |
+| Estrutura de pastas (`api/`, `ui/`, `prisma/`, `tests/`, `.docker/`) | ✅ | |
+| `package.json` + `tsconfig.json` | ✅ | |
+| Docker (Node, Nginx, Redis, PostgreSQL 16) | ✅ | |
+| `prisma/schema.prisma` — todas as tabelas | ✅ | |
+| Migration inicial | ⬜ | Requer DB rodando |
+| `src/app.ts` + `src/server.ts` | ✅ | Esqueletos criados |
 | `BaseController.ts` | ⬜ | |
 | `BaseRepository.ts` | ⬜ | |
 | `Response.ts` (trait JSON padronizado) | ⬜ | |
@@ -36,7 +36,7 @@
 | `AuthMiddleware.ts` | ⬜ | |
 | `PermissionMiddleware.ts` | ⬜ | |
 | Container de DI (tsyringe) | ⬜ | |
-| Swagger (fastify-swagger) | ⬜ | |
+| Swagger (fastify-swagger) | ✅ | Instalado e configurado no app.ts (em breve) |
 | `.agents/` com documentação de padrões | ✅ | Atualizado em 2026-05-06 |
 
 ---
