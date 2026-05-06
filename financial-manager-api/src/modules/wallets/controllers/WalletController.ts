@@ -5,6 +5,9 @@ import { CreateWalletService } from '../services/CreateWalletService';
 import { ListWalletsService } from '../services/ListWalletsService';
 import { UpdateWalletService } from '../services/UpdateWalletService';
 import { DeleteWalletService } from '../services/DeleteWalletService';
+import { DetailWalletService } from '../services/DetailWalletService';
+import { CreateWalletDTO } from '../dtos/CreateWalletDTO';
+import { UpdateWalletDTO } from '../dtos/UpdateWalletDTO';
 
 @injectable()
 export class WalletController extends BaseController {
@@ -13,6 +16,7 @@ export class WalletController extends BaseController {
     @inject('ListWalletsService') private list_wallets: ListWalletsService,
     @inject('UpdateWalletService') private update_wallet: UpdateWalletService,
     @inject('DeleteWalletService') private delete_wallet: DeleteWalletService,
+    @inject('DetailWalletService') private detail_wallet: DetailWalletService,
   ) {
     super();
   }
@@ -22,8 +26,14 @@ export class WalletController extends BaseController {
     return this.success(reply, wallets);
   }
 
+  async show(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { id } = request.params as { id: string };
+    const wallet = await this.detail_wallet.execute(id, (request.user as any).sub);
+    return this.success(reply, wallet);
+  }
+
   async store(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const data = request.body as any;
+    const data = CreateWalletDTO.parse(request.body);
     const wallet = await this.create_wallet.execute({
       user_id: (request.user as any).sub,
       ...data,
@@ -33,7 +43,7 @@ export class WalletController extends BaseController {
 
   async update(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
-    const data = request.body as any;
+    const data = UpdateWalletDTO.parse(request.body);
     const wallet = await this.update_wallet.execute({
       id,
       user_id: (request.user as any).sub,

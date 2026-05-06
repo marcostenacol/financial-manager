@@ -4,6 +4,7 @@ import { BaseController } from '@/base/http/BaseController';
 import { DetailProfileService } from '../services/DetailProfileService';
 import { UpdateProfileService } from '../services/UpdateProfileService';
 import { ChangeProfileTypeService } from '../services/ChangeProfileTypeService';
+import { UpdateAvatarService } from '../services/UpdateAvatarService';
 
 @injectable()
 export class ProfileController extends BaseController {
@@ -11,6 +12,7 @@ export class ProfileController extends BaseController {
     @inject('DetailProfileService') private detail_profile: DetailProfileService,
     @inject('UpdateProfileService') private update_profile: UpdateProfileService,
     @inject('ChangeProfileTypeService') private change_type: ChangeProfileTypeService,
+    @inject('UpdateAvatarService') private update_avatar: UpdateAvatarService,
   ) {
     super();
   }
@@ -33,5 +35,11 @@ export class ProfileController extends BaseController {
     const { type } = request.body as { type: 'personal' | 'business' };
     const profile = await this.change_type.execute((request.user as any).sub, type);
     return this.success(reply, profile, 'Tipo de perfil alterado com sucesso');
+  }
+
+  async avatar(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { avatar } = request.body as { avatar: string };
+    const profile = await this.update_avatar.execute((request.user as any).sub, avatar);
+    return this.success(reply, profile, 'Avatar atualizado com sucesso');
   }
 }
