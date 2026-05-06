@@ -4,6 +4,7 @@ import { LoginPage } from '../modules/auth/pages/LoginPage';
 import { RegisterPage } from '../modules/auth/pages/RegisterPage';
 import { ProfilePage } from '../modules/profile/pages/ProfilePage';
 import { WalletsPage } from '../modules/wallets/pages/WalletsPage';
+import { TransactionsPage } from '../modules/transactions/pages/TransactionsPage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
@@ -47,6 +48,15 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <WalletsPage />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/transactions" 
+        element={
+          <ProtectedRoute>
+            <TransactionsPage />
           </ProtectedRoute>
         } 
       />

@@ -141,8 +141,8 @@
 ### Frontend
 | Item | Status | Observação |
 |------|--------|------------|
-| Listagem de Transações | ⬜ | Filtros de data/carteira |
-| Modal Nova Transação | ⬜ | Entrada, Saída, Transferência |
+| Listagem de Transações | ✅ | Filtros Rápidos + Design Premium |
+| Modal Nova Transação | ✅ | Entrada/Saída + Seleção de Carteira |
 | Edição/Exclusão | ⬜ | |
 | Detalhes da Transação | ⬜ | |
 
