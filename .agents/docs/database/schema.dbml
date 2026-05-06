@@ -1,0 +1,89 @@
+Project task_manager {
+  database_type: "PostgreSQL"
+  Note: "Sistema de Gestao de Tarefas com suporte a múltiplos projetos, equipes e fluxos de trabalho customizados."
+}
+
+// --- Schema Admin ---
+
+Table admin.users {
+  id uuid [pk]
+  name varchar [not null]
+  email varchar [not null, unique]
+  password varchar [not null]
+  role_id uuid [not null]
+  last_status_id uuid [not null]
+  created_at timestamp
+  updated_at timestamp
+
+  Note: "Usuarios do sistema. Senha hasheada com $2a$ para pgcrypto."
+}
+
+Table admin.roles {
+  id uuid [pk]
+  name varchar [not null]
+  slug varchar [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table admin.user_statuses {
+  id uuid [pk]
+  name varchar [not null]
+  slug varchar [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// --- Schema Task ---
+
+Table task.projects {
+  id uuid [pk]
+  name varchar [not null]
+  description text
+  owner_id uuid [not null]
+  status_id uuid [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table task.tasks {
+  id uuid [pk]
+  project_id uuid [not null]
+  title varchar [not null]
+  description text
+  assigned_to uuid
+  status_id uuid [not null]
+  priority integer [default: 0] // 0: low, 1: medium, 2: high
+  due_date timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table task.task_statuses {
+  id uuid [pk]
+  name varchar [not null]
+  slug varchar [not null, unique]
+  color varchar [default: '#000000']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table task.project_statuses {
+  id uuid [pk]
+  name varchar [not null]
+  slug varchar [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+// --- Relacionamentos ---
+
+Ref: admin.users.role_id > admin.roles.id
+Ref: admin.users.last_status_id > admin.user_statuses.id
+
+Ref: task.projects.owner_id > admin.users.id
+Ref: task.projects.status_id > task.project_statuses.id
+
+Ref: task.tasks.project_id > task.projects.id
+Ref: task.tasks.assigned_to > admin.users.id
+Ref: task.tasks.status_id > task.task_statuses.id

@@ -1,0 +1,9 @@
+# Definição de fontes de dados para o MCP Toolbox
+kind: source
+name: task-manager-pg
+type: postgres
+host: 127.0.0.1
+port: 5432
+database: task-manager
+user: antigravity_readonly
+password: readonly_secret
