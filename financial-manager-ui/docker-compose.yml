@@ -1,0 +1,13 @@
+services:
+  ui:
+    build: .
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    networks:
+      - financial-network
+
+networks:
+  financial-network:
+    external: true
