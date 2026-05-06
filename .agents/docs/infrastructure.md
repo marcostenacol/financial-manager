@@ -23,20 +23,20 @@ services:
       POSTGRES_USER: financial
       POSTGRES_PASSWORD: financial
     volumes:
-      - .docker/postgres:/docker-entrypoint-initdb.d
+      - ./financial-manager-api/docker/postgres:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
 
   cache:
     image: redis:7-alpine
     volumes:
-      - .docker/redis:/usr/local/etc/redis
+      - ./financial-manager-api/docker/redis:/usr/local/etc/redis
       - redis_data:/data
 
   nginx:
     image: nginx:alpine
     ports: ["80:80", "443:443"]
     volumes:
-      - .docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./financial-manager-ui/docker/nginx/conf.d:/etc/nginx/conf.d
     depends_on: [app]
 ```
 

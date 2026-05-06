@@ -21,7 +21,7 @@
 
 | Item | Status | Observação |
 |------|--------|------------|
-| Estrutura de pastas (`api/`, `ui/`, `prisma/`, `tests/`, `.docker/`) | ✅ | |
+| Estrutura de pastas (`api/`, `ui/`, `prisma/`, `tests/`, `api/docker/`, `ui/docker/`) | ✅ | |
 | `package.json` + `tsconfig.json` | ✅ | |
 | Docker (Node, Nginx, Redis, PostgreSQL 16) | ✅ | |
 | `prisma/schema.prisma` — todas as tabelas | ✅ | |
