@@ -34,7 +34,7 @@ describe('CreateWalletService', () => {
       ...walletData,
     } as any);
 
-    const result = await createWalletService.execute(walletData, userId);
+    const result = await createWalletService.execute({ ...walletData, user_id: userId } as any);
 
     expect(result).toHaveProperty('id');
     expect(result.name).toBe(walletData.name);
