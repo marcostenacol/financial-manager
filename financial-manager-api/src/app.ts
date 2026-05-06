@@ -41,9 +41,11 @@ app.setErrorHandler(errorHandler);
 // Routes
 import { authRoutes } from '@/modules/auth/routes';
 import { profileRoutes } from '@/modules/profile/routes';
+import { walletRoutes } from '@/modules/wallets/routes';
 
 app.register(authRoutes, { prefix: '/api/v1/auth' });
 app.register(profileRoutes, { prefix: '/api/v1/profile' });
+app.register(walletRoutes, { prefix: '/api/v1/wallets' });
 
 // Health Check
 app.get('/health', async () => {

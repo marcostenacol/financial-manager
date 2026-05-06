@@ -10,9 +10,12 @@ import { AuthRepositoryInterface } from '@/modules/auth/repositories/contracts/A
 import { AuthRepository } from '@/modules/auth/repositories/AuthRepository';
 import { ProfileRepositoryInterface } from '@/modules/profile/repositories/contracts/ProfileRepositoryInterface';
 import { ProfileRepository } from '@/modules/profile/repositories/ProfileRepository';
+import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { WalletRepository } from '@/modules/wallets/repositories/WalletRepository';
 
 container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepository);
 container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', ProfileRepository);
+container.registerSingleton<WalletRepositoryInterface>('WalletRepository', WalletRepository);
 
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
@@ -22,6 +25,10 @@ import { LogoutService } from '@/modules/auth/services/LogoutService';
 import { DetailProfileService } from '@/modules/profile/services/DetailProfileService';
 import { UpdateProfileService } from '@/modules/profile/services/UpdateProfileService';
 import { ChangeProfileTypeService } from '@/modules/profile/services/ChangeProfileTypeService';
+import { CreateWalletService } from '@/modules/wallets/services/CreateWalletService';
+import { ListWalletsService } from '@/modules/wallets/services/ListWalletsService';
+import { UpdateWalletService } from '@/modules/wallets/services/UpdateWalletService';
+import { DeleteWalletService } from '@/modules/wallets/services/DeleteWalletService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -30,3 +37,7 @@ container.registerSingleton<LogoutService>('LogoutService', LogoutService);
 container.registerSingleton<DetailProfileService>('DetailProfileService', DetailProfileService);
 container.registerSingleton<UpdateProfileService>('UpdateProfileService', UpdateProfileService);
 container.registerSingleton<ChangeProfileTypeService>('ChangeProfileTypeService', ChangeProfileTypeService);
+container.registerSingleton<CreateWalletService>('CreateWalletService', CreateWalletService);
+container.registerSingleton<ListWalletsService>('ListWalletsService', ListWalletsService);
+container.registerSingleton<UpdateWalletService>('UpdateWalletService', UpdateWalletService);
+container.registerSingleton<DeleteWalletService>('DeleteWalletService', DeleteWalletService);
