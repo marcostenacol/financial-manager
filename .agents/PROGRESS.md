@@ -60,6 +60,14 @@
 | `auth/routes.ts` | ✅ | |
 | Testes auth | ⬜ | `tests/auth/` |
 
+### Frontend
+| Item | Status | Observação |
+|------|--------|------------|
+| AuthContext & Providers | ✅ | |
+| Página de Login | ✅ | |
+| Página de Registro | ✅ | |
+| Interceptor de Token Refresh | ✅ | |
+
 ---
 
 ## 👤 Módulo Profile
@@ -75,6 +83,12 @@
 | `ProfileController.ts` | ✅ | |
 | `profile/routes.ts` | ✅ | |
 | Testes profile | ⬜ | `tests/profile/` |
+
+### Frontend
+| Item | Status | Observação |
+|------|--------|------------|
+| Página de Perfil | ⬜ | |
+| Upload de Avatar | ⬜ | |
 
 ---
 
@@ -95,6 +109,12 @@
 | `WalletController.ts` | ✅ | |
 | `wallet/routes.ts` | ✅ | |
 | Testes wallet | ⬜ | `tests/wallet/` |
+
+### Frontend
+| Item | Status | Observação |
+|------|--------|------------|
+| Dashboard de Carteiras | ⬜ | |
+| Modal Criar/Editar Carteira | ⬜ | |
 
 ---
 
