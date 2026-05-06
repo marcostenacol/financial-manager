@@ -6,6 +6,8 @@ import { ListTransactionsService } from '../services/ListTransactionsService';
 import { DetailTransactionService } from '../services/DetailTransactionService';
 import { UpdateTransactionService } from '../services/UpdateTransactionService';
 import { DeleteTransactionService } from '../services/DeleteTransactionService';
+import { TransferService } from '../services/TransferService';
+import { CreateTransferSchema } from '../dtos/ICreateTransferDTO';
 
 @injectable()
 export class TransactionController extends BaseController {
@@ -15,6 +17,7 @@ export class TransactionController extends BaseController {
     @inject('DetailTransactionService') private detailTransaction: DetailTransactionService,
     @inject('UpdateTransactionService') private updateTransaction: UpdateTransactionService,
     @inject('DeleteTransactionService') private deleteTransaction: DeleteTransactionService,
+    @inject('TransferService') private transferService: TransferService,
   ) {
     super();
   }
@@ -53,5 +56,13 @@ export class TransactionController extends BaseController {
     const userId = (request.user as any).sub;
     await this.deleteTransaction.execute(id, userId);
     return this.success(reply, null, 'Transação removida com sucesso');
+  }
+
+  async transfer(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = (request.user as any).sub;
+    const data = CreateTransferSchema.parse(request.body);
+
+    await this.transferService.execute(data, userId);
+    return this.success(reply, null, 'Transferência realizada com sucesso');
   }
 }

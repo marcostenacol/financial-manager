@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
 
 interface DashboardOverview {
@@ -18,9 +19,17 @@ interface ExpenseByCategory {
   percentage: number;
 }
 
+interface MonthlyEvolution {
+  month_name: string;
+  income: number;
+  expense: number;
+  balance: number;
+}
+
 export const DashboardPage = () => {
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [expensesByCategory, setExpensesByCategory] = useState<ExpenseByCategory[]>([]);
+  const [evolution, setEvolution] = useState<MonthlyEvolution[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,12 +38,14 @@ export const DashboardPage = () => {
 
   const loadDashboardData = async () => {
     try {
-      const [overviewRes, expensesRes] = await Promise.all([
+      const [overviewRes, expensesRes, evolutionRes] = await Promise.all([
         api.get('/reports/overview'),
         api.get('/reports/expenses-by-category'),
+        api.get('/reports/evolution'),
       ]);
       setOverview(overviewRes.data.data);
       setExpensesByCategory(expensesRes.data.data);
+      setEvolution(evolutionRes.data.data);
     } catch (error) {
       console.error('Erro ao carregar dashboard', error);
     } finally {
@@ -182,19 +193,77 @@ export const DashboardPage = () => {
           </div>
         </motion.div>
 
-        {/* Placeholder para Evolução Mensal */}
+        {/* Evolução Mensal */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl flex flex-col items-center justify-center text-center"
+          className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
         >
-          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
-            <TrendingUp className="w-8 h-8 text-slate-600" />
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-blue-400" />
+              Evolução Mensal
+            </h3>
           </div>
-          <h3 className="text-white font-bold text-lg">Evolução Mensal</h3>
-          <p className="text-slate-500 text-sm max-w-[240px] mt-2">
-            Em breve, visualize o crescimento do seu patrimônio ao longo do tempo.
-          </p>
+
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={evolution}>
+                <defs>
+                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                <XAxis 
+                  dataKey="month_name" 
+                  stroke="#94a3b8" 
+                  fontSize={12} 
+                  tickLine={false} 
+                  axisLine={false}
+                />
+                <YAxis 
+                  stroke="#94a3b8" 
+                  fontSize={12} 
+                  tickLine={false} 
+                  axisLine={false}
+                  tickFormatter={(value) => `R$${value}`}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1e293b', 
+                    border: '1px solid #ffffff10',
+                    borderRadius: '16px',
+                    color: '#fff'
+                  }}
+                  itemStyle={{ color: '#fff' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="income" 
+                  stroke="#10b981" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorIncome)" 
+                  name="Receita"
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="expense" 
+                  stroke="#ef4444" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorExpense)" 
+                  name="Despesa"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
       </div>
     </div>

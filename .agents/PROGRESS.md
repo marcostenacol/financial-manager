@@ -133,7 +133,7 @@
 | `DetailTransactionService.ts` | ✅ | |
 | `UpdateTransactionService.ts` | ✅ | Recalcula balance |
 | `DeleteTransactionService.ts` | ✅ | Recalcula balance |
-| `TransferService.ts` | ⬜ | Pendente (Duas transações atômicas) |
+| `TransferService.ts` | ✅ | Duas transações atômicas via Prisma |
 | `TransactionController.ts` | ✅ | |
 | `transaction/routes.ts` | ✅ | |
 | Testes transaction | ✅ | List e Create Services |
@@ -146,6 +146,7 @@
 |------|--------|------------|
 | Listagem de Transações | ✅ | Filtros Rápidos + Design Premium |
 | Modal Nova Transação | ✅ | Entrada/Saída + Seleção de Carteira |
+| Modal de Transferência | ✅ | Seleção de origem/destino e categoria |
 | Edição/Exclusão | ⬜ | |
 | Detalhes da Transação | ⬜ | |
 
@@ -218,7 +219,7 @@
 |------|--------|------------|
 | Dashboard (Widgets) | ✅ | Saldo, Receita, Despesa |
 | Gráfico de Gastos por Categoria | ✅ | Barras de Progresso Animadas |
-| Gráfico de Evolução Mensal | ⬜ | Area/Line Chart |
+| Gráfico de Evolução Mensal | ✅ | AreaChart (Recharts) |
 | Filtros de Relatórios | ⬜ | |
 
 > [!IMPORTANT]
