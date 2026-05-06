@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // url      = env("DATABASE_URL")
 }
 
 // ─────────────────────────────────────────
@@ -41,16 +40,17 @@ model User {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  role            Role            @relation(fields: [roleId], references: [id])
-  lastStatus      UserStatus?     @relation("LastStatus", fields: [lastStatusId], references: [id])
-  statusHistory   UserHasStatus[]
-  refreshTokens   RefreshToken[]
-  profile         Profile?
-  wallets         Wallet[]
-
-  @@map("users")
-}
+ 
+   role            Role            @relation(fields: [roleId], references: [id])
+   lastStatus      UserStatus?     @relation("LastStatus", fields: [lastStatusId], references: [id])
+   statusHistory   UserHasStatus[]
+   refreshTokens   RefreshToken[]
+   profile         Profile?
+   wallets         Wallet[]
+   savingsGoals    SavingsGoal[]
+ 
+   @@map("users")
+ }
 
 model UserHasStatus {
   id        String  @id @default(uuid())
@@ -177,6 +177,24 @@ model Recurrence {
   wallet       Wallet        @relation(fields: [walletId], references: [id])
   category     Category      @relation(fields: [categoryId], references: [id])
   transactions Transaction[]
-
-  @@map("recurrences")
-}
+ 
+   @@map("recurrences")
+ }
+ 
+ model SavingsGoal {
+   id           String    @id @default(uuid())
+   userId       String    @map("user_id")
+   name         String
+   targetAmount Decimal   @map("target_amount") @db.Decimal(15, 2)
+   currentAmount Decimal  @default(0) @map("current_amount") @db.Decimal(15, 2)
+   deadline     DateTime?
+   color        String    @default("#3b82f6")
+   icon         String?
+ 
+   createdAt DateTime @default(now()) @map("created_at")
+   updatedAt DateTime @updatedAt @map("updated_at")
+ 
+   user User @relation(fields: [userId], references: [id])
+ 
+   @@map("savings_goals")
+ }

@@ -8,6 +8,7 @@ import { TransactionsPage } from '../modules/transactions/pages/TransactionsPage
 import { CategoriesPage } from '../modules/categories/pages/CategoriesPage';
 import { RecurrencesPage } from '../modules/recurrences/pages/RecurrencesPage';
 import { DashboardPage } from '../modules/reports/pages/DashboardPage';
+import { SavingsGoalsPage } from '../modules/savings-goals/pages/SavingsGoalsPage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
@@ -77,6 +78,15 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <RecurrencesPage />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/savings-goals" 
+        element={
+          <ProtectedRoute>
+            <SavingsGoalsPage />
           </ProtectedRoute>
         } 
       />

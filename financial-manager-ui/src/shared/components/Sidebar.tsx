@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
 
@@ -12,6 +12,7 @@ export const Sidebar = () => {
     { icon: Wallet, label: 'Carteiras', path: '/wallets' },
     { icon: History, label: 'Transações', path: '/transactions' },
     { icon: Tag, label: 'Categorias', path: '/categories' },
+    { icon: Target, label: 'Metas', path: '/savings-goals' },
     { icon: RefreshCw, label: 'Recorrências', path: '/recurrences' },
     { icon: UserCircle, label: 'Meu Perfil', path: '/profile' },
   ];
