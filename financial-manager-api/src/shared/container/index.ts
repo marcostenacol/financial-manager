@@ -16,12 +16,15 @@ import { TransactionRepositoryInterface } from '@/modules/transactions/repositor
 import { TransactionRepository } from '@/modules/transactions/repositories/TransactionRepository';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CategoryRepository } from '@/modules/categories/repositories/CategoryRepository';
+import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositories/contracts/RecurrenceRepositoryInterface';
+import { RecurrenceRepository } from '@/modules/recurrences/repositories/RecurrenceRepository';
 
 container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepository);
 container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', ProfileRepository);
 container.registerSingleton<WalletRepositoryInterface>('WalletRepository', WalletRepository);
 container.registerSingleton<TransactionRepositoryInterface>('TransactionRepository', TransactionRepository);
 container.registerSingleton<CategoryRepositoryInterface>('CategoryRepository', CategoryRepository);
+container.registerSingleton<RecurrenceRepositoryInterface>('RecurrenceRepository', RecurrenceRepository);
 
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
@@ -44,6 +47,8 @@ import { UpdateTransactionService } from '@/modules/transactions/services/Update
 import { DeleteTransactionService } from '@/modules/transactions/services/DeleteTransactionService';
 import { CreateCategoryService } from '@/modules/categories/services/CreateCategoryService';
 import { ListCategoriesService } from '@/modules/categories/services/ListCategoriesService';
+import { CreateRecurrenceService } from '@/modules/recurrences/services/CreateRecurrenceService';
+import { ListRecurrencesService } from '@/modules/recurrences/services/ListRecurrencesService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -65,3 +70,5 @@ container.registerSingleton<UpdateTransactionService>('UpdateTransactionService'
 container.registerSingleton<DeleteTransactionService>('DeleteTransactionService', DeleteTransactionService);
 container.registerSingleton<CreateCategoryService>('CreateCategoryService', CreateCategoryService);
 container.registerSingleton<ListCategoriesService>('ListCategoriesService', ListCategoriesService);
+container.registerSingleton<CreateRecurrenceService>('CreateRecurrenceService', CreateRecurrenceService);
+container.registerSingleton<ListRecurrencesService>('ListRecurrencesService', ListRecurrencesService);

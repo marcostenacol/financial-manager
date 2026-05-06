@@ -6,6 +6,7 @@ import { ProfilePage } from '../modules/profile/pages/ProfilePage';
 import { WalletsPage } from '../modules/wallets/pages/WalletsPage';
 import { TransactionsPage } from '../modules/transactions/pages/TransactionsPage';
 import { CategoriesPage } from '../modules/categories/pages/CategoriesPage';
+import { RecurrencesPage } from '../modules/recurrences/pages/RecurrencesPage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
@@ -67,6 +68,15 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <CategoriesPage />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/recurrences" 
+        element={
+          <ProtectedRoute>
+            <RecurrencesPage />
           </ProtectedRoute>
         } 
       />
