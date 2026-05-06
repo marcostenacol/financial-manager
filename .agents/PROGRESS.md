@@ -136,7 +136,7 @@
 | `TransferService.ts` | ⬜ | Pendente (Duas transações atômicas) |
 | `TransactionController.ts` | ✅ | |
 | `transaction/routes.ts` | ✅ | |
-| Testes transaction | ⬜ | |
+| Testes transaction | ✅ | List e Create Services |
 
 > [!NOTE]
 > **Transferências Financeiras**: Requer o `TransferService` para criar duas transações atômicas (saída da origem e entrada no destino) com status de transferência. Pendente integração no frontend.
@@ -165,7 +165,7 @@
 | `DeleteCategoryService.ts` | ⬜ | |
 | `CategoryController.ts` | ✅ | |
 | `category/routes.ts` | ✅ | |
-| Testes category | ⬜ | |
+| Testes category | ✅ | Create Service |
 
 ### Frontend
 | Item | Status | Observação |
