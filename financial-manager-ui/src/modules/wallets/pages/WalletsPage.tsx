@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical, Trash2, Edit2 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateWalletModal } from '../components/CreateWalletModal';
+import { CreateTransferModal } from '../../transactions/components/CreateTransferModal';
+import { ArrowRightLeft } from 'lucide-react';
 
 interface Wallet {
   id: string;
@@ -16,6 +18,7 @@ export const WalletsPage = () => {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
 
   useEffect(() => {
     loadWallets();
@@ -56,13 +59,22 @@ export const WalletsPage = () => {
           <h1 className="text-3xl font-bold text-white">Minhas Carteiras</h1>
           <p className="text-slate-400">Gerencie seu dinheiro em diferentes contas</p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
-        >
-          <Plus className="w-5 h-5" />
-          Nova Carteira
-        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={() => setIsTransferModalOpen(true)}
+            className="bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all border border-white/10 active:scale-95"
+          >
+            <ArrowRightLeft className="w-5 h-5 text-blue-400" />
+            Transferir
+          </button>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+          >
+            <Plus className="w-5 h-5" />
+            Nova Carteira
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -130,6 +142,12 @@ export const WalletsPage = () => {
       <CreateWalletModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
+        onSuccess={loadWallets}
+      />
+
+      <CreateTransferModal 
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
         onSuccess={loadWallets}
       />
     </div>

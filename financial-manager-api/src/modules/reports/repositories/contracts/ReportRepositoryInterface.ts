@@ -13,7 +13,15 @@ export interface ExpenseByCategoryData {
   percentage: number;
 }
 
+export interface MonthlyEvolutionData {
+  month_name: string;
+  income: number;
+  expense: number;
+  balance: number;
+}
+
 export interface ReportRepositoryInterface {
   getDashboardOverview(userId: string): Promise<DashboardOverviewData>;
   getExpensesByCategory(userId: string, month: number, year: number): Promise<ExpenseByCategoryData[]>;
+  getMonthlyEvolution(userId: string): Promise<MonthlyEvolutionData[]>;
 }

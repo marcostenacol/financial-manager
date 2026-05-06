@@ -1,5 +1,5 @@
 import { prisma } from '@/shared/database/PrismaClient';
-import { DashboardOverviewData, ExpenseByCategoryData, ReportRepositoryInterface } from './contracts/ReportRepositoryInterface';
+import { DashboardOverviewData, ExpenseByCategoryData, MonthlyEvolutionData, ReportRepositoryInterface } from './contracts/ReportRepositoryInterface';
 import { injectable } from 'tsyringe';
 
 @injectable()
@@ -87,12 +87,50 @@ export class ReportRepository implements ReportRepositoryInterface {
       FROM category_totals ct, total_sum ts
       ORDER BY ct.total DESC
     `, userId, startDate, endDate);
-
-    return results.map(row => ({
-      category_name: row.category_name,
-      color: row.color,
-      total: Number(row.total),
-      percentage: Number(row.percentage),
-    }));
-  }
-}
+ 
+     return results.map(row => ({
+       category_name: row.category_name,
+       color: row.color,
+       total: Number(row.total),
+       percentage: Number(row.percentage),
+     }));
+   }
+ 
+   async getMonthlyEvolution(userId: string): Promise<MonthlyEvolutionData[]> {
+     const results = await prisma.$queryRawUnsafe<any[]>(`
+       WITH RECURSIVE months AS (
+         SELECT date_trunc('month', now()) as month
+         UNION ALL
+         SELECT date_trunc('month', month - interval '1 month')
+         FROM months
+         WHERE month > date_trunc('month', now() - interval '5 months')
+       ),
+       monthly_stats AS (
+         SELECT 
+           date_trunc('month', t.occurred_at) as month,
+           COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as income,
+           COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
+         FROM transactions t
+         JOIN wallets w ON t.wallet_id = w.id
+         WHERE w.user_id = $1
+           AND t.status = 'completed'
+         GROUP BY 1
+       )
+       SELECT 
+         to_char(m.month, 'Mon') as month_name,
+         COALESCE(ms.income, 0) as income,
+         COALESCE(ms.expense, 0) as expense,
+         (COALESCE(ms.income, 0) - COALESCE(ms.expense, 0)) as balance
+       FROM months m
+       LEFT JOIN monthly_stats ms ON m.month = ms.month
+       ORDER BY m.month ASC
+     `, userId);
+ 
+     return results.map(row => ({
+       month_name: row.month_name,
+       income: Number(row.income),
+       expense: Number(row.expense),
+       balance: Number(row.balance),
+     }));
+   }
+ }
