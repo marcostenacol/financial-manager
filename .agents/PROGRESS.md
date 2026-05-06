@@ -88,7 +88,7 @@
 | Item | Status | Observação |
 |------|--------|------------|
 | Página de Perfil | ✅ | Design Premium + Layout |
-| Upload de Avatar | ⬜ | |
+| Upload de Avatar | ✅ | Frontend + Backend Multipart |
 
 ---
 
