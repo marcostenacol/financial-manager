@@ -85,7 +85,7 @@ Utilize as ferramentas em `.agents/skills/` para acelerar o desenvolvimento:
 ## 🧪 Qualidade e Testes
 - **Backend**: Vitest + Supertest (Feature e Unit).
 - Siga as diretrizes em `.agents/docs/backend/testing-tdd.md`.
-- **Nunca** rodar testes automaticamente — sempre recomendar ao usuário.
+- **Execução de Testes**: Sempre execute os testes (`npm test`) após finalizar uma funcionalidade para garantir a integridade do código antes da entrega.
 
 ---
 > [!IMPORTANT]

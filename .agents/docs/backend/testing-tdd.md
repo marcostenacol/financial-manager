@@ -168,7 +168,7 @@ Cada módulo deve ter testes cobrindo:
 
 ## Regras
 
-- **Nunca** rodar testes automaticamente — sempre recomendar ao usuário executar.
+- **Execução Automática**: O agente deve rodar os testes (`npm test`) após cada implementação para validar a integridade.
 - Um arquivo de teste por caso de uso.
 - Usar banco de testes isolado (`DATABASE_URL_TEST`).
 - Limpar banco antes de cada suite (`beforeAll` com `migrate reset`).
