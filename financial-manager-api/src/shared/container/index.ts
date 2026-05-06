@@ -18,6 +18,8 @@ import { CategoryRepositoryInterface } from '@/modules/categories/repositories/c
 import { CategoryRepository } from '@/modules/categories/repositories/CategoryRepository';
 import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositories/contracts/RecurrenceRepositoryInterface';
 import { RecurrenceRepository } from '@/modules/recurrences/repositories/RecurrenceRepository';
+import { ReportRepositoryInterface } from '@/modules/reports/repositories/contracts/ReportRepositoryInterface';
+import { ReportRepository } from '@/modules/reports/repositories/ReportRepository';
 
 container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepository);
 container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', ProfileRepository);
@@ -25,6 +27,7 @@ container.registerSingleton<WalletRepositoryInterface>('WalletRepository', Walle
 container.registerSingleton<TransactionRepositoryInterface>('TransactionRepository', TransactionRepository);
 container.registerSingleton<CategoryRepositoryInterface>('CategoryRepository', CategoryRepository);
 container.registerSingleton<RecurrenceRepositoryInterface>('RecurrenceRepository', RecurrenceRepository);
+container.registerSingleton<ReportRepositoryInterface>('ReportRepository', ReportRepository);
 
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
@@ -50,6 +53,8 @@ import { ListCategoriesService } from '@/modules/categories/services/ListCategor
 import { CreateRecurrenceService } from '@/modules/recurrences/services/CreateRecurrenceService';
 import { ListRecurrencesService } from '@/modules/recurrences/services/ListRecurrencesService';
 import { ProcessRecurrenceService } from '@/modules/recurrences/services/ProcessRecurrenceService';
+import { GetDashboardOverviewService } from '@/modules/reports/services/GetDashboardOverviewService';
+import { GetExpensesByCategoryService } from '@/modules/reports/services/GetExpensesByCategoryService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -74,3 +79,5 @@ container.registerSingleton<ListCategoriesService>('ListCategoriesService', List
 container.registerSingleton<CreateRecurrenceService>('CreateRecurrenceService', CreateRecurrenceService);
 container.registerSingleton<ListRecurrencesService>('ListRecurrencesService', ListRecurrencesService);
 container.registerSingleton<ProcessRecurrenceService>('ProcessRecurrenceService', ProcessRecurrenceService);
+container.registerSingleton<GetDashboardOverviewService>('GetDashboardOverviewService', GetDashboardOverviewService);
+container.registerSingleton<GetExpensesByCategoryService>('GetExpensesByCategoryService', GetExpensesByCategoryService);

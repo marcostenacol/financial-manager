@@ -7,10 +7,10 @@ import { WalletsPage } from '../modules/wallets/pages/WalletsPage';
 import { TransactionsPage } from '../modules/transactions/pages/TransactionsPage';
 import { CategoriesPage } from '../modules/categories/pages/CategoriesPage';
 import { RecurrencesPage } from '../modules/recurrences/pages/RecurrencesPage';
+import { DashboardPage } from '../modules/reports/pages/DashboardPage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
-const Dashboard = () => <div className="p-8 text-white">Dashboard Page (Coming Soon)</div>;
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -31,7 +31,7 @@ export const AppRoutes = () => {
         path="/" 
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <DashboardPage />
           </ProtectedRoute>
         } 
       />

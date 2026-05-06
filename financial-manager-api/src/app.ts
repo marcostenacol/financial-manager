@@ -55,6 +55,7 @@ import { walletRoutes } from '@/modules/wallets/routes';
 import { transactionRoutes } from '@/modules/transactions/routes';
 import { categoryRoutes } from '@/modules/categories/routes';
 import { recurrenceRoutes } from '@/modules/recurrences/routes';
+import { reportRoutes } from '@/modules/reports/routes';
 
 app.register(authRoutes, { prefix: '/api/v1/auth' });
 app.register(profileRoutes, { prefix: '/api/v1/profile' });
@@ -62,6 +63,7 @@ app.register(walletRoutes, { prefix: '/api/v1/wallets' });
 app.register(transactionRoutes, { prefix: '/api/v1/transactions' });
 app.register(categoryRoutes, { prefix: '/api/v1/categories' });
 app.register(recurrenceRoutes, { prefix: '/api/v1/recurrences' });
+app.register(reportRoutes, { prefix: '/api/v1/reports' });
 
 // Health Check
 app.get('/health', async () => {
