@@ -26,18 +26,18 @@
 | Docker (Node, Nginx, Redis, PostgreSQL 16) | ✅ | |
 | `prisma/schema.prisma` — todas as tabelas | ✅ | |
 | Migration inicial | ⬜ | Requer DB rodando |
-| `src/app.ts` + `src/server.ts` | ✅ | Esqueletos criados |
-| `BaseController.ts` | ⬜ | |
-| `BaseRepository.ts` | ⬜ | |
-| `Response.ts` (trait JSON padronizado) | ⬜ | |
-| `CacheTrait.ts` | ⬜ | |
-| `RedisClient.ts` | ⬜ | |
-| `AppError.ts` + `ErrorHandler.ts` | ⬜ | |
-| `AuthMiddleware.ts` | ⬜ | |
+| `src/app.ts` + `src/server.ts` | ✅ | Inicializados com Fastify |
+| `BaseController.ts` | ✅ | |
+| `BaseRepository.ts` | ✅ | |
+| `Response.ts` (trait JSON padronizado) | ✅ | |
+| `CacheTrait.ts` | ✅ | |
+| `RedisClient.ts` | ✅ | |
+| `AppError.ts` + `ErrorHandler.ts` | ✅ | |
+| `AuthMiddleware.ts` | ✅ | |
 | `PermissionMiddleware.ts` | ⬜ | |
-| Container de DI (tsyringe) | ⬜ | |
-| Swagger (fastify-swagger) | ✅ | Instalado e configurado no app.ts (em breve) |
-| `.agents/` com documentação de padrões | ✅ | Atualizado em 2026-05-06 |
+| Container de DI (tsyringe) | ✅ | Configuração inicial |
+| Swagger (fastify-swagger) | ✅ | Configurado no app.ts |
+| `.agents/` com documentação de padrões | ✅ | |
 
 ---
 
