@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Tag, Palette, ArrowUpCircle, ArrowDownCircle, Trash2, Edit2, MoreVertical } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateCategoryModal } from '../components/CreateCategoryModal';
+import { UpdateCategoryModal } from '../components/UpdateCategoryModal';
 
 interface Category {
   id: string;
@@ -10,16 +11,24 @@ interface Category {
   color: string;
   icon: string | null;
   type: 'income' | 'expense' | 'both';
+  userId?: string;
 }
 
 export const CategoriesPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   useEffect(() => {
     loadCategories();
   }, []);
+
+  const handleEdit = (category: Category) => {
+    setSelectedCategory(category);
+    setIsUpdateModalOpen(true);
+  };
 
   const loadCategories = async () => {
     try {
@@ -71,7 +80,8 @@ export const CategoriesPage = () => {
                   key={category.id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="group relative bg-white/5 border border-white/10 p-5 rounded-2xl hover:bg-white/[0.08] transition-all"
+                  onClick={() => handleEdit(category)}
+                  className="group relative bg-white/5 border border-white/10 p-5 rounded-2xl hover:bg-white/[0.08] transition-all cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
                     <div 
@@ -118,6 +128,13 @@ export const CategoriesPage = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={loadCategories}
+      />
+
+      <UpdateCategoryModal 
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+        onSuccess={loadCategories}
+        category={selectedCategory}
       />
     </div>
   );

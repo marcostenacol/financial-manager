@@ -51,6 +51,8 @@ import { DeleteTransactionService } from '@/modules/transactions/services/Delete
 import { TransferService } from '@/modules/transactions/services/TransferService';
 import { CreateCategoryService } from '@/modules/categories/services/CreateCategoryService';
 import { ListCategoriesService } from '@/modules/categories/services/ListCategoriesService';
+import { UpdateCategoryService } from '@/modules/categories/services/UpdateCategoryService';
+import { DeleteCategoryService } from '@/modules/categories/services/DeleteCategoryService';
 import { CreateRecurrenceService } from '@/modules/recurrences/services/CreateRecurrenceService';
 import { ListRecurrencesService } from '@/modules/recurrences/services/ListRecurrencesService';
 import { ProcessRecurrenceService } from '@/modules/recurrences/services/ProcessRecurrenceService';
@@ -79,6 +81,8 @@ container.registerSingleton<DeleteTransactionService>('DeleteTransactionService'
 container.registerSingleton<TransferService>('TransferService', TransferService);
 container.registerSingleton<CreateCategoryService>('CreateCategoryService', CreateCategoryService);
 container.registerSingleton<ListCategoriesService>('ListCategoriesService', ListCategoriesService);
+container.registerSingleton<UpdateCategoryService>('UpdateCategoryService', UpdateCategoryService);
+container.registerSingleton<DeleteCategoryService>('DeleteCategoryService', DeleteCategoryService);
 container.registerSingleton<CreateRecurrenceService>('CreateRecurrenceService', CreateRecurrenceService);
 container.registerSingleton<ListRecurrencesService>('ListRecurrencesService', ListRecurrencesService);
 container.registerSingleton<ProcessRecurrenceService>('ProcessRecurrenceService', ProcessRecurrenceService);

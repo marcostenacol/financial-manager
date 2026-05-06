@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical, Trash2, Edit2 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateWalletModal } from '../components/CreateWalletModal';
+import { UpdateWalletModal } from '../components/UpdateWalletModal';
 import { CreateTransferModal } from '../../transactions/components/CreateTransferModal';
 import { ArrowRightLeft } from 'lucide-react';
 
@@ -18,11 +19,18 @@ export const WalletsPage = () => {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
   useEffect(() => {
     loadWallets();
   }, []);
+
+  const handleEdit = (wallet: Wallet) => {
+    setSelectedWallet(wallet);
+    setIsUpdateModalOpen(true);
+  };
 
   const loadWallets = async () => {
     try {
@@ -92,7 +100,8 @@ export const WalletsPage = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className={`relative group h-48 p-6 rounded-3xl border border-white/10 bg-gradient-to-br ${getWalletGradient(wallet.type)} shadow-xl overflow-hidden`}
+                onClick={() => handleEdit(wallet)}
+                className={`relative group h-48 p-6 rounded-3xl border border-white/10 bg-gradient-to-br ${getWalletGradient(wallet.type)} shadow-xl overflow-hidden cursor-pointer`}
               >
                 {/* Efeito de Vidro */}
                 <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
@@ -149,6 +158,13 @@ export const WalletsPage = () => {
         isOpen={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}
         onSuccess={loadWallets}
+      />
+
+      <UpdateWalletModal 
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+        onSuccess={loadWallets}
+        wallet={selectedWallet}
       />
     </div>
   );
