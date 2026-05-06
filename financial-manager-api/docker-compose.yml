@@ -1,12 +1,17 @@
 services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://financial:financial@db:5432/financial
-      REDIS_URL: redis://cache:6379
-      JWT_SECRET: ${JWT_SECRET:-super-secret-key}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+      NODE_ENV: ${NODE_ENV}
     depends_on:
       db:
         condition: service_healthy
@@ -18,11 +23,11 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: financial
-      POSTGRES_USER: financial
-      POSTGRES_PASSWORD: financial
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U financial -d financial"]
+      test: ["CMD-SHELL", "pg_isready -U $${DB_USER} -d $${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
