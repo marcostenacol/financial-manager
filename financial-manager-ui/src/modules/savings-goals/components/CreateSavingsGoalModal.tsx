@@ -1,12 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, Target, Palette, Calendar, TrendingUp } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface CreateSavingsGoalModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialData?: {
+    id: string;
+    name: string;
+    targetAmount: number;
+    currentAmount: number;
+    deadline: string | null;
+    color: string;
+  };
 }
 
 const PRESET_COLORS = [
@@ -15,7 +24,8 @@ const PRESET_COLORS = [
   '#d946ef', '#f43f5e', '#64748b'
 ];
 
-export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess }: CreateSavingsGoalModalProps) => {
+export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess, initialData }: CreateSavingsGoalModalProps) => {
+  const { showToast } = useToast();
   const [name, setName] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [currentAmount, setCurrentAmount] = useState('0');
@@ -23,28 +33,45 @@ export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess }: CreateSav
   const [color, setColor] = useState('#3b82f6');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setTargetAmount(initialData.targetAmount.toString());
+      setCurrentAmount(initialData.currentAmount.toString());
+      setDeadline(initialData.deadline ? new Date(initialData.deadline).toISOString().split('T')[0] : '');
+      setColor(initialData.color);
+    } else {
+      setName('');
+      setTargetAmount('');
+      setCurrentAmount('0');
+      setDeadline('');
+      setColor('#3b82f6');
+    }
+  }, [initialData, isOpen]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await api.post('/savings-goals', {
+      const data = {
         name,
         target_amount: Number(targetAmount),
         current_amount: Number(currentAmount),
         deadline: deadline ? new Date(deadline).toISOString() : null,
         color,
-      });
+      };
+
+      if (initialData) {
+        await api.put(`/savings-goals/${initialData.id}`, data);
+      } else {
+        await api.post('/savings-goals', data);
+      }
       
       onSuccess();
       onClose();
-      // Reset
-      setName('');
-      setTargetAmount('');
-      setCurrentAmount('0');
-      setDeadline('');
     } catch (error) {
-      console.error('Erro ao criar meta', error);
+      showToast('Erro ao salvar meta', 'error');
     } finally {
       setLoading(false);
     }
@@ -68,7 +95,7 @@ export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess }: CreateSav
         className="relative w-full max-w-xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
       >
         <div className="p-6 border-b border-white/5 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">Nova Meta de Economia</h2>
+          <h2 className="text-xl font-bold text-white">{initialData ? 'Editar Meta' : 'Nova Meta de Economia'}</h2>
           <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400">
             <X className="w-5 h-5" />
           </button>
@@ -165,7 +192,7 @@ export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess }: CreateSav
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Criar Meta Financeira
+                {initialData ? 'Salvar Alterações' : 'Criar Meta Financeira'}
               </>
             )}
           </button>

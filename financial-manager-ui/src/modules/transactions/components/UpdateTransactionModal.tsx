@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2 } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Wallet {
   id: string;
@@ -32,6 +33,7 @@ interface UpdateTransactionModalProps {
 }
 
 export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction }: UpdateTransactionModalProps) => {
+  const { showToast } = useToast();
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -65,7 +67,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       setWallets(walletsRes.data.data);
       setCategories(categoriesRes.data.data);
     } catch (error) {
-      console.error('Erro ao carregar dados para transação', error);
+      showToast('Erro ao carregar dados para transação', 'error');
     }
   };
 
@@ -88,7 +90,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Erro ao atualizar transação', error);
+      showToast('Erro ao atualizar transação', 'error');
     } finally {
       setLoading(false);
     }
@@ -103,7 +105,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Erro ao deletar transação', error);
+      showToast('Erro ao deletar transação', 'error');
     } finally {
       setDeleting(false);
     }

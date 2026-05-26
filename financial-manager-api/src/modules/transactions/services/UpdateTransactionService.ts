@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { Transaction } from '@prisma/client';
+import { Transaction, Prisma } from '@prisma/client';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { UpdateTransactionDTOType } from '../dtos/UpdateTransactionDTO';
@@ -40,12 +40,16 @@ export class UpdateTransactionService {
         ? Number(wallet.balance) - amount 
         : Number(wallet.balance) + amount;
       
-      await this.walletRepository.update(wallet.id, { balance: revertedBalance as any });
+      await this.walletRepository.update(wallet.id, { balance: new Prisma.Decimal(revertedBalance) });
     }
 
     // Atualiza a transação
     const updatedTransaction = await this.transactionRepository.update(id, {
-      ...data,
+      description: data.description,
+      amount: data.amount,
+      type: data.type,
+      status: data.status,
+      categoryId: data.category_id,
       occurredAt: data.occurred_at ? new Date(data.occurred_at) : undefined,
     });
 
@@ -58,14 +62,14 @@ export class UpdateTransactionService {
         ? Number(currentWallet!.balance) + amount 
         : Number(currentWallet!.balance) - amount;
 
-      await this.walletRepository.update(wallet.id, { balance: newBalance as any });
+      await this.walletRepository.update(wallet.id, { balance: new Prisma.Decimal(newBalance) });
     }
 
-    // Invalida caches
+    // Invalida caches (incluindo listagens filtradas)
     await this.cache.del(`wallet:detail:${wallet.id}`);
     await this.cache.del(`wallets:user:${userId}`);
-    await this.cache.del(`transactions:user:${userId}`);
-    await this.cache.del(`transactions:wallet:${wallet.id}`);
+    await this.cache.delPattern(`transactions:user:${userId}*`);
+    await this.cache.delPattern(`transactions:wallet:${wallet.id}*`);
 
     return updatedTransaction;
   }

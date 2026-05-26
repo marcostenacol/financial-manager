@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, Tag, Type, Palette, ArrowUpCircle, ArrowDownCircle, Layers } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface CreateCategoryModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ const PREDEFINED_COLORS = [
 ];
 
 export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCategoryModalProps) => {
+  const { showToast } = useToast();
   const [name, setName] = useState('');
   const [color, setColor] = useState(PREDEFINED_COLORS[0]);
   const [type, setType] = useState<'income' | 'expense' | 'both'>('expense');
@@ -39,7 +41,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
       setColor(PREDEFINED_COLORS[0]);
       setType('expense');
     } catch (error) {
-      console.error('Erro ao criar categoria', error);
+      showToast('Erro ao criar categoria', 'error');
     } finally {
       setLoading(false);
     }

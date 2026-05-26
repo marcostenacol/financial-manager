@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRightLeft, AlertCircle, ChevronDown } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Wallet {
   id: string;
@@ -21,6 +22,7 @@ interface CreateTransferModalProps {
 }
 
 export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen, onClose, onSuccess }) => {
+  const { showToast } = useToast();
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,7 +49,7 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
       setWallets(walletsRes.data.data);
       setCategories(categoriesRes.data.data.filter((c: any) => c.type === 'both' || c.type === 'expense'));
     } catch (err) {
-      console.error('Erro ao carregar dados para transferência', err);
+      showToast('Erro ao carregar dados para transferência', 'error');
     }
   };
 

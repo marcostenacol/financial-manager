@@ -1,4 +1,5 @@
 import { inject, injectable } from 'tsyringe';
+import { Prisma } from '@prisma/client';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
@@ -38,15 +39,15 @@ export class DeleteTransactionService {
         ? Number(wallet.balance) - amount 
         : Number(wallet.balance) + amount;
       
-      await this.walletRepository.update(wallet.id, { balance: revertedBalance as any });
+      await this.walletRepository.update(wallet.id, { balance: new Prisma.Decimal(revertedBalance) });
     }
 
     await this.transactionRepository.delete(id);
 
-    // Invalida caches
+    // Invalida caches (incluindo listagens filtradas)
     await this.cache.del(`wallet:detail:${wallet.id}`);
     await this.cache.del(`wallets:user:${userId}`);
-    await this.cache.del(`transactions:user:${userId}`);
-    await this.cache.del(`transactions:wallet:${wallet.id}`);
+    await this.cache.delPattern(`transactions:user:${userId}*`);
+    await this.cache.delPattern(`transactions:wallet:${wallet.id}*`);
   }
 }

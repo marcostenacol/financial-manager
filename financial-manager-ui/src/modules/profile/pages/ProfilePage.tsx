@@ -3,19 +3,25 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../../contexts/AuthContext';
 import { api } from '../../../services/api';
 import { User, Mail, Shield, Save, UserCircle, Camera } from 'lucide-react';
+import { useToast } from '../../../shared/components/Toast';
 
 export const ProfilePage = () => {
   const { user, signOut } = useAuth();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [name, setName] = useState('');
+  const [bio, setBio] = useState('');
   const [type, setType] = useState('personal');
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const { updateUser } = useAuth();
 
   useEffect(() => {
     if (user) {
-      setName(user.name);
+      setName(user.name || '');
+      setBio(user.bio || '');
+      setType(user.type || 'personal');
       if (user.avatar) {
         setAvatar(`${import.meta.env.VITE_API_URL || 'http://localhost:3333/api/v1'}/../../uploads/${user.avatar}`);
       }
@@ -40,22 +46,29 @@ export const ProfilePage = () => {
     setSuccess(false);
 
     try {
-      await api.put('/profile', { name });
+      await api.put('/profile', { name, bio });
+      let updatedUser = { ...user!, name, bio };
+
+      if (type !== user?.type) {
+        const typeResponse = await api.patch('/profile/type', { type });
+        updatedUser = { ...updatedUser, type: typeResponse.data.data.type };
+      }
 
       if (avatarFile) {
         const formData = new FormData();
         formData.append('avatar', avatarFile);
-        await api.patch('/profile/me/avatar', formData, {
+        const avatarResponse = await api.patch('/profile/me/avatar', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
+        updatedUser = { ...updatedUser, avatar: avatarResponse.data.data.avatar };
       }
 
+      updateUser(updatedUser);
       setSuccess(true);
-      // Opcional: atualizar o user no context se o backend retornar o novo user
     } catch (error) {
-      console.error('Erro ao atualizar perfil', error);
+      showToast('Erro ao atualizar perfil', 'error');
     } finally {
       setLoading(false);
     }
@@ -117,6 +130,19 @@ export const ProfilePage = () => {
                     className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
                     placeholder="Seu nome"
                     required
+                  />
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-400 ml-1">Biografia</label>
+                <div className="relative group">
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all resize-none h-24"
+                    placeholder="Conte um pouco sobre você..."
                   />
                 </div>
               </div>

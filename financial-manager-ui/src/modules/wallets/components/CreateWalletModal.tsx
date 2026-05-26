@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface CreateWalletModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ const WALLET_TYPES = [
 ];
 
 export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletModalProps) => {
+  const { showToast } = useToast();
   const [name, setName] = useState('');
   const [type, setType] = useState('checking');
   const [balance, setBalance] = useState('');
@@ -43,7 +45,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       setType('checking');
       setBalance('');
     } catch (error) {
-      console.error('Erro ao criar carteira', error);
+      showToast('Erro ao criar carteira', 'error');
     } finally {
       setLoading(false);
     }
