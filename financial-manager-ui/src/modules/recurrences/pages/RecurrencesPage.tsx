@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, RefreshCw, Calendar, Wallet as WalletIcon, Tag, Clock, ArrowUpCircle, ArrowDownCircle, ChevronRight } from 'lucide-react';
+import { Plus, RefreshCw, Clock, Wallet as WalletIcon, X } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateRecurrenceModal } from '../components/CreateRecurrenceModal';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Recurrence {
   id: string;
@@ -11,11 +12,14 @@ interface Recurrence {
   type: 'income' | 'expense';
   period: 'daily' | 'weekly' | 'monthly' | 'yearly';
   startsAt: string;
+  endsAt: string | null;
   wallet?: { name: string };
   category?: { name: string; color: string };
+  isActive: boolean;
 }
 
 export const RecurrencesPage = () => {
+  const { showToast } = useToast();
   const [recurrences, setRecurrences] = useState<Recurrence[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,12 +33,11 @@ export const RecurrencesPage = () => {
       const response = await api.get('/recurrences');
       setRecurrences(response.data.data);
     } catch (error) {
-      console.error('Erro ao carregar recorrências', error);
+      showToast('Erro ao carregar recorrências', 'error');
     } finally {
       setLoading(false);
     }
   };
-
   const getPeriodLabel = (period: string) => {
     const labels: any = {
       daily: 'Diário',
@@ -43,6 +46,31 @@ export const RecurrencesPage = () => {
       yearly: 'Anual'
     };
     return labels[period] || period;
+  };
+
+  const handleCancel = async (id: string) => {
+    if (!confirm('Tem certeza que deseja cancelar esta recorrência definitivamente?')) return;
+
+    try {
+      await api.patch(`/recurrences/${id}/cancel`);
+      loadRecurrences();
+    } catch (error) {
+      showToast('Erro ao cancelar recorrência', 'error');
+    }
+  };
+
+  const handleToggleActive = async (id: string) => {
+    try {
+      await api.patch(`/recurrences/${id}/toggle`);
+      loadRecurrences();
+    } catch (error) {
+      showToast('Erro ao alternar status da recorrência', 'error');
+    }
+  };
+
+  const isExpired = (recurrence: Recurrence) => {
+    if (!recurrence.endsAt) return false;
+    return new Date(recurrence.endsAt) < new Date();
   };
 
   return (
@@ -100,12 +128,39 @@ export const RecurrencesPage = () => {
 
                   <div className="flex items-center gap-6">
                     <div className="text-right">
-                      <p className={`text-lg font-bold ${recurrence.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <p className={`text-lg font-bold ${recurrence.type === 'income' ? 'text-emerald-400' : 'text-red-400'} ${isExpired(recurrence) ? 'opacity-50 line-through' : ''}`}>
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(recurrence.amount)}
                       </p>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Próximo: {new Date(recurrence.startsAt).toLocaleDateString('pt-BR')}</p>
+                      {isExpired(recurrence) ? (
+                        <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Encerrada</span>
+                      ) : (
+                        <div className="flex flex-col items-end gap-1">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Próximo: {new Date(recurrence.startsAt).toLocaleDateString('pt-BR')}</p>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${recurrence.isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                            {recurrence.isActive ? 'Ativa' : 'Pausada'}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <ChevronRight className="w-5 h-5 text-slate-700" />
+                    
+                    {!isExpired(recurrence) && (
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => handleToggleActive(recurrence.id)}
+                          className={`p-2 rounded-xl transition-all ${recurrence.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
+                          title={recurrence.isActive ? 'Pausar' : 'Ativar'}
+                        >
+                          <RefreshCw className={`w-5 h-5 ${!recurrence.isActive ? 'animate-pulse' : ''}`} />
+                        </button>
+                        <button 
+                          onClick={() => handleCancel(recurrence.id)}
+                          className="p-2 hover:bg-red-500/10 text-slate-600 hover:text-red-400 rounded-xl transition-all"
+                          title="Cancelar Definitivamente"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               ))}

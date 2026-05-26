@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity, Target, FileDown, FileSpreadsheet } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface DashboardOverview {
   total_balance: number;
@@ -35,20 +36,29 @@ interface SavingsGoal {
 }
 
 export const DashboardPage = () => {
+  const { showToast } = useToast();
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [expensesByCategory, setExpensesByCategory] = useState<ExpenseByCategory[]>([]);
   const [evolution, setEvolution] = useState<MonthlyEvolution[]>([]);
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [start_date, setStartDate] = useState<string>('');
+  const [end_date, setEndDate] = useState<string>('');
+  const [active_preset, setActivePreset] = useState('month');
 
   useEffect(() => {
     loadDashboardData();
-  }, []);
+  }, [start_date, end_date]);
 
   const loadDashboardData = async () => {
     try {
+      const params = {
+        start_date: start_date || undefined,
+        end_date: end_date || undefined,
+      };
+
       const [overviewRes, expensesRes, evolutionRes, goalsRes] = await Promise.all([
-        api.get('/reports/overview'),
+        api.get('/reports/overview', { params }),
         api.get('/reports/expenses-by-category'),
         api.get('/reports/evolution'),
         api.get('/savings-goals'),
@@ -56,11 +66,58 @@ export const DashboardPage = () => {
       setOverview(overviewRes.data.data);
       setExpensesByCategory(expensesRes.data.data);
       setEvolution(evolutionRes.data.data);
-      setGoals(goalsRes.data.data.slice(0, 3)); // Mostrar apenas as 3 primeiras
+      setGoals(goalsRes.data.data.slice(0, 3));
     } catch (error) {
-      console.error('Erro ao carregar dashboard', error);
+      showToast('Erro ao carregar dashboard', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePresetChange = (preset: string) => {
+    setActivePreset(preset);
+    const now = new Date();
+    let start = '';
+    let end = '';
+
+    switch (preset) {
+      case '7days':
+        start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      case '30days':
+        start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      case 'month':
+        start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        break;
+      case 'custom':
+        return; // Don't update yet
+    }
+
+    setStartDate(start);
+    setEndDate(end); // Empty means "until now" or default
+  };
+
+  const handleExport = async (format: 'pdf' | 'excel') => {
+    try {
+      const response = await api.get('/reports/export', {
+        params: {
+          format,
+          start_date: start_date || undefined,
+          end_date: end_date || undefined,
+        },
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `relatorio.${format === 'pdf' ? 'pdf' : 'xlsx'}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      showToast('Erro ao exportar', 'error');
     }
   };
 
@@ -82,10 +139,77 @@ export const DashboardPage = () => {
 
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-        <p className="text-slate-400">Bem-vindo de volta! Aqui está o resumo das suas finanças.</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+          <p className="text-slate-400">Bem-vindo de volta! Aqui está o resumo das suas finanças.</p>
+        </div>
+
+        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+          {[
+            { id: 'month', label: 'Este Mês' },
+            { id: '7days', label: '7 dias' },
+            { id: '30days', label: '30 dias' },
+            { id: 'custom', label: 'Personalizado' },
+          ].map((preset) => (
+            <button
+              key={preset.id}
+              onClick={() => handlePresetChange(preset.id)}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                active_preset === preset.id 
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleExport('pdf')}
+            className="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/10 flex items-center gap-2 transition-all"
+          >
+            <FileDown className="w-4 h-4 text-red-400" />
+            PDF
+          </button>
+          <button
+            onClick={() => handleExport('excel')}
+            className="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/10 flex items-center gap-2 transition-all"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            Excel
+          </button>
+        </div>
       </div>
+
+      {active_preset === 'custom' && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex gap-4 mb-8 p-4 bg-white/5 border border-white/10 rounded-2xl items-end"
+        >
+          <div className="space-y-1">
+            <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500 ml-1">Início</label>
+            <input 
+              type="date" 
+              value={start_date}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="bg-slate-800 border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500 ml-1">Fim</label>
+            <input 
+              type="date" 
+              value={end_date}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="bg-slate-800 border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            />
+          </div>
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Saldo Total */}

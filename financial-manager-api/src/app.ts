@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 import fastify, { FastifyInstance } from 'fastify';
 import fastifyJwt from '@fastify/jwt';
+import fastifyCors from '@fastify/cors';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import multipart from '@fastify/multipart';
@@ -20,6 +21,13 @@ const app: FastifyInstance = fastify({
 container.registerInstance<FastifyInstance>('Fastify', app);
 
 // Plugins
+app.register(fastifyCors, {
+  origin: process.env.NODE_ENV === 'production'
+    ? (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean)
+    : ['http://localhost:5173'],
+  credentials: true,
+});
+
 app.register(fastifyJwt, {
   secret: process.env.JWT_SECRET || 'secret',
 });
@@ -57,6 +65,7 @@ import { categoryRoutes } from '@/modules/categories/routes';
 import { recurrenceRoutes } from '@/modules/recurrences/routes';
 import { reportRoutes } from '@/modules/reports/routes';
 import { savingsGoalRoutes } from '@/modules/savings-goals/routes';
+import { notificationRoutes } from '@/modules/notifications/routes';
 
 app.register(authRoutes, { prefix: '/api/v1/auth' });
 app.register(profileRoutes, { prefix: '/api/v1/profile' });
@@ -66,6 +75,7 @@ app.register(categoryRoutes, { prefix: '/api/v1/categories' });
 app.register(recurrenceRoutes, { prefix: '/api/v1/recurrences' });
 app.register(reportRoutes, { prefix: '/api/v1/reports' });
 app.register(savingsGoalRoutes, { prefix: '/api/v1/savings-goals' });
+app.register(notificationRoutes, { prefix: '/api/v1/notifications' });
 
 // Health Check
 app.get('/health', async () => {

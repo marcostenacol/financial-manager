@@ -7,6 +7,14 @@ import { CacheTrait } from '@/base/traits/CacheTrait';
 import { AuthRepositoryInterface } from '../repositories/contracts/AuthRepositoryInterface';
 import { LoginDTOType } from '../dtos/LoginDTO';
 
+interface UserWithRelations {
+  id: string;
+  email: string;
+  password: string;
+  role: { slug: string };
+  profile?: { name?: string | null } | null;
+}
+
 interface LoginResponse {
   user: {
     id: string;
@@ -29,7 +37,7 @@ export class LoginService {
   ) {}
 
   async execute(data: LoginDTOType): Promise<LoginResponse> {
-    const user = await this.auth_repository.findByEmail(data.email);
+    const user = await this.auth_repository.findByEmail(data.email) as UserWithRelations | null;
 
     if (!user) {
       throw new AppError('E-mail ou senha incorretos', 401);
@@ -43,14 +51,14 @@ export class LoginService {
 
     // Gerar Access Token (JWT)
     const token = this.fastify.jwt.sign(
-      { role: 'user' },
+      { role: user.role.slug },
       { sub: user.id, expiresIn: '15m' }, // Token curto: 15 min
     );
 
     // Gerar Refresh Token
     const refresh_token = crypto.randomBytes(40).toString('hex');
     const expires_at = new Date();
-    expires_at.setDate(expires_at.getDate() + 30); // Expira em 30 dias
+    expires_at.setDate(expires_at.getDate() + 7); // Expira em 7 dias
 
     await this.auth_repository.createRefreshToken(user.id, refresh_token, expires_at);
 
@@ -61,7 +69,7 @@ export class LoginService {
       user: {
         id: user.id,
         email: user.email,
-        name: (user as any).profile?.name || 'Usuário',
+        name: user.profile?.name || 'Usuário',
       },
       token,
       refresh_token,

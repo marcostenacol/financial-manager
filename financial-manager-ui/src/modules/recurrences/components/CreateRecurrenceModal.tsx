@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, RefreshCw, Calendar, Wallet as WalletIcon, Tag, Clock, FileText } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Wallet {
   id: string;
@@ -20,6 +21,7 @@ interface CreateRecurrenceModalProps {
 }
 
 export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecurrenceModalProps) => {
+  const { showToast } = useToast();
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState<'income' | 'expense'>('expense');
@@ -50,7 +52,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
       if (walletsRes.data.data.length > 0) setWalletId(walletsRes.data.data[0].id);
       if (categoriesRes.data.data.length > 0) setCategoryId(categoriesRes.data.data[0].id);
     } catch (error) {
-      console.error('Erro ao carregar dados', error);
+      showToast('Erro ao carregar dados', 'error');
     }
   };
 
@@ -72,7 +74,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Erro ao criar recorrência', error);
+      showToast('Erro ao criar recorrência', 'error');
     } finally {
       setLoading(false);
     }

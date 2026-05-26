@@ -4,6 +4,7 @@ import { Plus, Tag, Palette, ArrowUpCircle, ArrowDownCircle, Trash2, Edit2, More
 import { api } from '../../../services/api';
 import { CreateCategoryModal } from '../components/CreateCategoryModal';
 import { UpdateCategoryModal } from '../components/UpdateCategoryModal';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Category {
   id: string;
@@ -15,6 +16,7 @@ interface Category {
 }
 
 export const CategoriesPage = () => {
+  const { showToast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,7 +37,7 @@ export const CategoriesPage = () => {
       const response = await api.get('/categories');
       setCategories(response.data.data);
     } catch (error) {
-      console.error('Erro ao carregar categorias', error);
+      showToast('Erro ao carregar categorias', 'error');
     } finally {
       setLoading(false);
     }

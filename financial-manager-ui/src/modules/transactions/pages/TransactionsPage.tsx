@@ -8,13 +8,16 @@ import {
   ArrowDownCircle, 
   Calendar,
   Wallet as WalletIcon,
-  Tag,
+  RefreshCw,
   ChevronRight,
-  MoreVertical
+  Download
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateTransactionModal } from '../components/CreateTransactionModal';
 import { UpdateTransactionModal } from '../components/UpdateTransactionModal';
+import { AdvancedFiltersModal } from '../components/AdvancedFiltersModal';
+import { TransactionDetailModal } from '../components/TransactionDetailModal';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Transaction {
   id: string;
@@ -23,40 +26,104 @@ interface Transaction {
   type: 'income' | 'expense' | 'transfer';
   status: 'pending' | 'completed' | 'cancelled';
   occurredAt: string;
+  createdAt: string;
   category?: { name: string; color: string };
   wallet?: { name: string };
   walletId: string;
   categoryId?: string;
+  recurrenceId?: string | null;
+  recurrence?: {
+    period: string;
+  };
 }
 
 export const TransactionsPage = () => {
+  const { showToast } = useToast();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [perPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState({});
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+
+  // Debounce para busca
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Volta para a primeira página ao buscar
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     loadTransactions();
-  }, [filterType]);
+  }, [filterType, debouncedSearch, page, advancedFilters]);
 
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const params = filterType !== 'all' ? { type: filterType } : {};
+      const params = {
+        page,
+        per_page: perPage,
+        ...(filterType !== 'all' ? { type: filterType } : {}),
+        ...(debouncedSearch ? { search: debouncedSearch } : {}),
+        ...advancedFilters
+      };
+      
       const response = await api.get('/transactions', { params });
-      setTransactions(response.data.data);
+      setTransactions(response.data.data.transactions);
+      setTotal(response.data.data.total);
     } catch (error) {
-      console.error('Erro ao carregar transações', error);
+      showToast('Erro ao carregar transações', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (transaction: Transaction) => {
+  const handleExport = async () => {
+    try {
+      const response = await api.get('/transactions/export', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'transacoes.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      showToast('Erro ao exportar transações', 'error');
+    }
+  };
+
+  const handleShowDetail = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleEdit = () => {
+    setIsDetailModalOpen(false);
     setIsUpdateModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedTransaction || !window.confirm('Tem certeza que deseja excluir esta transação?')) return;
+
+    try {
+      await api.delete(`/transactions/${selectedTransaction.id}`);
+      setIsDetailModalOpen(false);
+      loadTransactions();
+    } catch (error) {
+      showToast('Erro ao excluir transação', 'error');
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -97,6 +164,14 @@ export const TransactionsPage = () => {
           </div>
 
           <button 
+            onClick={handleExport}
+            className="bg-white/5 hover:bg-white/10 text-white p-3 rounded-2xl border border-white/10 transition-all active:scale-95"
+            title="Exportar CSV"
+          >
+            <Download className="w-6 h-6 text-blue-400" />
+          </button>
+
+          <button 
             onClick={() => setIsModalOpen(true)}
             className="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/20"
           >
@@ -112,16 +187,54 @@ export const TransactionsPage = () => {
           <input 
             type="text" 
             placeholder="Buscar por descrição..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
           />
         </div>
-        <button className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-slate-300 hover:bg-white/10 transition-all font-medium">
+        <button 
+          onClick={() => setIsFiltersModalOpen(true)}
+          className={`flex items-center justify-center gap-2 border rounded-2xl py-4 px-6 transition-all font-medium ${
+            Object.keys(advancedFilters).length > 0 
+              ? 'bg-blue-600/20 border-blue-500 text-blue-400' 
+              : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+          }`}
+        >
           <Filter className="w-5 h-5" />
           Filtros Avançados
+          {Object.keys(advancedFilters).length > 0 && (
+            <span className="w-5 h-5 bg-blue-600 text-white text-[10px] rounded-full flex items-center justify-center">
+              {Object.keys(advancedFilters).length}
+            </span>
+          )}
         </button>
       </div>
 
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+            Mostrando {transactions.length} de {total} transações
+          </span>
+          <div className="flex items-center gap-2">
+            <button 
+              disabled={page === 1 || loading}
+              onClick={() => setPage(page - 1)}
+              className="p-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+            >
+              Anterior
+            </button>
+            <span className="text-white font-bold px-3 py-1 bg-blue-600/20 border border-blue-500/30 rounded-lg text-sm">
+              {page}
+            </span>
+            <button 
+              disabled={page * perPage >= total || loading}
+              onClick={() => setPage(page + 1)}
+              className="p-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+            >
+              Próximo
+            </button>
+          </div>
+        </div>
         {loading ? (
           <div className="p-8 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -136,7 +249,7 @@ export const TransactionsPage = () => {
                   key={transaction.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  onClick={() => handleEdit(transaction)}
+                  onClick={() => handleShowDetail(transaction)}
                   className="p-6 flex items-center justify-between group hover:bg-white/[0.02] transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
@@ -145,7 +258,14 @@ export const TransactionsPage = () => {
                     </div>
                     
                     <div>
-                      <h3 className="text-white font-bold group-hover:text-blue-400 transition-colors">{transaction.description}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-white font-bold group-hover:text-blue-400 transition-colors">{transaction.description}</h3>
+                        {transaction.recurrenceId && (
+                          <span title="Transação Recorrente">
+                            <RefreshCw className="w-3 h-3 text-blue-400" />
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-3 mt-1">
                         <span className="flex items-center gap-1 text-xs text-slate-500 font-medium bg-white/5 px-2 py-1 rounded-lg">
                           <Calendar className="w-3 h-3" />
@@ -199,6 +319,24 @@ export const TransactionsPage = () => {
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
         onSuccess={loadTransactions}
+        transaction={selectedTransaction}
+      />
+
+      <AdvancedFiltersModal 
+        isOpen={isFiltersModalOpen}
+        onClose={() => setIsFiltersModalOpen(false)}
+        onApply={(filters) => {
+          setAdvancedFilters(filters);
+          setPage(1);
+        }}
+        currentFilters={advancedFilters}
+      />
+
+      <TransactionDetailModal 
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
         transaction={selectedTransaction}
       />
     </div>

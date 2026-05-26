@@ -6,6 +6,7 @@ import { CreateWalletModal } from '../components/CreateWalletModal';
 import { UpdateWalletModal } from '../components/UpdateWalletModal';
 import { CreateTransferModal } from '../../transactions/components/CreateTransferModal';
 import { ArrowRightLeft } from 'lucide-react';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Wallet {
   id: string;
@@ -16,6 +17,7 @@ interface Wallet {
 }
 
 export const WalletsPage = () => {
+  const { showToast } = useToast();
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,7 +39,7 @@ export const WalletsPage = () => {
       const response = await api.get('/wallets');
       setWallets(response.data.data);
     } catch (error) {
-      console.error('Erro ao carregar carteiras', error);
+      showToast('Erro ao carregar carteiras', 'error');
     } finally {
       setLoading(false);
     }
