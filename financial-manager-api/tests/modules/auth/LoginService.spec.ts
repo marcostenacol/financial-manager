@@ -50,6 +50,7 @@ describe('LoginService', () => {
       name: 'John Doe',
       email: credentials.email,
       password: hashedPassword,
+      role: { slug: 'admin' },
     } as any);
 
     vi.spyOn(authRepository, 'createRefreshToken').mockResolvedValue({
@@ -75,6 +76,7 @@ describe('LoginService', () => {
       id: 'user-id',
       email: credentials.email,
       password: 'hashed-password',
+      role: { slug: 'admin' },
     } as any);
 
     vi.mocked(compare).mockResolvedValue(false as never);

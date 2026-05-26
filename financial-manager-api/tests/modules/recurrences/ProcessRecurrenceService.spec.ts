@@ -4,12 +4,14 @@ import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositorie
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CreateNotificationService } from '@/modules/notifications/services/CreateNotificationService';
 
 describe('ProcessRecurrenceService', () => {
   let recurrenceRepository: RecurrenceRepositoryInterface;
   let transactionRepository: TransactionRepositoryInterface;
   let walletRepository: WalletRepositoryInterface;
   let cacheTrait: CacheTrait;
+  let createNotificationService: CreateNotificationService;
   let processRecurrenceService: ProcessRecurrenceService;
 
   beforeEach(() => {
@@ -31,10 +33,15 @@ describe('ProcessRecurrenceService', () => {
       del: vi.fn(),
     } as any;
 
+    createNotificationService = {
+      execute: vi.fn(),
+    } as any;
+
     processRecurrenceService = new ProcessRecurrenceService(
       recurrenceRepository,
       transactionRepository,
       walletRepository,
+      createNotificationService,
       cacheTrait
     );
   });

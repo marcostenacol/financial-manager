@@ -48,6 +48,7 @@ model User {
    profile         Profile?
    wallets         Wallet[]
    savingsGoals    SavingsGoal[]
+   notifications   Notification[]
  
    @@map("users")
  }
@@ -171,6 +172,7 @@ model Recurrence {
   startsAt        DateTime  @map("starts_at")
   endsAt          DateTime? @map("ends_at")
   lastProcessedAt DateTime? @map("last_processed_at")
+  isActive        Boolean   @default(true) @map("is_active")
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -197,4 +199,18 @@ model Recurrence {
    user User @relation(fields: [userId], references: [id])
  
    @@map("savings_goals")
+ }
+ 
+ model Notification {
+   id        String    @id @default(uuid())
+   userId    String    @map("user_id")
+   title     String
+   message   String
+   type      String    // info, success, warning, error
+   readAt    DateTime? @map("read_at")
+   createdAt DateTime  @default(now()) @map("created_at")
+ 
+   user User @relation(fields: [userId], references: [id])
+ 
+   @@map("notifications")
  }

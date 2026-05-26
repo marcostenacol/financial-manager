@@ -11,15 +11,15 @@ export class GetDashboardOverviewService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string): Promise<DashboardOverviewData> {
-    const cacheKey = `reports:overview:${userId}`;
+  async execute(user_id: string, start_date?: Date, end_date?: Date): Promise<DashboardOverviewData> {
+    const cacheKey = `reports:overview:${user_id}:${start_date?.toISOString()}:${end_date?.toISOString()}`;
     
     const cached = await this.cache.get<DashboardOverviewData>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    const data = await this.reportRepository.getDashboardOverview(userId);
+    const data = await this.reportRepository.getDashboardOverview(user_id, start_date, end_date);
 
     // Cache curto para dashboard (5 minutos)
     await this.cache.set(cacheKey, data, 300);

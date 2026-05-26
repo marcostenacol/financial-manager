@@ -24,6 +24,7 @@
 | Estrutura de pastas (`api/`, `ui/`, `prisma/`, `tests/`, `api/docker/`, `ui/docker/`) | ✅ | |
 | `package.json` + `tsconfig.json` | ✅ | |
 | Docker (Node, Nginx, Redis, PostgreSQL 16) | ✅ | |
+| Makefiles (Root, API, UI) | ✅ | Orquestração de comandos |
 | `prisma/schema.prisma` — todas as tabelas | ✅ | |
 | Migration inicial | ⬜ | Requer DB rodando |
 | `src/app.ts` + `src/server.ts` | ✅ | Inicializados com Fastify |
@@ -33,9 +34,11 @@
 | `CacheTrait.ts` | ✅ | |
 | `RedisClient.ts` | ✅ | |
 | `AppError.ts` + `ErrorHandler.ts` | ✅ | |
-| `AuthMiddleware.ts` | ✅ | |
-| `PermissionMiddleware.ts` | ⬜ | |
-| Container de DI (tsyringe) | ✅ | Configuração inicial |
+| `AuthMiddleware.ts` | ✅ | Verificação de cache inicial |
+| `PermissionMiddleware.ts` | ✅ | RBAC por roles |
+| Container de DI (tsyringe) | ✅ | Registro global de serviços |
+| Validação de DTOs nos Controllers | ✅ | Todos os módulos usando Zod |
+| Invalidação de Cache (Wildcards) | ✅ | Usando `delPattern` em Transações |
 | Swagger (fastify-swagger) | ✅ | Configurado no app.ts |
 | `.agents/` com documentação de padrões | ✅ | |
 
@@ -87,8 +90,9 @@
 ### Frontend
 | Item | Status | Observação |
 |------|--------|------------|
-| Página de Perfil | ✅ | Design Premium + Layout |
+| Página de Perfil | ✅ | Sincronizada com Bio e Type |
 | Upload de Avatar | ✅ | Frontend + Backend Multipart |
+| Sincronização AuthContext | ✅ | Usando `updateUser` no sucesso |
 
 ---
 
@@ -147,8 +151,10 @@
 | Listagem de Transações | ✅ | Filtros Rápidos + Design Premium |
 | Modal Nova Transação | ✅ | Entrada/Saída + Seleção de Carteira |
 | Modal de Transferência | ✅ | Seleção de origem/destino e categoria |
-| Edição/Exclusão | ✅ | Modal de edição e remoção atômica |
-| Detalhes da Transação | ⬜ | |
+| Detalhes da Transação | ✅ | Visualização rica e detalhada |
+| Busca em Tempo Real | ✅ | Integração com API (Search) |
+| Filtros Avançados | ✅ | Data, Categoria, Status, Carteira |
+| Paginação de Resultados | ✅ | Suporte a grandes volumes de dados |
 
 ---
 
@@ -187,8 +193,8 @@
 | `RecurrenceRepository.ts` | ✅ | |
 | `CreateRecurrenceService.ts` | ✅ | |
 | `ListRecurrencesService.ts` | ✅ | |
-| `ProcessRecurrenceService.ts` | ⬜ | Job node-cron |
-| `CancelRecurrenceService.ts` | ⬜ | |
+| `ProcessRecurrenceService.ts` | ✅ | Job node-cron implementado |
+| `CancelRecurrenceService.ts` | ✅ | |
 | `RecurrenceController.ts` | ✅ | |
 | `recurrence/routes.ts` | ✅ | |
 | Testes recurrence | ✅ | Create Service |
@@ -198,7 +204,8 @@
 |------|--------|------------|
 | Listagem de Recorrências | ✅ | Cards com periodicidade |
 | Modal Criar/Editar | ✅ | Seleção de período |
-| Toggle Ativar/Desativar | ⬜ | |
+| Toggle Ativar/Desativar | ✅ | Pausar sem encerrar o ciclo |
+| Cancelamento de Recorrência | ✅ | Implementado via PATCH |
 
 ---
 
@@ -221,6 +228,7 @@
 |------|--------|------------|
 | Página de Metas | ✅ | Progress Bars Animadas |
 | Modal Criar/Editar | ✅ | Seletor de Cores |
+| Lógica de Edição/Exclusão de Metas | ✅ | Integrado com Backend |
 | Widget no Dashboard | ✅ | Resumo visual de progresso |
 
 ---
@@ -243,7 +251,21 @@
 | Dashboard (Widgets) | ✅ | Saldo, Receita, Despesa |
 | Gráfico de Gastos por Categoria | ✅ | Barras de Progresso Animadas |
 | Gráfico de Evolução Mensal | ✅ | AreaChart (Recharts) |
-| Filtros de Relatórios | ⬜ | |
+| Filtros por Período no Dashboard | ✅ | Global para todos os widgets |
+| Exportação de Relatórios (PDF/Excel) | ✅ | Backend + Frontend |
 
 > [!IMPORTANT]
 > **Dashboard Overview**: A página inicial do sistema deve integrar todos os widgets de relatórios (Saldo Total, Evolução Mensal e Gastos por Categoria) utilizando as CTEs otimizadas.
+## 🔔 Módulo Notifications
+| Item | Status | Observação |
+|------|--------|------------|
+| Tabela `notifications` no schema | ✅ | Incluída relação com User |
+| Central de Notificações (UI) | ✅ | Sino na Sidebar com Dropdown |
+| Gatilhos de Alerta (Saldo, Metas) | ✅ | Iniciado com Recorrências |
+
+---
+
+## 🧪 Qualidade
+| Item | Status | Observação |
+|------|--------|------------|
+| Testes Unitários (> 80%) | 🚧 | Foco em Backend |

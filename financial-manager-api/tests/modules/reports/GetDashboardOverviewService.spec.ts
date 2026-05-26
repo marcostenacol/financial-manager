@@ -55,6 +55,6 @@ describe('GetDashboardOverviewService', () => {
     const result = await getDashboardOverviewService.execute(userId);
 
     expect(result).toEqual(dbData);
-    expect(cacheTrait.set).toHaveBeenCalledWith(`reports:overview:${userId}`, dbData, 300);
+    expect(cacheTrait.set).toHaveBeenCalledWith(`reports:overview:${userId}:undefined:undefined`, dbData, 300);
   });
 });

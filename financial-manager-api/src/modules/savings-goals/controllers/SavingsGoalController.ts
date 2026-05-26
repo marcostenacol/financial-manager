@@ -5,6 +5,8 @@ import { CreateSavingsGoalService } from '../services/CreateSavingsGoalService';
 import { ListSavingsGoalsService } from '../services/ListSavingsGoalsService';
 import { UpdateSavingsGoalService } from '../services/UpdateSavingsGoalService';
 import { DeleteSavingsGoalService } from '../services/DeleteSavingsGoalService';
+import { CreateSavingsGoalSchema } from '../dtos/ICreateSavingsGoalDTO';
+import { UpdateSavingsGoalSchema } from '../dtos/IUpdateSavingsGoalDTO';
 
 @injectable()
 export class SavingsGoalController extends BaseController {
@@ -24,7 +26,7 @@ export class SavingsGoalController extends BaseController {
   }
 
   async store(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const data = request.body as any;
+    const data = CreateSavingsGoalSchema.parse(request.body);
     const userId = (request.user as any).sub;
     const goal = await this.createGoal.execute(data, userId);
     return this.success(reply, goal, 'Meta criada com sucesso', 201);
@@ -32,7 +34,7 @@ export class SavingsGoalController extends BaseController {
 
   async update(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
-    const data = request.body as any;
+    const data = UpdateSavingsGoalSchema.parse(request.body);
     const userId = (request.user as any).sub;
     const goal = await this.updateGoal.execute(id, data, userId);
     return this.success(reply, goal, 'Meta atualizada com sucesso');

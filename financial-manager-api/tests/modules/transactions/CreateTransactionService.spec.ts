@@ -24,6 +24,7 @@ describe('CreateTransactionService', () => {
 
     cacheTrait = {
       del: vi.fn(),
+      delPattern: vi.fn(),
     } as any;
 
     createTransactionService = new CreateTransactionService(transactionRepository, walletRepository, cacheTrait);

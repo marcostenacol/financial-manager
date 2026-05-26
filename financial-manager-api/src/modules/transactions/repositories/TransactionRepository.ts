@@ -30,6 +30,7 @@ export class TransactionRepository implements TransactionRepositoryInterface {
       include: {
         category: true,
         wallet: true,
+        recurrence: true,
       },
     });
   }
@@ -49,21 +50,31 @@ export class TransactionRepository implements TransactionRepositoryInterface {
     });
   }
 
-  async findByUserId(userId: string, filters?: any): Promise<Transaction[]> {
-    return prisma.transaction.findMany({
-      where: {
-        wallet: {
-          userId,
+  async findByUserId(userId: string, options?: { where?: any, take?: number, skip?: number }): Promise<{ data: Transaction[], total: number }> {
+    const where = {
+      wallet: {
+        userId,
+      },
+      ...(options?.where || {}),
+    };
+
+    const [data, total] = await prisma.$transaction([
+      prisma.transaction.findMany({
+        where,
+        include: {
+          category: true,
+          wallet: true,
+          recurrence: true,
         },
-        ...filters,
-      },
-      include: {
-        category: true,
-        wallet: true,
-      },
-      orderBy: {
-        occurredAt: 'desc',
-      },
-    });
+        orderBy: {
+          occurredAt: 'desc',
+        },
+        take: options?.take,
+        skip: options?.skip,
+      }),
+      prisma.transaction.count({ where }),
+    ]);
+
+    return { data, total };
   }
 }

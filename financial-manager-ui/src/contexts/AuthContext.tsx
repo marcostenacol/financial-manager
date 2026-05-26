@@ -6,6 +6,8 @@ interface User {
   name: string;
   email: string;
   avatar?: string;
+  type?: 'personal' | 'business';
+  bio?: string;
 }
 
 interface AuthContextData {

@@ -8,6 +8,11 @@ interface Filters {
   category_id?: string;
   start_date?: string;
   end_date?: string;
+  type?: 'income' | 'expense' | 'transfer';
+  status?: 'pending' | 'completed' | 'cancelled';
+  search?: string;
+  page?: number;
+  per_page?: number;
 }
 
 @injectable()
@@ -19,18 +24,27 @@ export class ListTransactionsService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, filters: Filters): Promise<Transaction[]> {
+  async execute(userId: string, filters: Filters): Promise<{ transactions: Transaction[], total: number }> {
     const cacheKey = `transactions:user:${userId}:${JSON.stringify(filters)}`;
     
-    const cachedTransactions = await this.cache.get<Transaction[]>(cacheKey);
-    if (cachedTransactions) {
-      return cachedTransactions;
+    const cached = await this.cache.get<{ transactions: Transaction[], total: number }>(cacheKey);
+    if (cached) {
+      return cached;
     }
 
     const prismaFilters: any = {};
 
     if (filters.category_id) prismaFilters.categoryId = filters.category_id;
     if (filters.wallet_id) prismaFilters.walletId = filters.wallet_id;
+    if (filters.type) prismaFilters.type = filters.type;
+    if (filters.status) prismaFilters.status = filters.status;
+    
+    if (filters.search) {
+      prismaFilters.description = {
+        contains: filters.search,
+        mode: 'insensitive',
+      };
+    }
     
     if (filters.start_date || filters.end_date) {
       prismaFilters.occurredAt = {};
@@ -38,10 +52,19 @@ export class ListTransactionsService {
       if (filters.end_date) prismaFilters.occurredAt.lte = new Date(filters.end_date);
     }
 
-    const transactions = await this.transactionRepository.findByUserId(userId, prismaFilters);
+    const page = Number(filters.page) || 1;
+    const perPage = Number(filters.per_page) || 10;
 
-    await this.cache.set(cacheKey, transactions);
+    const { data: transactions, total } = await this.transactionRepository.findByUserId(userId, {
+      where: prismaFilters,
+      take: perPage,
+      skip: (page - 1) * perPage,
+    });
 
-    return transactions;
+    const result = { transactions, total };
+
+    await this.cache.set(cacheKey, result);
+
+    return result;
   }
 }

@@ -12,6 +12,7 @@ const pump = promisify(pipeline);
 import { UpdateProfileService } from '../services/UpdateProfileService';
 import { ChangeProfileTypeService } from '../services/ChangeProfileTypeService';
 import { UpdateAvatarService } from '../services/UpdateAvatarService';
+import { UpdateProfileSchema, ChangeProfileTypeSchema } from '../dtos/ProfileDTO';
 
 @injectable()
 export class ProfileController extends BaseController {
@@ -30,7 +31,7 @@ export class ProfileController extends BaseController {
   }
 
   async update(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const data = request.body as any;
+    const data = UpdateProfileSchema.parse(request.body);
     const profile = await this.update_profile.execute({
       user_id: (request.user as any).sub,
       ...data,
@@ -39,7 +40,7 @@ export class ProfileController extends BaseController {
   }
 
   async changeType(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { type } = request.body as { type: 'personal' | 'business' };
+    const { type } = ChangeProfileTypeSchema.parse(request.body);
     const profile = await this.change_type.execute((request.user as any).sub, type);
     return this.success(reply, profile, 'Tipo de perfil alterado com sucesso');
   }

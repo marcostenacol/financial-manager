@@ -23,9 +23,9 @@ describe('ListTransactionsService', () => {
 
   it('should return transactions from cache if available', async () => {
     const userId = 'user-1';
-    const cachedData = { 
-      data: [{ id: 'tx-1', description: 'Test' }],
-      meta: { total: 1, page: 1, last_page: 1 }
+    const cachedData = {
+      transactions: [{ id: 'tx-1', description: 'Test' }] as any,
+      total: 1
     };
 
     vi.spyOn(cacheTrait, 'get').mockResolvedValue(cachedData);
@@ -38,17 +38,17 @@ describe('ListTransactionsService', () => {
 
   it('should return transactions from repository and set cache if not available', async () => {
     const userId = 'user-1';
-    const dbData = { 
-      data: [{ id: 'tx-1', description: 'Test' }],
-      meta: { total: 1, page: 1, last_page: 1 }
+    const dbData = {
+      data: [{ id: 'tx-1', description: 'Test' }] as any,
+      total: 1
     };
 
     vi.spyOn(cacheTrait, 'get').mockResolvedValue(null);
-    vi.spyOn(transactionRepository, 'findByUserId').mockResolvedValue(dbData as any);
+    vi.spyOn(transactionRepository, 'findByUserId').mockResolvedValue(dbData);
 
     const result = await listTransactionsService.execute(userId, {});
 
-    expect(result).toEqual(dbData);
+    expect(result).toEqual({ transactions: dbData.data, total: dbData.total });
     expect(cacheTrait.set).toHaveBeenCalled();
   });
 });

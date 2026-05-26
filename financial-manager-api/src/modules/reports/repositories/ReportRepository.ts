@@ -4,14 +4,17 @@ import { injectable } from 'tsyringe';
 
 @injectable()
 export class ReportRepository implements ReportRepositoryInterface {
-  async getDashboardOverview(userId: string): Promise<DashboardOverviewData> {
+  async getDashboardOverview(user_id: string, start_date?: Date, end_date?: Date): Promise<DashboardOverviewData> {
+    const final_start_date = start_date || new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const final_end_date = end_date || new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
+
     const results = await prisma.$queryRawUnsafe<any[]>(`
       WITH wallet_stats AS (
         SELECT COALESCE(SUM(balance), 0) as total_balance
         FROM wallets
         WHERE user_id = $1
       ),
-      monthly_stats AS (
+      current_period_stats AS (
         SELECT 
           COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as income,
           COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as expense
@@ -19,8 +22,8 @@ export class ReportRepository implements ReportRepositoryInterface {
         JOIN wallets w ON t.wallet_id = w.id
         WHERE w.user_id = $1
           AND status = 'completed'
-          AND occurred_at >= date_trunc('month', now())
-          AND occurred_at < date_trunc('month', now() + interval '1 month')
+          AND occurred_at >= $2
+          AND occurred_at < $3
       ),
       last_month_stats AS (
         SELECT 
@@ -35,12 +38,12 @@ export class ReportRepository implements ReportRepositoryInterface {
       )
       SELECT 
         w.total_balance,
-        m.income as monthly_income,
-        m.expense as monthly_expense,
+        cp.income as monthly_income,
+        cp.expense as monthly_expense,
         l.income as last_month_income,
         l.expense as last_month_expense
-      FROM wallet_stats w, monthly_stats m, last_month_stats l
-    `, userId);
+      FROM wallet_stats w, current_period_stats cp, last_month_stats l
+    `, user_id, final_start_date, final_end_date);
 
     const data = results[0];
 

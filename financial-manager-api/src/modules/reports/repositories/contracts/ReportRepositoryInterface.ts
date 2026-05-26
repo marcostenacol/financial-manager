@@ -21,7 +21,7 @@ export interface MonthlyEvolutionData {
 }
 
 export interface ReportRepositoryInterface {
-  getDashboardOverview(userId: string): Promise<DashboardOverviewData>;
+  getDashboardOverview(user_id: string, start_date?: Date, end_date?: Date): Promise<DashboardOverviewData>;
   getExpensesByCategory(userId: string, month: number, year: number): Promise<ExpenseByCategoryData[]>;
   getMonthlyEvolution(userId: string): Promise<MonthlyEvolutionData[]>;
 }

@@ -28,8 +28,13 @@ export class CreateTransactionService {
     }
 
     const transaction = await this.transactionRepository.create({
-      ...data,
-      occurredAt: new Date(data.occurred_at),
+      description: data.description,
+      amount: data.amount,
+      type: data.type,
+      status: data.status,
+      walletId: data.wallet_id,
+      categoryId: data.category_id,
+      occurredAt: new Date(data.occurred_at || new Date()),
     });
 
     // Se a transação estiver concluída, atualiza o saldo da carteira
@@ -40,7 +45,7 @@ export class CreateTransactionService {
         : Number(wallet.balance) - amount;
 
       await this.walletRepository.update(wallet.id, {
-        balance: newBalance,
+        balance: newBalance as any,
       });
 
       // Invalida cache da carteira e lista de carteiras
@@ -48,9 +53,9 @@ export class CreateTransactionService {
       await this.cache.del(`wallets:user:${userId}`);
     }
 
-    // Invalida cache de transações
-    await this.cache.del(`transactions:wallet:${wallet.id}`);
-    await this.cache.del(`transactions:user:${userId}`);
+    // Invalida cache de transações (incluindo listagens filtradas)
+    await this.cache.delPattern(`transactions:wallet:${wallet.id}*`);
+    await this.cache.delPattern(`transactions:user:${userId}*`);
 
     return transaction;
   }

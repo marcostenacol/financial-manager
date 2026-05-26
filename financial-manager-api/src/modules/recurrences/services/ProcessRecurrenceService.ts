@@ -6,6 +6,7 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CreateNotificationService } from '@/modules/notifications/services/CreateNotificationService';
 
 @injectable()
 export class ProcessRecurrenceService {
@@ -18,6 +19,9 @@ export class ProcessRecurrenceService {
 
     @inject('WalletRepository')
     private walletRepository: WalletRepositoryInterface,
+
+    @inject('CreateNotificationService')
+    private createNotification: CreateNotificationService,
 
     private cache: CacheTrait,
   ) {}
@@ -81,5 +85,15 @@ export class ProcessRecurrenceService {
     await this.recurrenceRepository.update(recurrence.id, {
       lastProcessedAt: now,
     });
+
+    // 4. Notificar usuário
+    if (wallet) {
+      await this.createNotification.execute({
+        userId: wallet.userId,
+        title: 'Recorrência Processada',
+        message: `Sua recorrência "${recurrence.description}" no valor de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(recurrence.amount))} foi processada com sucesso.`,
+        type: 'success',
+      });
+    }
   }
 }

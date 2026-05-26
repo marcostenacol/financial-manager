@@ -6,5 +6,5 @@ export interface TransactionRepositoryInterface {
   delete(id: string): Promise<void>;
   findById(id: string): Promise<Transaction | null>;
   findAllByWalletId(walletId: string, filters?: any): Promise<Transaction[]>;
-  findByUserId(userId: string, filters?: any): Promise<Transaction[]>;
+  findByUserId(userId: string, options?: { where?: any, take?: number, skip?: number }): Promise<{ data: Transaction[], total: number }>;
 }

@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { NotificationBell } from '../../modules/notifications/components/NotificationBell';
 
 export const Sidebar = () => {
   const { signOut, user } = useAuth();
@@ -20,11 +21,14 @@ export const Sidebar = () => {
   return (
     <aside className="w-64 bg-slate-900/50 backdrop-blur-xl border-r border-white/10 flex flex-col h-screen sticky top-0">
       <div className="p-6">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <span className="text-white font-bold text-xl">F</span>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <span className="text-white font-bold text-xl">F</span>
+            </div>
+            <span className="text-white font-bold text-lg tracking-tight">Financial.</span>
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">Financial.</span>
+          <NotificationBell />
         </div>
 
         <nav className="space-y-2">
