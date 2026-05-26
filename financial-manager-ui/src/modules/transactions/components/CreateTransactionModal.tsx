@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Wallet {
   id: string;
@@ -20,6 +21,7 @@ interface CreateTransactionModalProps {
 }
 
 export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTransactionModalProps) => {
+  const { showToast } = useToast();
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -50,7 +52,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
         setWalletId(walletsRes.data.data[0].id);
       }
     } catch (error) {
-      console.error('Erro ao carregar dados para transação', error);
+      showToast('Erro ao carregar dados para transação', 'error');
     }
   };
 
@@ -75,7 +77,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       setDescription('');
       setAmount('');
     } catch (error) {
-      console.error('Erro ao criar transação', error);
+      showToast('Erro ao criar transação', 'error');
     } finally {
       setLoading(false);
     }

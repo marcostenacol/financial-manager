@@ -43,7 +43,7 @@ export class RefreshTokenService {
     // Gerar novo Refresh Token (Rotate)
     const new_refresh_token = crypto.randomBytes(40).toString('hex');
     const expires_at = new Date();
-    expires_at.setDate(expires_at.getDate() + 30);
+    expires_at.setDate(expires_at.getDate() + 7);
 
     // Deleta o antigo e cria o novo
     await this.auth_repository.deleteRefreshToken(token);

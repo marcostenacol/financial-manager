@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Target, TrendingUp, Calendar, Trash2, Edit2 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateSavingsGoalModal } from '../components/CreateSavingsGoalModal';
+import { useToast } from '../../../shared/components/Toast';
 
 interface SavingsGoal {
   id: string;
@@ -14,9 +15,11 @@ interface SavingsGoal {
 }
 
 export const SavingsGoalsPage = () => {
+  const { showToast } = useToast();
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<SavingsGoal | undefined>();
 
   useEffect(() => {
     loadGoals();
@@ -27,10 +30,31 @@ export const SavingsGoalsPage = () => {
       const response = await api.get('/savings-goals');
       setGoals(response.data.data);
     } catch (error) {
-      console.error('Erro ao carregar metas', error);
+      showToast('Erro ao carregar metas', 'error');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (goal: SavingsGoal) => {
+    setEditingGoal(goal);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta meta?')) return;
+
+    try {
+      await api.delete(`/savings-goals/${id}`);
+      await loadGoals();
+    } catch (error) {
+      showToast('Erro ao excluir meta', 'error');
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setEditingGoal(undefined);
   };
 
   const calculateProgress = (current: number, target: number) => {
@@ -79,10 +103,16 @@ export const SavingsGoalsPage = () => {
                       <Target className="w-6 h-6" />
                     </div>
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 text-slate-500 hover:text-white transition-colors">
+                      <button 
+                        onClick={() => handleEdit(goal)}
+                        className="p-2 text-slate-500 hover:text-white transition-colors"
+                      >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-slate-500 hover:text-red-400 transition-colors">
+                      <button 
+                        onClick={() => handleDelete(goal.id)}
+                        className="p-2 text-slate-500 hover:text-red-400 transition-colors"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -138,8 +168,9 @@ export const SavingsGoalsPage = () => {
 
       <CreateSavingsGoalModal 
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleModalClose}
         onSuccess={loadGoals}
+        initialData={editingGoal}
       />
     </div>
   );

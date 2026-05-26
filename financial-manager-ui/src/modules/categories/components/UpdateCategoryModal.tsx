@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Palette, Tag, ArrowUpCircle, ArrowDownCircle, Trash2 } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useToast } from '../../../shared/components/Toast';
 
 interface Category {
   id: string;
@@ -25,6 +26,7 @@ const PRESET_COLORS = [
 ];
 
 export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: UpdateCategoryModalProps) => {
+  const { showToast } = useToast();
   const [name, setName] = useState('');
   const [color, setColor] = useState('#3b82f6');
   const [type, setType] = useState<'income' | 'expense' | 'both'>('expense');
@@ -54,7 +56,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Erro ao atualizar categoria', error);
+      showToast('Erro ao atualizar categoria', 'error');
     } finally {
       setLoading(false);
     }
@@ -69,7 +71,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
       onSuccess();
       onClose();
     } catch (error) {
-      console.error('Erro ao deletar categoria', error);
+      showToast('Erro ao deletar categoria', 'error');
       alert('Não foi possível excluir esta categoria. Verifique se existem transações vinculadas a ela.');
     } finally {
       setDeleting(false);
