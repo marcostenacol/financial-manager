@@ -81,7 +81,7 @@ Isso garante que as funções PL/pgSQL e schemas customizados estejam presentes 
 
 ---
 
-## 6. Diretrizes para IA (Prompting/Agentic) 🤖
+## 6. Diretrizes de Desenvolvimento 🛠️
 - Sempre crie um teste de feature ao implementar uma nova rota.
 - Mock de serviços externos é obrigatório.
 - Valide sempre o formato da resposta JSON padrão (`success`, `message`, `data`).

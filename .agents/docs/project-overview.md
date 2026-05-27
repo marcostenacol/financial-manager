@@ -74,7 +74,7 @@ financial/
 │   ├── app.ts          → Fastify app factory
 │   └── server.ts       → Entry point + node-cron jobs
 ├── tests/              → Testes Vitest + Supertest
-└── .agents/            → Documentação e guias de IA
+└── .agents/            → Documentação e guias de automação
 ```
 
 ---

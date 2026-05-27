@@ -1,6 +1,6 @@
-# 🧠 AI Master Guide - Sistema Financeiro (Node.js + TypeScript)
+# 🧠 Master Guide - Sistema Financeiro (Node.js + TypeScript)
 
-Este documento é a instrução mestre para qualquer planejamento, criação ou refatoração de código neste ecossistema. **O cumprimento destas diretrizes é obrigatório para todos os agentes de IA.**
+Este documento é a instrução mestre para qualquer planejamento, criação ou refatoração de código neste ecossistema. **O cumprimento destas diretrizes é obrigatório para todos os agentes de automação.**
 
 ---
 

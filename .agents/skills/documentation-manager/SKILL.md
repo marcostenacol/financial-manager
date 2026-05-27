@@ -6,7 +6,7 @@ description: >
 
 # Skill: Documentation Manager 📄
 
-Esta skill permite que a IA documente o projeto de forma autônoma ou modifique instruções existentes com base em prompts específicos.
+Esta skill permite que a automação documente o projeto de forma autônoma ou modifique instruções existentes com base em prompts específicos.
 
 ## 🛠️ Capacidades
 
@@ -23,7 +23,7 @@ Sempre que um novo `Package` ou `Module` for criado, rode esta skill para gerar:
 - Guia de integração para o Frontend.
 
 ### 2. Modificar Instruções Existentes
-Para alterar como a IA deve se comportar (ex: "mude o padrão de nomes de variáveis"), forneça o prompt e a IA atualizará os arquivos em `.agents/checklists/` e `.agents/agents/`.
+Para alterar como a IA deve se comportar (ex: "mude o padrão de nomes de variáveis"), forneça o prompt e o agente atualizará os arquivos em `.agents/checklists/` e `.agents/agents/`.
 
 ---
 
@@ -36,4 +36,4 @@ Para alterar como a IA deve se comportar (ex: "mude o padrão de nomes de variá
 
 ---
 > [!TIP]
-> Use o comando "Antigravity, documente o fluxo de [funcionalidade]" para disparar esta skill.
+> Use o comando "Agente, documente o fluxo de [funcionalidade]" para disparar esta skill.

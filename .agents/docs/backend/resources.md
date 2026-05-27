@@ -26,7 +26,7 @@ O Resource isola a estrutura interna do banco de dados da interface pública da 
 
 ---
 
-## 4. Diretrizes para IA (Prompting/Agentic) 🤖
+## 4. Diretrizes de Desenvolvimento 🛠️
 Ao criar ou revisar um Resource, verifique:
 - Se campos de data estão sendo formatados adequadamente (se necessário no frontend).
 - Se chaves estrangeiras (`_id`) estão sendo transformadas em nomes amigáveis quando o contexto é detalhamento.

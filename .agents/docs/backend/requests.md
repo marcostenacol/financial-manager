@@ -24,7 +24,7 @@ Utilizamos Form Requests customizadas para cada endpoint de escrita (`POST`, `PU
 
 ---
 
-## 4. Diretrizes para IA (Prompting/Agentic) 🤖
+## 4. Diretrizes de Desenvolvimento 🛠️
 Ao criar ou revisar uma Request, verifique:
 - Se a trait `Response` está presente.
 - Se o método `failedValidation` está utilizando o padrão do projeto.

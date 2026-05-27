@@ -5,5 +5,5 @@ type: postgres
 host: 127.0.0.1
 port: 5432
 database: task-manager
-user: antigravity_readonly
+user: system_readonly
 password: readonly_secret
