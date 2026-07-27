@@ -20,6 +20,8 @@ import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositorie
 import { RecurrenceRepository } from '@/modules/recurrences/repositories/RecurrenceRepository';
 import { ReportRepositoryInterface } from '@/modules/reports/repositories/contracts/ReportRepositoryInterface';
 import { ReportRepository } from '@/modules/reports/repositories/ReportRepository';
+import { NotificationRepositoryInterface } from '@/modules/notifications/repositories/contracts/NotificationRepositoryInterface';
+import { NotificationRepository } from '@/modules/notifications/repositories/NotificationRepository';
 
 container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepository);
 container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', ProfileRepository);
@@ -28,6 +30,7 @@ container.registerSingleton<TransactionRepositoryInterface>('TransactionReposito
 container.registerSingleton<CategoryRepositoryInterface>('CategoryRepository', CategoryRepository);
 container.registerSingleton<RecurrenceRepositoryInterface>('RecurrenceRepository', RecurrenceRepository);
 container.registerSingleton<ReportRepositoryInterface>('ReportRepository', ReportRepository);
+container.registerSingleton<NotificationRepositoryInterface>('NotificationRepository', NotificationRepository);
 
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
@@ -65,6 +68,10 @@ import { SavingsGoalRepositoryInterface } from '@/modules/savings-goals/reposito
 import { GetDashboardOverviewService } from '@/modules/reports/services/GetDashboardOverviewService';
 import { GetExpensesByCategoryService } from '@/modules/reports/services/GetExpensesByCategoryService';
 import { GetMonthlyEvolutionService } from '@/modules/reports/services/GetMonthlyEvolutionService';
+import { CreateNotificationService } from '@/modules/notifications/services/CreateNotificationService';
+import { ListNotificationsService } from '@/modules/notifications/services/ListNotificationsService';
+import { MarkNotificationAsReadService } from '@/modules/notifications/services/MarkNotificationAsReadService';
+import { DeleteNotificationService } from '@/modules/notifications/services/DeleteNotificationService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -100,3 +107,7 @@ container.registerSingleton<DeleteSavingsGoalService>('DeleteSavingsGoalService'
 container.registerSingleton<GetDashboardOverviewService>('GetDashboardOverviewService', GetDashboardOverviewService);
 container.registerSingleton<GetExpensesByCategoryService>('GetExpensesByCategoryService', GetExpensesByCategoryService);
 container.registerSingleton<GetMonthlyEvolutionService>('GetMonthlyEvolutionService', GetMonthlyEvolutionService);
+container.registerSingleton<CreateNotificationService>('CreateNotificationService', CreateNotificationService);
+container.registerSingleton<ListNotificationsService>('ListNotificationsService', ListNotificationsService);
+container.registerSingleton<MarkNotificationAsReadService>('MarkNotificationAsReadService', MarkNotificationAsReadService);
+container.registerSingleton<DeleteNotificationService>('DeleteNotificationService', DeleteNotificationService);
