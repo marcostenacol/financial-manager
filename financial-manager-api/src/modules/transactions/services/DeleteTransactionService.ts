@@ -47,6 +47,7 @@ export class DeleteTransactionService {
     // Invalida caches (incluindo listagens filtradas)
     await this.cache.del(`wallet:detail:${wallet.id}`);
     await this.cache.del(`wallets:user:${userId}`);
+    await this.cache.del(`transaction:detail:${id}`);
     await this.cache.delPattern(`transactions:user:${userId}*`);
     await this.cache.delPattern(`transactions:wallet:${wallet.id}*`);
   }
