@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins, Trash2 } from 'lucide-react';
-import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/useToast';
+import { useWallets } from '../hooks/useWallets';
 
 interface Wallet {
   id: string;
@@ -28,6 +28,7 @@ const WALLET_TYPES = [
 
 export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: UpdateWalletModalProps) => {
   const { showToast } = useToast();
+  const { updateWallet, deleteWallet } = useWallets();
   const [name, setName] = useState('');
   const [type, setType] = useState<'checking' | 'savings' | 'credit' | 'investment' | 'cash'>('checking');
   const [balance, setBalance] = useState('');
@@ -49,7 +50,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
     setLoading(true);
 
     try {
-      await api.put(`/wallets/${wallet.id}`, {
+      await updateWallet(wallet.id, {
         name,
         type,
         balance: Number(balance),
@@ -69,7 +70,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
     setDeleting(true);
 
     try {
-      await api.delete(`/wallets/${wallet.id}`);
+      await deleteWallet(wallet.id);
       onSuccess();
       onClose();
     } catch {

@@ -1,44 +1,24 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical } from 'lucide-react';
-import { api } from '../../../services/api';
 import { CreateWalletModal } from '../components/CreateWalletModal';
 import { UpdateWalletModal } from '../components/UpdateWalletModal';
 import { CreateTransferModal } from '../../transactions/components/CreateTransferModal';
 import { ArrowRightLeft } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
-
-interface Wallet {
-  id: string;
-  name: string;
-  type: 'checking' | 'savings' | 'credit' | 'investment' | 'cash';
-  balance: number;
-  currency: string;
-}
+import { useWallets, type Wallet } from '../hooks/useWallets';
 
 export const WalletsPage = () => {
   const { showToast } = useToast();
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { wallets, loading, loadWallets } = useWallets();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
-  const loadWallets = async () => {
-    try {
-      const response = await api.get('/wallets');
-      setWallets(response.data.data);
-    } catch {
-      showToast('Erro ao carregar carteiras', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadWallets();
+     
+    loadWallets().catch(() => showToast('Erro ao carregar carteiras', 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

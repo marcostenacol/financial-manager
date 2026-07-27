@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Palette, Tag, Trash2 } from 'lucide-react';
-import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/useToast';
+import { useCategories } from '../hooks/useCategories';
 
 interface Category {
   id: string;
@@ -27,6 +27,7 @@ const PRESET_COLORS = [
 
 export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: UpdateCategoryModalProps) => {
   const { showToast } = useToast();
+  const { updateCategory, deleteCategory } = useCategories();
   const [name, setName] = useState('');
   const [color, setColor] = useState('#3b82f6');
   const [type, setType] = useState<'income' | 'expense' | 'both'>('expense');
@@ -48,7 +49,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
     setLoading(true);
 
     try {
-      await api.put(`/categories/${category.id}`, {
+      await updateCategory(category.id, {
         name,
         color,
         type,
@@ -68,7 +69,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
     setDeleting(true);
 
     try {
-      await api.delete(`/categories/${category.id}`);
+      await deleteCategory(category.id);
       onSuccess();
       onClose();
     } catch {

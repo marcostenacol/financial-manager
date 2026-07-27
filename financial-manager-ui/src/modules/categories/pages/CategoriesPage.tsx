@@ -1,42 +1,21 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Tag, MoreVertical } from 'lucide-react';
-import { api } from '../../../services/api';
 import { CreateCategoryModal } from '../components/CreateCategoryModal';
 import { UpdateCategoryModal } from '../components/UpdateCategoryModal';
 import { useToast } from '../../../shared/components/useToast';
-
-interface Category {
-  id: string;
-  name: string;
-  color: string;
-  icon: string | null;
-  type: 'income' | 'expense' | 'both';
-  userId?: string;
-}
+import { useCategories, type Category } from '../hooks/useCategories';
 
 export const CategoriesPage = () => {
   const { showToast } = useToast();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { categories, loading, loadCategories } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
-  const loadCategories = async () => {
-    try {
-      const response = await api.get('/categories');
-      setCategories(response.data.data);
-    } catch {
-      showToast('Erro ao carregar categorias', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadCategories();
+     
+    loadCategories().catch(() => showToast('Erro ao carregar categorias', 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

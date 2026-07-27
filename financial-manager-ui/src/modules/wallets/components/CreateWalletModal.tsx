@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins } from 'lucide-react';
-import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/useToast';
+import { useWallets } from '../hooks/useWallets';
 
 interface CreateWalletModalProps {
   isOpen: boolean;
@@ -20,6 +20,7 @@ const WALLET_TYPES = [
 
 export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletModalProps) => {
   const { showToast } = useToast();
+  const { createWallet } = useWallets();
   const [name, setName] = useState('');
   const [type, setType] = useState('checking');
   const [balance, setBalance] = useState('');
@@ -32,7 +33,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
     setLoading(true);
 
     try {
-      await api.post('/wallets', {
+      await createWallet({
         name,
         type,
         balance: Number(balance),

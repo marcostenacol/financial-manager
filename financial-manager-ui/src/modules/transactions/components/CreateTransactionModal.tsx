@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText } from 'lucide-react';
-import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/useToast';
+import { useTransactions } from '../hooks/useTransactions';
+import { useWallets } from '../../wallets/hooks/useWallets';
+import { useCategories } from '../../categories/hooks/useCategories';
 
 interface Wallet {
   id: string;
@@ -22,6 +24,9 @@ interface CreateTransactionModalProps {
 
 export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTransactionModalProps) => {
   const { showToast } = useToast();
+  const { createTransaction } = useTransactions();
+  const { loadWallets } = useWallets();
+  const { loadCategories } = useCategories();
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -35,15 +40,15 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
 
   const loadData = async () => {
     try {
-      const [walletsRes, categoriesRes] = await Promise.all([
-        api.get('/wallets'),
-        api.get('/categories'), // Note: Precisaremos criar este endpoint
+      const [walletsData, categoriesData] = await Promise.all([
+        loadWallets(),
+        loadCategories(),
       ]);
-      setWallets(walletsRes.data.data);
-      setCategories(categoriesRes.data.data);
+      setWallets(walletsData);
+      setCategories(categoriesData);
 
-      if (walletsRes.data.data.length > 0) {
-        setWalletId(walletsRes.data.data[0].id);
+      if (walletsData.length > 0) {
+        setWalletId(walletsData[0].id);
       }
     } catch {
       showToast('Erro ao carregar dados para transação', 'error');
@@ -63,7 +68,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
     setLoading(true);
 
     try {
-      await api.post('/transactions', {
+      await createTransaction({
         description,
         amount: Number(amount),
         type,

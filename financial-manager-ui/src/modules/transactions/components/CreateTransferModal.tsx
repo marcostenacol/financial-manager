@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRightLeft, AlertCircle, ChevronDown } from 'lucide-react';
 import axios from 'axios';
-import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/useToast';
+import { useTransactions } from '../hooks/useTransactions';
+import { useWallets } from '../../wallets/hooks/useWallets';
+import { useCategories } from '../../categories/hooks/useCategories';
 
 interface Wallet {
   id: string;
@@ -25,6 +27,9 @@ interface CreateTransferModalProps {
 
 export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const { showToast } = useToast();
+  const { transfer } = useTransactions();
+  const { loadWallets } = useWallets();
+  const { loadCategories } = useCategories();
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,12 +43,12 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
 
   const loadData = async () => {
     try {
-      const [walletsRes, categoriesRes] = await Promise.all([
-        api.get('/wallets'),
-        api.get('/categories'),
+      const [walletsData, categoriesData] = await Promise.all([
+        loadWallets(),
+        loadCategories(),
       ]);
-      setWallets(walletsRes.data.data);
-      setCategories(categoriesRes.data.data.filter((c: Category) => c.type === 'both' || c.type === 'expense'));
+      setWallets(walletsData);
+      setCategories(categoriesData.filter((c: Category) => c.type === 'both' || c.type === 'expense'));
     } catch {
       showToast('Erro ao carregar dados para transferência', 'error');
     }
@@ -63,7 +68,7 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
     setError('');
 
     try {
-      await api.post('/transactions/transfer', {
+      await transfer({
         description,
         amount: Number(amount),
         source_wallet_id: sourceWalletId,

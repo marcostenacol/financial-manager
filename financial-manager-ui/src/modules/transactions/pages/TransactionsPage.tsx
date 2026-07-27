@@ -12,40 +12,20 @@ import {
   ChevronRight,
   Download
 } from 'lucide-react';
-import { api } from '../../../services/api';
 import { CreateTransactionModal } from '../components/CreateTransactionModal';
 import { UpdateTransactionModal } from '../components/UpdateTransactionModal';
 import { AdvancedFiltersModal } from '../components/AdvancedFiltersModal';
 import { TransactionDetailModal } from '../components/TransactionDetailModal';
 import { useToast } from '../../../shared/components/useToast';
-
-interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense' | 'transfer';
-  status: 'pending' | 'completed' | 'cancelled';
-  occurredAt: string;
-  createdAt: string;
-  category?: { name: string; color: string };
-  wallet?: { name: string };
-  walletId: string;
-  categoryId?: string;
-  recurrenceId?: string | null;
-  recurrence?: {
-    period: string;
-  };
-}
+import { useTransactions, type Transaction } from '../hooks/useTransactions';
 
 export const TransactionsPage = () => {
   const { showToast } = useToast();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { transactions, total, loading, loadTransactions, deleteTransaction, exportTransactions } = useTransactions();
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
   const [perPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -64,9 +44,8 @@ export const TransactionsPage = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const loadTransactions = async () => {
+  const fetchTransactions = async () => {
     try {
-      setLoading(true);
       const params = {
         page,
         per_page: perPage,
@@ -75,26 +54,22 @@ export const TransactionsPage = () => {
         ...advancedFilters
       };
 
-      const response = await api.get('/transactions', { params });
-      setTransactions(response.data.data.transactions);
-      setTotal(response.data.data.total);
+      await loadTransactions(params);
     } catch {
       showToast('Erro ao carregar transações', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadTransactions();
+     
+    fetchTransactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterType, debouncedSearch, page, advancedFilters]);
 
   const handleExport = async () => {
     try {
-      const response = await api.get('/transactions/export', { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const blob = await exportTransactions();
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'transacoes.csv');
@@ -120,9 +95,9 @@ export const TransactionsPage = () => {
     if (!selectedTransaction || !window.confirm('Tem certeza que deseja excluir esta transação?')) return;
 
     try {
-      await api.delete(`/transactions/${selectedTransaction.id}`);
+      await deleteTransaction(selectedTransaction.id);
       setIsDetailModalOpen(false);
-      loadTransactions();
+      fetchTransactions();
     } catch {
       showToast('Erro ao excluir transação', 'error');
     }
@@ -314,13 +289,13 @@ export const TransactionsPage = () => {
       <CreateTransactionModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={loadTransactions}
+        onSuccess={fetchTransactions}
       />
 
       <UpdateTransactionModal 
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
-        onSuccess={loadTransactions}
+        onSuccess={fetchTransactions}
         transaction={selectedTransaction}
       />
 

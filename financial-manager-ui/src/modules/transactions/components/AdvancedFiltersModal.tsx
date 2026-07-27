@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Filter, Calendar, Tag, Wallet as WalletIcon, CheckCircle } from 'lucide-react';
-import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/useToast';
+import { useWallets } from '../../wallets/hooks/useWallets';
+import { useCategories } from '../../categories/hooks/useCategories';
 
 interface Category {
   id: string;
@@ -31,18 +32,20 @@ interface AdvancedFiltersModalProps {
 
 export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters }: AdvancedFiltersModalProps) => {
   const { showToast } = useToast();
+  const { loadWallets } = useWallets();
+  const { loadCategories } = useCategories();
   const [categories, setCategories] = useState<Category[]>([]);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [filters, setFilters] = useState<Filters>(currentFilters);
 
   const loadData = async () => {
     try {
-      const [catRes, wallRes] = await Promise.all([
-        api.get('/categories'),
-        api.get('/wallets')
+      const [categoriesData, walletsData] = await Promise.all([
+        loadCategories(),
+        loadWallets(),
       ]);
-      setCategories(catRes.data.data);
-      setWallets(wallRes.data.data);
+      setCategories(categoriesData);
+      setWallets(walletsData);
     } catch {
       showToast('Erro ao carregar dados de filtro', 'error');
     }

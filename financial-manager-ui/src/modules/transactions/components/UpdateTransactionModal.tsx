@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2 } from 'lucide-react';
-import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/useToast';
+import { useTransactions } from '../hooks/useTransactions';
+import { useWallets } from '../../wallets/hooks/useWallets';
+import { useCategories } from '../../categories/hooks/useCategories';
 
 interface Wallet {
   id: string;
@@ -34,6 +36,9 @@ interface UpdateTransactionModalProps {
 
 export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction }: UpdateTransactionModalProps) => {
   const { showToast } = useToast();
+  const { updateTransaction, deleteTransaction } = useTransactions();
+  const { loadWallets } = useWallets();
+  const { loadCategories } = useCategories();
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -48,12 +53,12 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
 
   const loadData = async () => {
     try {
-      const [walletsRes, categoriesRes] = await Promise.all([
-        api.get('/wallets'),
-        api.get('/categories'),
+      const [walletsData, categoriesData] = await Promise.all([
+        loadWallets(),
+        loadCategories(),
       ]);
-      setWallets(walletsRes.data.data);
-      setCategories(categoriesRes.data.data);
+      setWallets(walletsData);
+      setCategories(categoriesData);
     } catch {
       showToast('Erro ao carregar dados para transação', 'error');
     }
@@ -79,11 +84,10 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
     setLoading(true);
 
     try {
-      await api.put(`/transactions/${transaction.id}`, {
+      await updateTransaction(transaction.id, {
         description,
         amount: Number(amount),
         type,
-        wallet_id: walletId,
         category_id: categoryId || undefined,
         occurred_at: occurredAt,
         status: transaction.status,
@@ -103,7 +107,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
     setDeleting(true);
 
     try {
-      await api.delete(`/transactions/${transaction.id}`);
+      await deleteTransaction(transaction.id);
       onSuccess();
       onClose();
     } catch {
