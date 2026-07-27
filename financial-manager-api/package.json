@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc; tsc-alias -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "migrate:dev": "prisma migrate dev",
@@ -44,6 +44,7 @@
     "@types/pdfkit": "^0.17.6",
     "prisma": "^7.8.0",
     "supertest": "^7.2.2",
+    "tsc-alias": "^1.9.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^6.1.1",

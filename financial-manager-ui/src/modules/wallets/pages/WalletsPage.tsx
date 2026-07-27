@@ -25,15 +25,6 @@ export const WalletsPage = () => {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
-  useEffect(() => {
-    loadWallets();
-  }, []);
-
-  const handleEdit = (wallet: Wallet) => {
-    setSelectedWallet(wallet);
-    setIsUpdateModalOpen(true);
-  };
-
   const loadWallets = async () => {
     try {
       const response = await api.get('/wallets');
@@ -43,6 +34,15 @@ export const WalletsPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadWallets();
+  }, []);
+
+  const handleEdit = (wallet: Wallet) => {
+    setSelectedWallet(wallet);
+    setIsUpdateModalOpen(true);
   };
 
   const getWalletIcon = (type: string) => {

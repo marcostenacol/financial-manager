@@ -5,7 +5,7 @@ services:
       dockerfile: docker/api/Dockerfile
     profiles: ["homolog", "main"]
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:central_password@central-db:5432/financial_db?schema=public}
       REDIS_URL: ${REDIS_URL:-redis://cache:6379}
@@ -13,6 +13,7 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
       NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT:-3000}
     depends_on:
       cache:
         condition: service_healthy
@@ -41,7 +42,7 @@ services:
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
     ports:
-      - "5434:5432"
+      - "127.0.0.1:5434:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s

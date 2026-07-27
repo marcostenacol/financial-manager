@@ -1,5 +1,5 @@
 import { SavingsGoal } from '@prisma/client';
-import { ICreateSavingsGoalDTO } from '../dtos/ICreateSavingsGoalDTO';
+import { ICreateSavingsGoalDTO } from '../../dtos/ICreateSavingsGoalDTO';
 
 export interface SavingsGoalRepositoryInterface {
   create(data: ICreateSavingsGoalDTO & { userId: string }): Promise<SavingsGoal>;
