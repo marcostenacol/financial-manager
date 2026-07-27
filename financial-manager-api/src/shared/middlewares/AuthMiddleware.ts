@@ -14,13 +14,15 @@ export async function authMiddleware(
     
     const cache = container.resolve<CacheTrait>(CacheTrait);
     const cached_user = await cache.get(`auth:token:${user_id}`);
-    
+
     if (!cached_user) {
-      // Fallback ou verificação de logout
-      // Por enquanto, se não estiver no cache (Redis), podemos considerar inválido se o padrão for obrigatório
-      // Mas vamos permitir por enquanto se o JWT for válido
+      // Sessão não encontrada no Redis: token foi revogado (logout) ou expirou no cache.
+      throw new AppError('Sessão inválida ou expirada', 401);
     }
   } catch (err) {
+    if (err instanceof AppError) {
+      throw err;
+    }
     throw new AppError('Não autenticado', 401);
   }
 }
