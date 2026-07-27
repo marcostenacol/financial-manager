@@ -3,6 +3,8 @@ import 'dotenv/config';
 import fastify, { FastifyInstance } from 'fastify';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCors from '@fastify/cors';
+import fastifyHelmet from '@fastify/helmet';
+import fastifyRateLimit from '@fastify/rate-limit';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import multipart from '@fastify/multipart';
@@ -14,6 +16,10 @@ import { container } from 'tsyringe';
 import '@/shared/container';
 import { errorHandler } from '@/shared/errors/ErrorHandler';
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET não configurado — defina a variável de ambiente antes de iniciar a aplicação.');
+}
+
 const app: FastifyInstance = fastify({
   logger: process.env.NODE_ENV === 'development',
 });
@@ -21,6 +27,13 @@ const app: FastifyInstance = fastify({
 container.registerInstance<FastifyInstance>('Fastify', app);
 
 // Plugins
+app.register(fastifyHelmet);
+
+app.register(fastifyRateLimit, {
+  max: 100,
+  timeWindow: '1 minute',
+});
+
 app.register(fastifyCors, {
   origin: process.env.NODE_ENV === 'production'
     ? (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean)
@@ -29,7 +42,7 @@ app.register(fastifyCors, {
 });
 
 app.register(fastifyJwt, {
-  secret: process.env.JWT_SECRET || 'secret',
+  secret: process.env.JWT_SECRET,
 });
 
 app.register(fastifySwagger, {
