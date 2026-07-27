@@ -13,19 +13,32 @@ export const ProfilePage = () => {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [type, setType] = useState('personal');
+  const [savedType, setSavedType] = useState('personal');
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const { updateUser } = useAuth();
 
   useEffect(() => {
-    if (user) {
-      setName(user.name || '');
-      setBio(user.bio || '');
-      setType(user.type || 'personal');
-      if (user.avatar) {
-        setAvatar(`${import.meta.env.VITE_API_URL || 'http://localhost:3333/api/v1'}/../../uploads/${user.avatar}`);
+    if (!user) return;
+
+    const loadProfile = async () => {
+      try {
+        const response = await api.get('/profile/me');
+        const profile = response.data.data;
+        setName(profile.name || '');
+        setBio(profile.bio || '');
+        setType(profile.type || 'personal');
+        setSavedType(profile.type || 'personal');
+        if (profile.avatar) {
+          setAvatar(`${import.meta.env.VITE_API_URL || 'http://localhost:3333/api/v1'}/../../uploads/${profile.avatar}`);
+        }
+      } catch {
+        showToast('Erro ao carregar perfil', 'error');
       }
-    }
+    };
+
+    loadProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,12 +59,13 @@ export const ProfilePage = () => {
     setSuccess(false);
 
     try {
-      await api.put('/profile', { name, bio });
+      await api.put('/profile/me', { name, bio });
       let updatedUser = { ...user!, name, bio };
 
-      if (type !== user?.type) {
-        const typeResponse = await api.patch('/profile/type', { type });
+      if (type !== savedType) {
+        const typeResponse = await api.patch('/profile/me/type', { type });
         updatedUser = { ...updatedUser, type: typeResponse.data.data.type };
+        setSavedType(typeResponse.data.data.type);
       }
 
       if (avatarFile) {
@@ -67,7 +81,7 @@ export const ProfilePage = () => {
 
       updateUser(updatedUser);
       setSuccess(true);
-    } catch (error) {
+    } catch {
       showToast('Erro ao atualizar perfil', 'error');
     } finally {
       setLoading(false);

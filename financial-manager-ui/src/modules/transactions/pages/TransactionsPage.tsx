@@ -64,10 +64,6 @@ export const TransactionsPage = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  useEffect(() => {
-    loadTransactions();
-  }, [filterType, debouncedSearch, page, advancedFilters]);
-
   const loadTransactions = async () => {
     try {
       setLoading(true);
@@ -78,16 +74,22 @@ export const TransactionsPage = () => {
         ...(debouncedSearch ? { search: debouncedSearch } : {}),
         ...advancedFilters
       };
-      
+
       const response = await api.get('/transactions', { params });
       setTransactions(response.data.data.transactions);
       setTotal(response.data.data.total);
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar transações', 'error');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadTransactions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterType, debouncedSearch, page, advancedFilters]);
 
   const handleExport = async () => {
     try {
@@ -99,7 +101,7 @@ export const TransactionsPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (error) {
+    } catch {
       showToast('Erro ao exportar transações', 'error');
     }
   };
@@ -121,7 +123,7 @@ export const TransactionsPage = () => {
       await api.delete(`/transactions/${selectedTransaction.id}`);
       setIsDetailModalOpen(false);
       loadTransactions();
-    } catch (error) {
+    } catch {
       showToast('Erro ao excluir transação', 'error');
     }
   };

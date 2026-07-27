@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import axios from 'axios';
 import { api } from '../../../services/api';
 
 export const RegisterPage = () => {
@@ -20,8 +21,9 @@ export const RegisterPage = () => {
     try {
       await api.post('/auth/register', { name, email, password });
       navigate('/login', { state: { message: 'Conta criada com sucesso! Faça login para continuar.' } });
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao criar conta. Tente novamente.');
+    } catch (err) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || 'Erro ao criar conta. Tente novamente.');
     } finally {
       setIsLoading(false);
     }

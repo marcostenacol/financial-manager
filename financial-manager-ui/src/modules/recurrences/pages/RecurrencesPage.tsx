@@ -24,22 +24,25 @@ export const RecurrencesPage = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    loadRecurrences();
-  }, []);
-
   const loadRecurrences = async () => {
     try {
       const response = await api.get('/recurrences');
       setRecurrences(response.data.data);
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar recorrências', 'error');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadRecurrences();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const getPeriodLabel = (period: string) => {
-    const labels: any = {
+    const labels: Record<string, string> = {
       daily: 'Diário',
       weekly: 'Semanal',
       monthly: 'Mensal',
@@ -54,7 +57,7 @@ export const RecurrencesPage = () => {
     try {
       await api.patch(`/recurrences/${id}/cancel`);
       loadRecurrences();
-    } catch (error) {
+    } catch {
       showToast('Erro ao cancelar recorrência', 'error');
     }
   };
@@ -63,7 +66,7 @@ export const RecurrencesPage = () => {
     try {
       await api.patch(`/recurrences/${id}/toggle`);
       loadRecurrences();
-    } catch (error) {
+    } catch {
       showToast('Erro ao alternar status da recorrência', 'error');
     }
   };

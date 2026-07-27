@@ -33,12 +33,6 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadData();
-    }
-  }, [isOpen]);
-
   const loadData = async () => {
     try {
       const [walletsRes, categoriesRes] = await Promise.all([
@@ -47,14 +41,22 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       ]);
       setWallets(walletsRes.data.data);
       setCategories(categoriesRes.data.data);
-      
+
       if (walletsRes.data.data.length > 0) {
         setWalletId(walletsRes.data.data[0].id);
       }
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar dados para transação', 'error');
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      loadData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +78,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       // Reset
       setDescription('');
       setAmount('');
-    } catch (error) {
+    } catch {
       showToast('Erro ao criar transação', 'error');
     } finally {
       setLoading(false);

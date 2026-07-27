@@ -21,20 +21,22 @@ export const SavingsGoalsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | undefined>();
 
-  useEffect(() => {
-    loadGoals();
-  }, []);
-
   const loadGoals = async () => {
     try {
       const response = await api.get('/savings-goals');
       setGoals(response.data.data);
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar metas', 'error');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadGoals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleEdit = (goal: SavingsGoal) => {
     setEditingGoal(goal);
@@ -47,7 +49,7 @@ export const SavingsGoalsPage = () => {
     try {
       await api.delete(`/savings-goals/${id}`);
       await loadGoals();
-    } catch (error) {
+    } catch {
       showToast('Erro ao excluir meta', 'error');
     }
   };

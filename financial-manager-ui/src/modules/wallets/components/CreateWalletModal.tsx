@@ -44,7 +44,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       setName('');
       setType('checking');
       setBalance('');
-    } catch (error) {
+    } catch {
       showToast('Erro ao criar carteira', 'error');
     } finally {
       setLoading(false);

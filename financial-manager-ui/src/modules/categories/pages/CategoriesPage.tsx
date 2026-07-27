@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Tag, Palette, ArrowUpCircle, ArrowDownCircle, Trash2, Edit2, MoreVertical } from 'lucide-react';
+import { Plus, Tag, MoreVertical } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateCategoryModal } from '../components/CreateCategoryModal';
 import { UpdateCategoryModal } from '../components/UpdateCategoryModal';
@@ -23,24 +23,26 @@ export const CategoriesPage = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
+  const loadCategories = async () => {
+    try {
+      const response = await api.get('/categories');
+      setCategories(response.data.data);
+    } catch {
+      showToast('Erro ao carregar categorias', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEdit = (category: Category) => {
     setSelectedCategory(category);
     setIsUpdateModalOpen(true);
-  };
-
-  const loadCategories = async () => {
-    try {
-      const response = await api.get('/categories');
-      setCategories(response.data.data);
-    } catch (error) {
-      showToast('Erro ao carregar categorias', 'error');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const getTypeLabel = (type: string) => {

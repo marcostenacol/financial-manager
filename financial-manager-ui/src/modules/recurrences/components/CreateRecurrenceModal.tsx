@@ -34,12 +34,6 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadData();
-    }
-  }, [isOpen]);
-
   const loadData = async () => {
     try {
       const [walletsRes, categoriesRes] = await Promise.all([
@@ -48,13 +42,21 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
       ]);
       setWallets(walletsRes.data.data);
       setCategories(categoriesRes.data.data);
-      
+
       if (walletsRes.data.data.length > 0) setWalletId(walletsRes.data.data[0].id);
       if (categoriesRes.data.data.length > 0) setCategoryId(categoriesRes.data.data[0].id);
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar dados', 'error');
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      loadData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +75,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
       
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Erro ao criar recorrência', 'error');
     } finally {
       setLoading(false);
@@ -172,7 +174,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <select
                   value={period}
-                  onChange={(e) => setPeriod(e.target.value as any)}
+                  onChange={(e) => setPeriod(e.target.value as 'daily' | 'weekly' | 'monthly' | 'yearly')}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none"
                 >
                   <option value="daily" className="bg-slate-900">Diário</option>

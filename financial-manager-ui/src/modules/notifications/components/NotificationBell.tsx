@@ -19,10 +19,21 @@ export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const loadNotifications = async () => {
+    try {
+      const response = await api.get('/notifications');
+      setNotifications(response.data.data);
+    } catch {
+      showToast('Erro ao carregar notificações', 'error');
+    }
+  };
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadNotifications();
     const interval = setInterval(loadNotifications, 60000); // Atualiza a cada minuto
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -35,22 +46,13 @@ export const NotificationBell = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const loadNotifications = async () => {
-    try {
-      const response = await api.get('/notifications');
-      setNotifications(response.data.data);
-    } catch (error) {
-      showToast('Erro ao carregar notificações', 'error');
-    }
-  };
-
   const unreadCount = notifications.filter(n => !n.readAt).length;
 
   const handleMarkAsRead = async (id: string) => {
     try {
       await api.patch(`/notifications/${id}/read`);
       loadNotifications();
-    } catch (error) {
+    } catch {
       showToast('Erro ao marcar como lida', 'error');
     }
   };
@@ -59,7 +61,7 @@ export const NotificationBell = () => {
     try {
       await api.patch('/notifications/read-all');
       loadNotifications();
-    } catch (error) {
+    } catch {
       showToast('Erro ao marcar todas como lidas', 'error');
     }
   };

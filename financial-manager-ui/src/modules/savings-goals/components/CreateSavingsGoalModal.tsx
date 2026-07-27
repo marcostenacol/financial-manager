@@ -35,6 +35,7 @@ export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess, initialData
 
   useEffect(() => {
     if (initialData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(initialData.name);
       setTargetAmount(initialData.targetAmount.toString());
       setCurrentAmount(initialData.currentAmount.toString());
@@ -70,7 +71,7 @@ export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess, initialData
       
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Erro ao salvar meta', 'error');
     } finally {
       setLoading(false);

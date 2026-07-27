@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import 'dotenv/config';
+import '@/shared/config/env';
 import fastify, { FastifyInstance } from 'fastify';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCors from '@fastify/cors';
@@ -21,7 +22,9 @@ if (!process.env.JWT_SECRET) {
 }
 
 const app: FastifyInstance = fastify({
-  logger: process.env.NODE_ENV === 'development',
+  logger: {
+    level: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+  },
 });
 
 container.registerInstance<FastifyInstance>('Fastify', app);

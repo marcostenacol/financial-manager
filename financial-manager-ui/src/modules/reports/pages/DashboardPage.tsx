@@ -46,10 +46,6 @@ export const DashboardPage = () => {
   const [end_date, setEndDate] = useState<string>('');
   const [active_preset, setActivePreset] = useState('month');
 
-  useEffect(() => {
-    loadDashboardData();
-  }, [start_date, end_date]);
-
   const loadDashboardData = async () => {
     try {
       const params = {
@@ -67,18 +63,24 @@ export const DashboardPage = () => {
       setExpensesByCategory(expensesRes.data.data);
       setEvolution(evolutionRes.data.data);
       setGoals(goalsRes.data.data.slice(0, 3));
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar dashboard', 'error');
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadDashboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [start_date, end_date]);
+
   const handlePresetChange = (preset: string) => {
     setActivePreset(preset);
     const now = new Date();
     let start = '';
-    let end = '';
+    const end = '';
 
     switch (preset) {
       case '7days':
@@ -116,7 +118,7 @@ export const DashboardPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch (error) {
+    } catch {
       showToast('Erro ao exportar', 'error');
     }
   };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import axios from 'axios';
 import { useAuth } from '../../../contexts/AuthContext';
 
 export const LoginPage = () => {
@@ -20,8 +21,9 @@ export const LoginPage = () => {
     try {
       await signIn({ email, password });
       navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao realizar login. Tente novamente.');
+    } catch (err) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || 'Erro ao realizar login. Tente novamente.');
     } finally {
       setIsLoading(false);
     }

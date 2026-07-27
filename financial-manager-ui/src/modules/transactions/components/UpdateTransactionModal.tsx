@@ -46,18 +46,6 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && transaction) {
-      setType(transaction.type as 'income' | 'expense');
-      setDescription(transaction.description);
-      setAmount(transaction.amount.toString());
-      setWalletId(transaction.walletId);
-      setCategoryId(transaction.categoryId || '');
-      setOccurredAt(new Date(transaction.occurredAt).toISOString().split('T')[0]);
-      loadData();
-    }
-  }, [isOpen, transaction]);
-
   const loadData = async () => {
     try {
       const [walletsRes, categoriesRes] = await Promise.all([
@@ -66,10 +54,24 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       ]);
       setWallets(walletsRes.data.data);
       setCategories(categoriesRes.data.data);
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar dados para transação', 'error');
     }
   };
+
+  useEffect(() => {
+    if (isOpen && transaction) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setType(transaction.type as 'income' | 'expense');
+      setDescription(transaction.description);
+      setAmount(transaction.amount.toString());
+      setWalletId(transaction.walletId);
+      setCategoryId(transaction.categoryId || '');
+      setOccurredAt(new Date(transaction.occurredAt).toISOString().split('T')[0]);
+      loadData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, transaction]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,10 +88,10 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
         occurred_at: occurredAt,
         status: transaction.status,
       });
-      
+
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Erro ao atualizar transação', 'error');
     } finally {
       setLoading(false);
@@ -104,7 +106,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       await api.delete(`/transactions/${transaction.id}`);
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Erro ao deletar transação', 'error');
     } finally {
       setDeleting(false);

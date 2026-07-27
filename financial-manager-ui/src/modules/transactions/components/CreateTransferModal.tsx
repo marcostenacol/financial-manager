@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRightLeft, AlertCircle, ChevronDown } from 'lucide-react';
+import axios from 'axios';
 import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/Toast';
 
@@ -13,6 +14,7 @@ interface Wallet {
 interface Category {
   id: string;
   name: string;
+  type: 'income' | 'expense' | 'both';
 }
 
 interface CreateTransferModalProps {
@@ -34,12 +36,6 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
   const [destinationWalletId, setDestinationWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
 
-  useEffect(() => {
-    if (isOpen) {
-      loadData();
-    }
-  }, [isOpen]);
-
   const loadData = async () => {
     try {
       const [walletsRes, categoriesRes] = await Promise.all([
@@ -47,11 +43,19 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
         api.get('/categories'),
       ]);
       setWallets(walletsRes.data.data);
-      setCategories(categoriesRes.data.data.filter((c: any) => c.type === 'both' || c.type === 'expense'));
-    } catch (err) {
+      setCategories(categoriesRes.data.data.filter((c: Category) => c.type === 'both' || c.type === 'expense'));
+    } catch {
       showToast('Erro ao carregar dados para transferência', 'error');
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      loadData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,8 +79,9 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
       setSourceWalletId('');
       setDestinationWalletId('');
       setCategoryId('');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao realizar transferência');
+    } catch (err) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || 'Erro ao realizar transferência');
     } finally {
       setLoading(false);
     }

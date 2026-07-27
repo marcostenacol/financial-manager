@@ -36,6 +36,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
 
   useEffect(() => {
     if (isOpen && wallet) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(wallet.name);
       setType(wallet.type);
       setBalance(wallet.balance.toString());
@@ -56,7 +57,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
       
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Erro ao atualizar carteira', 'error');
     } finally {
       setLoading(false);
@@ -71,7 +72,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
       await api.delete(`/wallets/${wallet.id}`);
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch {
       showToast('Erro ao deletar carteira', 'error');
       alert('Não foi possível excluir esta carteira. Verifique se existem transações ativas.');
     } finally {
@@ -133,7 +134,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
                   <button
                     key={wType.id}
                     type="button"
-                    onClick={() => setType(wType.id as any)}
+                    onClick={() => setType(wType.id as 'checking' | 'savings' | 'credit' | 'investment' | 'cash')}
                     className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${
                       type === wType.id 
                         ? 'bg-blue-600/10 border-blue-600 text-white shadow-lg shadow-blue-600/5' 

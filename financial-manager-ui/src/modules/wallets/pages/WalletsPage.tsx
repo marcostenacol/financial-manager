@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateWalletModal } from '../components/CreateWalletModal';
 import { UpdateWalletModal } from '../components/UpdateWalletModal';
@@ -29,7 +29,7 @@ export const WalletsPage = () => {
     try {
       const response = await api.get('/wallets');
       setWallets(response.data.data);
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar carteiras', 'error');
     } finally {
       setLoading(false);
@@ -37,7 +37,9 @@ export const WalletsPage = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadWallets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEdit = (wallet: Wallet) => {

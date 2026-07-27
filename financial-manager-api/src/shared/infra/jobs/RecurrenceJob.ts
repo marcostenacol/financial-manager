@@ -1,12 +1,14 @@
-import cron from 'node-cron';
+import cron, { ScheduledTask } from 'node-cron';
 import { container } from 'tsyringe';
 import { ProcessRecurrenceService } from '@/modules/recurrences/services/ProcessRecurrenceService';
 
+let scheduledTask: ScheduledTask | undefined;
+
 export const setupRecurrenceJob = () => {
   // Roda todo dia à meia-noite
-  cron.schedule('0 0 * * *', async () => {
+  scheduledTask = cron.schedule('0 0 * * *', async () => {
     console.log('[Job] Iniciando processamento de recorrências...');
-    
+
     try {
       const processRecurrence = container.resolve(ProcessRecurrenceService);
       await processRecurrence.execute();
@@ -15,4 +17,13 @@ export const setupRecurrenceJob = () => {
       console.error('[Job] Erro ao processar recorrências:', error);
     }
   });
+
+  return scheduledTask;
+};
+
+export const stopRecurrenceJob = () => {
+  if (scheduledTask) {
+    scheduledTask.stop();
+    scheduledTask = undefined;
+  }
 };

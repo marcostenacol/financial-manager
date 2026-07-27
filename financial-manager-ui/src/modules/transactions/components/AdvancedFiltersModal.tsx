@@ -35,13 +35,6 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [filters, setFilters] = useState<Filters>(currentFilters);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadData();
-      setFilters(currentFilters);
-    }
-  }, [isOpen, currentFilters]);
-
   const loadData = async () => {
     try {
       const [catRes, wallRes] = await Promise.all([
@@ -50,10 +43,19 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
       ]);
       setCategories(catRes.data.data);
       setWallets(wallRes.data.data);
-    } catch (error) {
+    } catch {
       showToast('Erro ao carregar dados de filtro', 'error');
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      loadData();
+      setFilters(currentFilters);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, currentFilters]);
 
   const handleApply = () => {
     onApply(filters);

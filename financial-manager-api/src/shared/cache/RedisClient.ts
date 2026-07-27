@@ -7,10 +7,16 @@ export async function getRedisClient(): Promise<RedisClientType> {
     client = createClient({
       url: process.env.REDIS_URL || 'redis://localhost:6379',
     });
-    
+
     client.on('error', (err) => console.error('Redis Client Error', err));
-    
+
     await client.connect();
   }
   return client;
+}
+
+export async function closeRedisClient(): Promise<void> {
+  if (client && client.isOpen) {
+    await client.quit();
+  }
 }
