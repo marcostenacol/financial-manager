@@ -7,7 +7,10 @@ import { DetailTransactionService } from '../services/DetailTransactionService';
 import { UpdateTransactionService } from '../services/UpdateTransactionService';
 import { DeleteTransactionService } from '../services/DeleteTransactionService';
 import { TransferService } from '../services/TransferService';
+import { ExportTransactionsService } from '../services/ExportTransactionsService';
 import { CreateTransferSchema } from '../dtos/ICreateTransferDTO';
+import { CreateTransactionDTO } from '../dtos/CreateTransactionDTO';
+import { UpdateTransactionDTO } from '../dtos/UpdateTransactionDTO';
 
 @injectable()
 export class TransactionController extends BaseController {
@@ -18,6 +21,7 @@ export class TransactionController extends BaseController {
     @inject('UpdateTransactionService') private updateTransaction: UpdateTransactionService,
     @inject('DeleteTransactionService') private deleteTransaction: DeleteTransactionService,
     @inject('TransferService') private transferService: TransferService,
+    @inject('ExportTransactionsService') private exportTransactions: ExportTransactionsService,
   ) {
     super();
   }
@@ -29,6 +33,15 @@ export class TransactionController extends BaseController {
     return this.success(reply, transactions);
   }
 
+  async export(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = (request.user as any).sub;
+    const csv = await this.exportTransactions.execute(userId);
+    reply
+      .header('Content-Type', 'text/csv; charset=utf-8')
+      .header('Content-Disposition', 'attachment; filename="transacoes.csv"')
+      .send(csv);
+  }
+
   async show(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
     const userId = (request.user as any).sub;
@@ -37,7 +50,7 @@ export class TransactionController extends BaseController {
   }
 
   async store(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const data = request.body as any;
+    const data = CreateTransactionDTO.parse(request.body);
     const userId = (request.user as any).sub;
     const transaction = await this.createTransaction.execute(data, userId);
     return this.success(reply, transaction, 'Transação criada com sucesso', 201);
@@ -45,7 +58,7 @@ export class TransactionController extends BaseController {
 
   async update(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
-    const data = request.body as any;
+    const data = UpdateTransactionDTO.parse(request.body);
     const userId = (request.user as any).sub;
     const transaction = await this.updateTransaction.execute(id, data, userId);
     return this.success(reply, transaction, 'Transação atualizada com sucesso');
