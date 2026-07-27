@@ -1,42 +1,38 @@
 import { injectable } from 'tsyringe';
-import { Wallet } from '@prisma/client';
-import { BaseRepository } from '@/base/repository/BaseRepository';
+import { Wallet, Prisma } from '@prisma/client';
+import { prisma } from '@/shared/database/PrismaClient';
 import { WalletRepositoryInterface } from './contracts/WalletRepositoryInterface';
 
 @injectable()
-export class WalletRepository extends BaseRepository implements WalletRepositoryInterface {
-  async create(data: { user_id: string; name: string; balance?: number }): Promise<Wallet> {
-    return this.prisma.wallet.create({
-      data: {
-        userId: data.user_id,
-        name: data.name,
-        balance: data.balance || 0,
-      },
+export class WalletRepository implements WalletRepositoryInterface {
+  async create(data: Prisma.WalletUncheckedCreateInput): Promise<Wallet> {
+    return prisma.wallet.create({
+      data,
     });
   }
 
   async findAllByUserId(user_id: string): Promise<Wallet[]> {
-    return this.prisma.wallet.findMany({
+    return prisma.wallet.findMany({
       where: { userId: user_id },
       orderBy: { name: 'asc' },
     });
   }
 
   async findById(id: string): Promise<Wallet | null> {
-    return this.prisma.wallet.findUnique({
+    return prisma.wallet.findUnique({
       where: { id },
     });
   }
 
-  async update(id: string, data: Partial<Wallet>): Promise<Wallet> {
-    return this.prisma.wallet.update({
+  async update(id: string, data: Prisma.WalletUncheckedUpdateInput): Promise<Wallet> {
+    return prisma.wallet.update({
       where: { id },
       data,
     });
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.wallet.delete({
+    await prisma.wallet.delete({
       where: { id },
     });
   }
