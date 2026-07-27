@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from '../../../contexts/useAuth';
 import { api } from '../../../services/api';
 import { User, Mail, Shield, Save, UserCircle, Camera } from 'lucide-react';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 export const ProfilePage = () => {
   const { user, signOut } = useAuth();

@@ -6,7 +6,7 @@ import { CreateWalletModal } from '../components/CreateWalletModal';
 import { UpdateWalletModal } from '../components/UpdateWalletModal';
 import { CreateTransferModal } from '../../transactions/components/CreateTransferModal';
 import { ArrowRightLeft } from 'lucide-react';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 interface Wallet {
   id: string;

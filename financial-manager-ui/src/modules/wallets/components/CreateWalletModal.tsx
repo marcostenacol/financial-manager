@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins } from 'lucide-react';
 import { api } from '../../../services/api';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 interface CreateWalletModalProps {
   isOpen: boolean;

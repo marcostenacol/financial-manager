@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2 } from 'lucide-react';
 import { api } from '../../../services/api';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 interface Wallet {
   id: string;

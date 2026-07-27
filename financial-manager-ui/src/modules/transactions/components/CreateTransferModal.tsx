@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRightLeft, AlertCircle, ChevronDown } from 'lucide-react';
 import axios from 'axios';
 import { api } from '../../../services/api';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 interface Wallet {
   id: string;

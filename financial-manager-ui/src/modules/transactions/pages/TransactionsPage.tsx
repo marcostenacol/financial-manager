@@ -17,7 +17,7 @@ import { CreateTransactionModal } from '../components/CreateTransactionModal';
 import { UpdateTransactionModal } from '../components/UpdateTransactionModal';
 import { AdvancedFiltersModal } from '../components/AdvancedFiltersModal';
 import { TransactionDetailModal } from '../components/TransactionDetailModal';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 interface Transaction {
   id: string;

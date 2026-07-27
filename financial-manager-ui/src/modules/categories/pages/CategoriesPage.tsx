@@ -4,7 +4,7 @@ import { Plus, Tag, MoreVertical } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateCategoryModal } from '../components/CreateCategoryModal';
 import { UpdateCategoryModal } from '../components/UpdateCategoryModal';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 interface Category {
   id: string;

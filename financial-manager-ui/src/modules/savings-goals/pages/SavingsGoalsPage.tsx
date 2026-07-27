@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Target, TrendingUp, Calendar, Trash2, Edit2 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateSavingsGoalModal } from '../components/CreateSavingsGoalModal';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 interface SavingsGoal {
   id: string;

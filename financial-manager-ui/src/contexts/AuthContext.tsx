@@ -1,24 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  bio?: string;
-  type?: string;
-}
-
-interface AuthContextData {
-  user: User | null;
-  loading: boolean;
-  signIn(data: object): Promise<void>;
-  signOut(): void;
-  updateUser(user: User): void;
-}
-
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+import { AuthContext } from './AuthContextValue';
+import type { User } from './AuthContextValue';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -68,5 +51,3 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);

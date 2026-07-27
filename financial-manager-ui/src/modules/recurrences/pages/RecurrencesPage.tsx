@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, RefreshCw, Clock, Wallet as WalletIcon, X } from 'lucide-react';
 import { api } from '../../../services/api';
 import { CreateRecurrenceModal } from '../components/CreateRecurrenceModal';
-import { useToast } from '../../../shared/components/Toast';
+import { useToast } from '../../../shared/components/useToast';
 
 interface Recurrence {
   id: string;
