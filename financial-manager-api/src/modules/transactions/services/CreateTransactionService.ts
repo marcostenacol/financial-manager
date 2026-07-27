@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { Transaction } from '@prisma/client';
+import { Prisma, Transaction } from '@prisma/client';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { CreateTransactionDTOType } from '../dtos/CreateTransactionDTO';
@@ -28,16 +28,21 @@ export class CreateTransactionService {
     }
 
     const transaction = await this.transactionRepository.create({
-      ...data,
+      walletId: data.wallet_id,
+      categoryId: data.category_id,
+      type: data.type,
+      amount: new Prisma.Decimal(data.amount),
+      description: data.description,
+      status: data.status,
       occurredAt: new Date(data.occurred_at),
     });
 
     // Se a transação estiver concluída, atualiza o saldo da carteira
     if (data.status === TransactionStatusEnum.COMPLETED) {
-      const amount = Number(data.amount);
-      const newBalance = data.type === TransactionTypeEnum.INCOME 
-        ? Number(wallet.balance) + amount 
-        : Number(wallet.balance) - amount;
+      const amount = new Prisma.Decimal(data.amount);
+      const newBalance = data.type === TransactionTypeEnum.INCOME
+        ? new Prisma.Decimal(wallet.balance).plus(amount)
+        : new Prisma.Decimal(wallet.balance).minus(amount);
 
       await this.walletRepository.update(wallet.id, {
         balance: newBalance,

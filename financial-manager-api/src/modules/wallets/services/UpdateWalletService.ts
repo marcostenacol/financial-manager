@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { Wallet } from '@prisma/client';
+import { Wallet, Prisma } from '@prisma/client';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { WalletRepositoryInterface } from '../repositories/contracts/WalletRepositoryInterface';
@@ -8,7 +8,9 @@ interface UpdateWalletDTO {
   id: string;
   user_id: string;
   name?: string;
+  type?: string;
   balance?: number;
+  currency?: string;
 }
 
 @injectable()
@@ -27,7 +29,14 @@ export class UpdateWalletService {
       throw new AppError('Carteira não encontrada', 404);
     }
 
-    const updated_wallet = await this.wallet_repository.update(id, data);
+    const update_payload: Prisma.WalletUncheckedUpdateInput = {
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.type !== undefined && { type: data.type }),
+      ...(data.currency !== undefined && { currency: data.currency }),
+      ...(data.balance !== undefined && { balance: new Prisma.Decimal(data.balance) }),
+    };
+
+    const updated_wallet = await this.wallet_repository.update(id, update_payload);
 
     // Invalida cache
     await this.cache.del(`wallets:user:${user_id}`);

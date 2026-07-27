@@ -5,6 +5,7 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
+import { Prisma } from '@prisma/client';
 
 describe('CreateTransactionService', () => {
   let transactionRepository: TransactionRepositoryInterface;
@@ -48,7 +49,7 @@ describe('CreateTransactionService', () => {
     const result = await createTransactionService.execute(data as any, userId);
 
     expect(result).toHaveProperty('id');
-    expect(walletRepository.update).toHaveBeenCalledWith(walletId, { balance: 1500 });
+    expect(walletRepository.update).toHaveBeenCalledWith(walletId, { balance: new Prisma.Decimal(1500) });
     expect(cacheTrait.del).toHaveBeenCalled();
   });
 
@@ -71,7 +72,7 @@ describe('CreateTransactionService', () => {
     const result = await createTransactionService.execute(data as any, userId);
 
     expect(result).toHaveProperty('id');
-    expect(walletRepository.update).toHaveBeenCalledWith(walletId, { balance: 300 });
+    expect(walletRepository.update).toHaveBeenCalledWith(walletId, { balance: new Prisma.Decimal(300) });
   });
 
   it('should not update balance if status is pending', async () => {

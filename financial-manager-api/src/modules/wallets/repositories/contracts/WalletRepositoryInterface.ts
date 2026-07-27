@@ -1,9 +1,9 @@
-import { Wallet } from '@prisma/client';
+import { Wallet, Prisma } from '@prisma/client';
 
 export interface WalletRepositoryInterface {
-  create(data: { user_id: string; name: string; balance?: number }): Promise<Wallet>;
+  create(data: Prisma.WalletUncheckedCreateInput): Promise<Wallet>;
   findAllByUserId(user_id: string): Promise<Wallet[]>;
   findById(id: string): Promise<Wallet | null>;
-  update(id: string, data: Partial<Wallet>): Promise<Wallet>;
+  update(id: string, data: Prisma.WalletUncheckedUpdateInput): Promise<Wallet>;
   delete(id: string): Promise<void>;
 }
