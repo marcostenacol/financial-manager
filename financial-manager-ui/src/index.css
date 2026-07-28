@@ -6,14 +6,14 @@
   --bg: #0f172a;
   --surface: rgba(255, 255, 255, 0.05);
   --surface-2: rgba(255, 255, 255, 0.1);
-  --ink: #fff;
-  --muted: #94a3b8;
+  --ink: 255 255 255;
+  --muted: 148 163 184;
   --border: rgba(255, 255, 255, 0.1);
-  --accent: #4fb3ac;
+  --accent: 79 179 172;
   --accent-ink: #0a1615;
   --accent-soft: rgba(79, 179, 172, 0.15);
-  --success: #4ade80;
-  --danger: #f28b74;
+  --success: 74 222 128;
+  --danger: 242 139 116;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -10px rgba(0, 0, 0, 0.55);
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -32,20 +32,20 @@
   --bg: #eef0f1;
   --surface: #fff;
   --surface-2: #f7f8f8;
-  --ink: #14181a;
-  --muted: #667077;
+  --ink: 20 24 26;
+  --muted: 102 112 119;
   --border: rgba(20, 24, 26, 0.06);
-  --accent: #0f5c5c;
+  --accent: 15 92 92;
   --accent-ink: #fff;
   --accent-soft: #e4efee;
-  --success: #1a7a4c;
-  --danger: #b3402e;
+  --success: 26 122 76;
+  --danger: 179 64 46;
   --shadow: 0 1px 2px rgba(16, 24, 26, 0.04), 0 8px 24px -8px rgba(16, 24, 26, 0.1);
 }
 
 body {
   background: var(--bg);
-  color: var(--ink);
+  color: rgb(var(--ink));
   margin: 0;
   display: flex;
   place-items: center;

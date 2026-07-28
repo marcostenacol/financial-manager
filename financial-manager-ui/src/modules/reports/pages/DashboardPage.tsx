@@ -12,7 +12,7 @@ const CHART_COLORS = {
   expense: '#f28b74',
   grid: 'rgba(255,255,255,.1)',
   axis: '#94a3b8',
-  tooltipBg: 'rgba(255,255,255,.05)',
+  tooltipBg: '#0f172a',
 };
 
 interface DashboardOverview {
@@ -228,7 +228,7 @@ export const DashboardPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl shadow-xl shadow-app-card relative overflow-hidden group"
+          className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl shadow-app-card relative overflow-hidden group"
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
             <Wallet className="w-24 h-24" />

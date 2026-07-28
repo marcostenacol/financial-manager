@@ -7,9 +7,9 @@ interface DefaultLayoutProps {
 
 export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   return (
-    <div className="flex min-h-screen bg-app-bg">
+    <div className="flex min-h-screen gap-4 bg-app-bg p-4">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 min-w-0 overflow-y-auto rounded-2xl bg-app-surface shadow-app-card">
         {children}
       </main>
     </div>

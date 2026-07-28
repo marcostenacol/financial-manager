@@ -18,7 +18,7 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 bg-app-surface backdrop-blur-xl border-r border-app-border flex flex-col h-screen sticky top-0">
+    <aside className="w-64 bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-app-card flex flex-col h-[calc(100vh-2rem)] sticky top-4">
       <div className="p-6">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -36,11 +36,11 @@ export const Sidebar = () => {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                   isActive
-                    ? 'bg-app-accent text-app-accent-ink shadow-lg shadow-app-card'
+                    ? 'bg-app-accent text-app-accent-ink shadow-app-card'
                     : 'text-app-muted hover:bg-app-surface-2 hover:text-app-ink'
                 }`}
               >
-                <item.icon className={`w-5 h-5 ${isActive ? 'text-app-ink' : 'text-app-muted group-hover:text-app-accent'}`} />
+                <item.icon className={`w-5 h-5 ${isActive ? 'text-app-accent-ink' : 'text-app-muted group-hover:text-app-accent'}`} />
                 <span className="font-medium">{item.label}</span>
                 {isActive && (
                   <motion.div 

@@ -114,27 +114,27 @@ export const TransactionsPage = () => {
     <div className="p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Transações</h1>
-          <p className="text-slate-400">Acompanhe seu fluxo de caixa detalhadamente</p>
+          <h1 className="text-3xl font-bold text-app-ink">Transações</h1>
+          <p className="text-app-muted">Acompanhe seu fluxo de caixa detalhadamente</p>
         </div>
         
         <div className="flex items-center gap-3">
           <div className="bg-app-surface border border-app-border rounded-2xl p-1 flex items-center">
             <button
               onClick={() => setFilterType('all')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'all' ? 'bg-app-accent text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'all' ? 'bg-app-accent text-app-accent-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               Tudo
             </button>
             <button
               onClick={() => setFilterType('income')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'income' ? 'bg-app-success text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'income' ? 'bg-app-success text-white shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               Entradas
             </button>
             <button
               onClick={() => setFilterType('expense')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-app-danger text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-app-danger text-white shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               Saídas
             </button>
@@ -142,7 +142,7 @@ export const TransactionsPage = () => {
 
           <button
             onClick={handleExport}
-            className="bg-app-surface hover:bg-app-surface-2 text-white p-3 rounded-2xl border border-app-border transition-all active:scale-95"
+            className="bg-app-surface hover:bg-app-surface-2 text-app-ink p-3 rounded-2xl border border-app-border transition-all active:scale-95"
             title="Exportar CSV"
           >
             <Download className="w-6 h-6 text-blue-400" />
@@ -150,7 +150,7 @@ export const TransactionsPage = () => {
 
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+            className="bg-app-accent hover:bg-app-accent/90 text-app-accent-ink p-3 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/20"
           >
             <Plus className="w-6 h-6" />
           </button>
@@ -160,13 +160,13 @@ export const TransactionsPage = () => {
       {/* Busca e Filtros Avançados */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="md:col-span-2 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
           <input
             type="text"
             placeholder="Buscar por descrição..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
+            className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
           />
         </div>
         <button
@@ -174,13 +174,13 @@ export const TransactionsPage = () => {
           className={`flex items-center justify-center gap-2 border rounded-2xl py-4 px-6 transition-all font-medium ${
             Object.keys(advancedFilters).length > 0
               ? 'bg-app-accent/20 border-app-accent text-app-accent'
-              : 'bg-app-surface border-app-border text-slate-300 hover:bg-app-surface-2'
+              : 'bg-app-surface border-app-border text-app-muted hover:bg-app-surface-2'
           }`}
         >
           <Filter className="w-5 h-5" />
           Filtros Avançados
           {Object.keys(advancedFilters).length > 0 && (
-            <span className="w-5 h-5 bg-blue-600 text-white text-[10px] rounded-full flex items-center justify-center">
+            <span className="w-5 h-5 bg-app-accent text-app-accent-ink text-[10px] rounded-full flex items-center justify-center">
               {Object.keys(advancedFilters).length}
             </span>
           )}
@@ -189,24 +189,24 @@ export const TransactionsPage = () => {
 
       <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-app-card">
         <div className="px-6 py-4 border-b border-app-border flex items-center justify-between bg-app-surface-2">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+          <span className="text-xs font-bold text-app-muted uppercase tracking-widest">
             Mostrando {transactions.length} de {total} transações
           </span>
           <div className="flex items-center gap-2">
             <button
               disabled={page === 1 || loading}
               onClick={() => setPage(page - 1)}
-              className="p-2 rounded-xl bg-app-surface border border-app-border text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               Anterior
             </button>
-            <span className="text-white font-bold px-3 py-1 bg-app-accent/20 border border-app-accent/30 rounded-lg text-sm">
+            <span className="text-app-ink font-bold px-3 py-1 bg-app-accent/20 border border-app-accent/30 rounded-lg text-sm">
               {page}
             </span>
             <button
               disabled={page * perPage >= total || loading}
               onClick={() => setPage(page + 1)}
-              className="p-2 rounded-xl bg-app-surface border border-app-border text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               Próximo
             </button>
@@ -236,7 +236,7 @@ export const TransactionsPage = () => {
                     
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-white font-bold group-hover:text-blue-400 transition-colors">{transaction.description}</h3>
+                        <h3 className="text-app-ink font-bold group-hover:text-blue-400 transition-colors">{transaction.description}</h3>
                         {transaction.recurrenceId && (
                           <span title="Transação Recorrente">
                             <RefreshCw className="w-3 h-3 text-blue-400" />
@@ -244,11 +244,11 @@ export const TransactionsPage = () => {
                         )}
                       </div>
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="flex items-center gap-1 text-xs text-slate-500 font-medium bg-app-surface px-2 py-1 rounded-lg">
+                        <span className="flex items-center gap-1 text-xs text-app-muted font-medium bg-app-surface px-2 py-1 rounded-lg">
                           <Calendar className="w-3 h-3" />
                           {formatDate(transaction.occurredAt)}
                         </span>
-                        <span className="flex items-center gap-1 text-xs text-slate-500 font-medium bg-app-surface px-2 py-1 rounded-lg">
+                        <span className="flex items-center gap-1 text-xs text-app-muted font-medium bg-app-surface px-2 py-1 rounded-lg">
                           <WalletIcon className="w-3 h-3" />
                           {transaction.wallet?.name || 'Carteira'}
                         </span>
@@ -267,7 +267,7 @@ export const TransactionsPage = () => {
                         {transaction.status === 'completed' ? 'Efetivado' : 'Pendente'}
                       </span>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-slate-700 group-hover:text-slate-400 transition-colors" />
+                    <ChevronRight className="w-5 h-5 text-app-muted group-hover:text-app-ink transition-colors" />
                   </div>
                 </motion.div>
               ))}
@@ -276,10 +276,10 @@ export const TransactionsPage = () => {
             {transactions.length === 0 && !loading && (
               <div className="p-20 flex flex-col items-center justify-center text-center">
                 <div className="p-4 bg-app-surface rounded-full mb-4">
-                  <ArrowUpCircle className="w-12 h-12 text-slate-600" />
+                  <ArrowUpCircle className="w-12 h-12 text-app-muted" />
                 </div>
-                <h3 className="text-white font-bold text-lg">Nenhuma transação encontrada</h3>
-                <p className="text-slate-500 mt-1 max-w-xs">Parece que você ainda não registrou movimentos financeiros com este filtro.</p>
+                <h3 className="text-app-ink font-bold text-lg">Nenhuma transação encontrada</h3>
+                <p className="text-app-muted mt-1 max-w-xs">Parece que você ainda não registrou movimentos financeiros com este filtro.</p>
               </div>
             )}
           </div>
