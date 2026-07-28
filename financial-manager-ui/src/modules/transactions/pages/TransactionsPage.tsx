@@ -119,30 +119,30 @@ export const TransactionsPage = () => {
         </div>
         
         <div className="flex items-center gap-3">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-1 flex items-center">
-            <button 
+          <div className="bg-app-surface border border-app-border rounded-2xl p-1 flex items-center">
+            <button
               onClick={() => setFilterType('all')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'all' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'all' ? 'bg-app-accent text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
             >
               Tudo
             </button>
-            <button 
+            <button
               onClick={() => setFilterType('income')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'income' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'income' ? 'bg-app-success text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
             >
               Entradas
             </button>
-            <button 
+            <button
               onClick={() => setFilterType('expense')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-red-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-app-danger text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
             >
               Saídas
             </button>
           </div>
 
-          <button 
+          <button
             onClick={handleExport}
-            className="bg-white/5 hover:bg-white/10 text-white p-3 rounded-2xl border border-white/10 transition-all active:scale-95"
+            className="bg-app-surface hover:bg-app-surface-2 text-white p-3 rounded-2xl border border-app-border transition-all active:scale-95"
             title="Exportar CSV"
           >
             <Download className="w-6 h-6 text-blue-400" />
@@ -161,20 +161,20 @@ export const TransactionsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="md:col-span-2 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Buscar por descrição..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+            className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
           />
         </div>
-        <button 
+        <button
           onClick={() => setIsFiltersModalOpen(true)}
           className={`flex items-center justify-center gap-2 border rounded-2xl py-4 px-6 transition-all font-medium ${
-            Object.keys(advancedFilters).length > 0 
-              ? 'bg-blue-600/20 border-blue-500 text-blue-400' 
-              : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+            Object.keys(advancedFilters).length > 0
+              ? 'bg-app-accent/20 border-app-accent text-app-accent'
+              : 'bg-app-surface border-app-border text-slate-300 hover:bg-app-surface-2'
           }`}
         >
           <Filter className="w-5 h-5" />
@@ -187,26 +187,26 @@ export const TransactionsPage = () => {
         </button>
       </div>
 
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-app-card">
+        <div className="px-6 py-4 border-b border-app-border flex items-center justify-between bg-app-surface-2">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
             Mostrando {transactions.length} de {total} transações
           </span>
           <div className="flex items-center gap-2">
-            <button 
+            <button
               disabled={page === 1 || loading}
               onClick={() => setPage(page - 1)}
-              className="p-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+              className="p-2 rounded-xl bg-app-surface border border-app-border text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               Anterior
             </button>
-            <span className="text-white font-bold px-3 py-1 bg-blue-600/20 border border-blue-500/30 rounded-lg text-sm">
+            <span className="text-white font-bold px-3 py-1 bg-app-accent/20 border border-app-accent/30 rounded-lg text-sm">
               {page}
             </span>
-            <button 
+            <button
               disabled={page * perPage >= total || loading}
               onClick={() => setPage(page + 1)}
-              className="p-2 rounded-xl bg-white/5 border border-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+              className="p-2 rounded-xl bg-app-surface border border-app-border text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               Próximo
             </button>
@@ -215,22 +215,22 @@ export const TransactionsPage = () => {
         {loading ? (
           <div className="p-8 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-20 bg-white/5 rounded-2xl animate-pulse" />
+              <div key={i} className="h-20 bg-app-surface rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-app-border">
             <AnimatePresence>
               {transactions.map((transaction) => (
-                <motion.div 
+                <motion.div
                   key={transaction.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   onClick={() => handleShowDetail(transaction)}
-                  className="p-6 flex items-center justify-between group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                  className="p-6 flex items-center justify-between group hover:bg-app-surface-2 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-2xl ${transaction.type === 'income' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                    <div className={`p-3 rounded-2xl ${transaction.type === 'income' ? 'bg-app-success/20 text-app-success' : 'bg-app-danger/20 text-app-danger'}`}>
                       {transaction.type === 'income' ? <ArrowUpCircle className="w-6 h-6" /> : <ArrowDownCircle className="w-6 h-6" />}
                     </div>
                     
@@ -244,11 +244,11 @@ export const TransactionsPage = () => {
                         )}
                       </div>
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="flex items-center gap-1 text-xs text-slate-500 font-medium bg-white/5 px-2 py-1 rounded-lg">
+                        <span className="flex items-center gap-1 text-xs text-slate-500 font-medium bg-app-surface px-2 py-1 rounded-lg">
                           <Calendar className="w-3 h-3" />
                           {formatDate(transaction.occurredAt)}
                         </span>
-                        <span className="flex items-center gap-1 text-xs text-slate-500 font-medium bg-white/5 px-2 py-1 rounded-lg">
+                        <span className="flex items-center gap-1 text-xs text-slate-500 font-medium bg-app-surface px-2 py-1 rounded-lg">
                           <WalletIcon className="w-3 h-3" />
                           {transaction.wallet?.name || 'Carteira'}
                         </span>
@@ -258,7 +258,7 @@ export const TransactionsPage = () => {
 
                   <div className="flex items-center gap-6 text-right">
                     <div>
-                      <p className={`text-lg font-bold ${transaction.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <p className={`text-lg font-bold ${transaction.type === 'income' ? 'text-app-success' : 'text-app-danger'}`}>
                         {transaction.type === 'income' ? '+' : '-'} {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(transaction.amount)}
                       </p>
                       <span className={`text-[10px] uppercase tracking-widest font-bold ${
@@ -275,7 +275,7 @@ export const TransactionsPage = () => {
 
             {transactions.length === 0 && !loading && (
               <div className="p-20 flex flex-col items-center justify-center text-center">
-                <div className="p-4 bg-white/5 rounded-full mb-4">
+                <div className="p-4 bg-app-surface rounded-full mb-4">
                   <ArrowUpCircle className="w-12 h-12 text-slate-600" />
                 </div>
                 <h3 className="text-white font-bold text-lg">Nenhuma transação encontrada</h3>
