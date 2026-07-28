@@ -8,6 +8,7 @@ export async function reportRoutes(fastify: FastifyInstance): Promise<void> {
 
   fastify.addHook('preHandler', authMiddleware);
 
+  fastify.get('/export', (request, reply) => controller.export(request, reply));
   fastify.get('/overview', (request, reply) => controller.overview(request, reply));
   fastify.get('/expenses-by-category', (request, reply) => controller.expensesByCategory(request, reply));
   fastify.get('/evolution', (request, reply) => controller.evolution(request, reply));

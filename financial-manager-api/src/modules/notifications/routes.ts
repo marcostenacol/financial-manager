@@ -9,6 +9,7 @@ export async function notificationRoutes(fastify: FastifyInstance): Promise<void
   fastify.addHook('preHandler', authMiddleware);
 
   fastify.get('/', (request, reply) => controller.index(request, reply));
+  fastify.patch('/read-all', (request, reply) => controller.markAllAsReadHandler(request, reply));
   fastify.patch('/:id/read', (request, reply) => controller.markAsReadHandler(request, reply));
   fastify.delete('/:id', (request, reply) => controller.delete(request, reply));
 }

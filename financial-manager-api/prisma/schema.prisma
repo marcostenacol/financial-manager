@@ -172,6 +172,7 @@ model Recurrence {
   startsAt        DateTime  @map("starts_at")
   endsAt          DateTime? @map("ends_at")
   lastProcessedAt DateTime? @map("last_processed_at")
+  isActive        Boolean   @default(true) @map("is_active")
 
   createdAt DateTime @default(now()) @map("created_at")
 

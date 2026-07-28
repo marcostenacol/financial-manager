@@ -36,4 +36,11 @@ export class NotificationRepository implements NotificationRepositoryInterface {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async markAllAsRead(userId: string): Promise<void> {
+    await prisma.notification.updateMany({
+      where: { userId, read: false },
+      data: { read: true },
+    });
+  }
 }

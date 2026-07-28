@@ -10,4 +10,6 @@ export async function recurrenceRoutes(fastify: FastifyInstance): Promise<void> 
 
   fastify.get('/', (request, reply) => controller.index(request, reply));
   fastify.post('/', (request, reply) => controller.store(request, reply));
+  fastify.patch('/:id/toggle', (request, reply) => controller.toggle(request, reply));
+  fastify.patch('/:id/cancel', (request, reply) => controller.cancel(request, reply));
 }

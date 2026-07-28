@@ -6,4 +6,5 @@ export interface NotificationRepositoryInterface {
   delete(id: string): Promise<void>;
   findById(id: string): Promise<Notification | null>;
   findAllByUserId(userId: string): Promise<Notification[]>;
+  markAllAsRead(userId: string): Promise<void>;
 }

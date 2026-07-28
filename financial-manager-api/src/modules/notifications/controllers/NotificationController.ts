@@ -3,6 +3,7 @@ import { injectable, inject } from 'tsyringe';
 import { BaseController } from '@/base/http/BaseController';
 import { ListNotificationsService } from '../services/ListNotificationsService';
 import { MarkNotificationAsReadService } from '../services/MarkNotificationAsReadService';
+import { MarkAllNotificationsAsReadService } from '../services/MarkAllNotificationsAsReadService';
 import { DeleteNotificationService } from '../services/DeleteNotificationService';
 
 @injectable()
@@ -10,6 +11,7 @@ export class NotificationController extends BaseController {
   constructor(
     @inject('ListNotificationsService') private listNotifications: ListNotificationsService,
     @inject('MarkNotificationAsReadService') private markAsRead: MarkNotificationAsReadService,
+    @inject('MarkAllNotificationsAsReadService') private markAllAsRead: MarkAllNotificationsAsReadService,
     @inject('DeleteNotificationService') private deleteNotification: DeleteNotificationService,
   ) {
     super();
@@ -26,6 +28,12 @@ export class NotificationController extends BaseController {
     const userId = (request.user as any).sub;
     const notification = await this.markAsRead.execute(id, userId);
     return this.success(reply, notification, 'Notificação marcada como lida');
+  }
+
+  async markAllAsReadHandler(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = (request.user as any).sub;
+    await this.markAllAsRead.execute(userId);
+    return this.success(reply, null, 'Todas as notificações foram marcadas como lidas');
   }
 
   async delete(request: FastifyRequest, reply: FastifyReply): Promise<void> {

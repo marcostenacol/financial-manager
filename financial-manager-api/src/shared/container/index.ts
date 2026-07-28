@@ -48,6 +48,7 @@ import { DeleteWalletService } from '@/modules/wallets/services/DeleteWalletServ
 import { DetailWalletService } from '@/modules/wallets/services/DetailWalletService';
 import { CreateTransactionService } from '@/modules/transactions/services/CreateTransactionService';
 import { ListTransactionsService } from '@/modules/transactions/services/ListTransactionsService';
+import { ExportTransactionsService } from '@/modules/transactions/services/ExportTransactionsService';
 import { DetailTransactionService } from '@/modules/transactions/services/DetailTransactionService';
 import { UpdateTransactionService } from '@/modules/transactions/services/UpdateTransactionService';
 import { DeleteTransactionService } from '@/modules/transactions/services/DeleteTransactionService';
@@ -59,6 +60,8 @@ import { DeleteCategoryService } from '@/modules/categories/services/DeleteCateg
 import { CreateRecurrenceService } from '@/modules/recurrences/services/CreateRecurrenceService';
 import { ListRecurrencesService } from '@/modules/recurrences/services/ListRecurrencesService';
 import { ProcessRecurrenceService } from '@/modules/recurrences/services/ProcessRecurrenceService';
+import { ToggleRecurrenceService } from '@/modules/recurrences/services/ToggleRecurrenceService';
+import { CancelRecurrenceService } from '@/modules/recurrences/services/CancelRecurrenceService';
 import { CreateSavingsGoalService } from '@/modules/savings-goals/services/CreateSavingsGoalService';
 import { ListSavingsGoalsService } from '@/modules/savings-goals/services/ListSavingsGoalsService';
 import { UpdateSavingsGoalService } from '@/modules/savings-goals/services/UpdateSavingsGoalService';
@@ -68,9 +71,11 @@ import { SavingsGoalRepositoryInterface } from '@/modules/savings-goals/reposito
 import { GetDashboardOverviewService } from '@/modules/reports/services/GetDashboardOverviewService';
 import { GetExpensesByCategoryService } from '@/modules/reports/services/GetExpensesByCategoryService';
 import { GetMonthlyEvolutionService } from '@/modules/reports/services/GetMonthlyEvolutionService';
+import { ExportReportService } from '@/modules/reports/services/ExportReportService';
 import { CreateNotificationService } from '@/modules/notifications/services/CreateNotificationService';
 import { ListNotificationsService } from '@/modules/notifications/services/ListNotificationsService';
 import { MarkNotificationAsReadService } from '@/modules/notifications/services/MarkNotificationAsReadService';
+import { MarkAllNotificationsAsReadService } from '@/modules/notifications/services/MarkAllNotificationsAsReadService';
 import { DeleteNotificationService } from '@/modules/notifications/services/DeleteNotificationService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
@@ -88,6 +93,7 @@ container.registerSingleton<DeleteWalletService>('DeleteWalletService', DeleteWa
 container.registerSingleton<DetailWalletService>('DetailWalletService', DetailWalletService);
 container.registerSingleton<CreateTransactionService>('CreateTransactionService', CreateTransactionService);
 container.registerSingleton<ListTransactionsService>('ListTransactionsService', ListTransactionsService);
+container.registerSingleton<ExportTransactionsService>('ExportTransactionsService', ExportTransactionsService);
 container.registerSingleton<DetailTransactionService>('DetailTransactionService', DetailTransactionService);
 container.registerSingleton<UpdateTransactionService>('UpdateTransactionService', UpdateTransactionService);
 container.registerSingleton<DeleteTransactionService>('DeleteTransactionService', DeleteTransactionService);
@@ -99,6 +105,8 @@ container.registerSingleton<DeleteCategoryService>('DeleteCategoryService', Dele
 container.registerSingleton<CreateRecurrenceService>('CreateRecurrenceService', CreateRecurrenceService);
 container.registerSingleton<ListRecurrencesService>('ListRecurrencesService', ListRecurrencesService);
 container.registerSingleton<ProcessRecurrenceService>('ProcessRecurrenceService', ProcessRecurrenceService);
+container.registerSingleton<ToggleRecurrenceService>('ToggleRecurrenceService', ToggleRecurrenceService);
+container.registerSingleton<CancelRecurrenceService>('CancelRecurrenceService', CancelRecurrenceService);
 container.registerSingleton<SavingsGoalRepositoryInterface>('SavingsGoalRepository', SavingsGoalRepository);
 container.registerSingleton<CreateSavingsGoalService>('CreateSavingsGoalService', CreateSavingsGoalService);
 container.registerSingleton<ListSavingsGoalsService>('ListSavingsGoalsService', ListSavingsGoalsService);
@@ -107,7 +115,9 @@ container.registerSingleton<DeleteSavingsGoalService>('DeleteSavingsGoalService'
 container.registerSingleton<GetDashboardOverviewService>('GetDashboardOverviewService', GetDashboardOverviewService);
 container.registerSingleton<GetExpensesByCategoryService>('GetExpensesByCategoryService', GetExpensesByCategoryService);
 container.registerSingleton<GetMonthlyEvolutionService>('GetMonthlyEvolutionService', GetMonthlyEvolutionService);
+container.registerSingleton<ExportReportService>('ExportReportService', ExportReportService);
 container.registerSingleton<CreateNotificationService>('CreateNotificationService', CreateNotificationService);
 container.registerSingleton<ListNotificationsService>('ListNotificationsService', ListNotificationsService);
 container.registerSingleton<MarkNotificationAsReadService>('MarkNotificationAsReadService', MarkNotificationAsReadService);
+container.registerSingleton<MarkAllNotificationsAsReadService>('MarkAllNotificationsAsReadService', MarkAllNotificationsAsReadService);
 container.registerSingleton<DeleteNotificationService>('DeleteNotificationService', DeleteNotificationService);
