@@ -5,6 +5,16 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { api } from '../../../services/api';
 import { useToast } from '../../../shared/components/useToast';
 
+// Recharts requires literal color strings, not CSS var() — keep these in sync with the
+// CSS tokens in src/index.css (--success, --danger, --border, --muted, --surface).
+const CHART_COLORS = {
+  income: '#4ade80',
+  expense: '#f28b74',
+  grid: 'rgba(255,255,255,.1)',
+  axis: '#94a3b8',
+  tooltipBg: 'rgba(255,255,255,.05)',
+};
+
 interface DashboardOverview {
   total_balance: number;
   monthly_income: number;
@@ -132,9 +142,9 @@ export const DashboardPage = () => {
     return (
       <div className="p-8 space-y-8 animate-pulse">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-white/5 rounded-3xl" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-app-surface rounded-3xl" />)}
         </div>
-        <div className="h-64 bg-white/5 rounded-3xl" />
+        <div className="h-64 bg-app-surface rounded-3xl" />
       </div>
     );
   }
@@ -143,11 +153,11 @@ export const DashboardPage = () => {
     <div className="p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <p className="text-slate-400">Bem-vindo de volta! Aqui está o resumo das suas finanças.</p>
+          <h1 className="text-3xl font-bold text-app-ink">Dashboard</h1>
+          <p className="text-app-muted">Bem-vindo de volta! Aqui está o resumo das suas finanças.</p>
         </div>
 
-        <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+        <div className="flex bg-app-surface p-1 rounded-2xl border border-app-border">
           {[
             { id: 'month', label: 'Este Mês' },
             { id: '7days', label: '7 dias' },
@@ -158,9 +168,9 @@ export const DashboardPage = () => {
               key={preset.id}
               onClick={() => handlePresetChange(preset.id)}
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                active_preset === preset.id 
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
-                  : 'text-slate-400 hover:text-white'
+                active_preset === preset.id
+                  ? 'bg-app-accent text-app-accent-ink shadow-lg shadow-blue-600/20'
+                  : 'text-app-muted hover:text-app-ink'
               }`}
             >
               {preset.label}
@@ -171,14 +181,14 @@ export const DashboardPage = () => {
         <div className="flex gap-2">
           <button
             onClick={() => handleExport('pdf')}
-            className="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/10 flex items-center gap-2 transition-all"
+            className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-4 py-2 rounded-xl text-sm font-bold border border-app-border flex items-center gap-2 transition-all"
           >
             <FileDown className="w-4 h-4 text-red-400" />
             PDF
           </button>
           <button
             onClick={() => handleExport('excel')}
-            className="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-xl text-sm font-bold border border-white/10 flex items-center gap-2 transition-all"
+            className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-4 py-2 rounded-xl text-sm font-bold border border-app-border flex items-center gap-2 transition-all"
           >
             <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             Excel
@@ -187,10 +197,10 @@ export const DashboardPage = () => {
       </div>
 
       {active_preset === 'custom' && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex gap-4 mb-8 p-4 bg-white/5 border border-white/10 rounded-2xl items-end"
+          className="flex gap-4 mb-8 p-4 bg-app-surface border border-app-border rounded-2xl items-end"
         >
           <div className="space-y-1">
             <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500 ml-1">Início</label>
@@ -218,7 +228,7 @@ export const DashboardPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl shadow-xl shadow-blue-900/20 relative overflow-hidden group"
+          className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl shadow-xl shadow-app-card relative overflow-hidden group"
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
             <Wallet className="w-24 h-24" />
@@ -238,7 +248,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl"
+          className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-6 rounded-3xl"
         >
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-emerald-500/20 rounded-2xl text-emerald-400">
@@ -264,7 +274,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl"
+          className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-6 rounded-3xl"
         >
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-red-500/20 rounded-2xl text-red-400">
@@ -291,7 +301,7 @@ export const DashboardPage = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+          className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -334,7 +344,7 @@ export const DashboardPage = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+          className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -348,24 +358,24 @@ export const DashboardPage = () => {
               <AreaChart data={evolution}>
                 <defs>
                   <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    <stop offset="5%" stopColor={CHART_COLORS.income} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={CHART_COLORS.income} stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                    <stop offset="5%" stopColor={CHART_COLORS.expense} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={CHART_COLORS.expense} stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} vertical={false} />
                 <XAxis 
                   dataKey="month_name" 
-                  stroke="#94a3b8" 
+                  stroke={CHART_COLORS.axis} 
                   fontSize={12} 
                   tickLine={false} 
                   axisLine={false}
                 />
                 <YAxis 
-                  stroke="#94a3b8" 
+                  stroke={CHART_COLORS.axis} 
                   fontSize={12} 
                   tickLine={false} 
                   axisLine={false}
@@ -373,8 +383,8 @@ export const DashboardPage = () => {
                 />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#1e293b', 
-                    border: '1px solid #ffffff10',
+                    backgroundColor: CHART_COLORS.tooltipBg, 
+                    border: `1px solid ${CHART_COLORS.grid}`,
                     borderRadius: '16px',
                     color: '#fff'
                   }}
@@ -383,7 +393,7 @@ export const DashboardPage = () => {
                 <Area 
                   type="monotone" 
                   dataKey="income" 
-                  stroke="#10b981" 
+                  stroke={CHART_COLORS.income} 
                   strokeWidth={3}
                   fillOpacity={1} 
                   fill="url(#colorIncome)" 
@@ -392,7 +402,7 @@ export const DashboardPage = () => {
                 <Area 
                   type="monotone" 
                   dataKey="expense" 
-                  stroke="#ef4444" 
+                  stroke={CHART_COLORS.expense} 
                   strokeWidth={3}
                   fillOpacity={1} 
                   fill="url(#colorExpense)" 
@@ -409,7 +419,7 @@ export const DashboardPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mt-8 bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-3xl"
+        className="mt-8 bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-8 rounded-3xl"
       >
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-xl font-bold text-white flex items-center gap-2">
