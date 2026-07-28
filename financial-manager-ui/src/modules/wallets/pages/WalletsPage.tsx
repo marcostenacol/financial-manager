@@ -48,20 +48,20 @@ export const WalletsPage = () => {
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Minhas Carteiras</h1>
-          <p className="text-slate-400">Gerencie seu dinheiro em diferentes contas</p>
+          <h1 className="text-3xl font-bold text-app-ink">Minhas Carteiras</h1>
+          <p className="text-app-muted">Gerencie seu dinheiro em diferentes contas</p>
         </div>
         <div className="flex gap-4">
-          <button 
+          <button
             onClick={() => setIsTransferModalOpen(true)}
-            className="bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all border border-white/10 active:scale-95"
+            className="bg-app-surface hover:bg-app-surface-2 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all border border-app-border active:scale-95"
           >
             <ArrowRightLeft className="w-5 h-5 text-blue-400" />
             Transferir
           </button>
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+            className="bg-app-accent hover:opacity-90 text-app-accent-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
           >
             <Plus className="w-5 h-5" />
             Nova Carteira
@@ -72,7 +72,7 @@ export const WalletsPage = () => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 bg-white/5 border border-white/10 rounded-3xl animate-pulse" />
+            <div key={i} className="h-48 bg-app-surface border border-app-border rounded-3xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -85,7 +85,7 @@ export const WalletsPage = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 onClick={() => handleEdit(wallet)}
-                className={`relative group h-48 p-6 rounded-3xl border border-white/10 bg-gradient-to-br ${getWalletGradient(wallet.type)} shadow-xl overflow-hidden cursor-pointer`}
+                className={`relative group h-48 p-6 rounded-3xl border border-app-border bg-gradient-to-br ${getWalletGradient(wallet.type)} shadow-app-card overflow-hidden cursor-pointer`}
               >
                 {/* Efeito de Vidro */}
                 <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
@@ -116,7 +116,7 @@ export const WalletsPage = () => {
           </AnimatePresence>
 
           {wallets.length === 0 && !loading && (
-            <div className="col-span-full py-20 flex flex-col items-center justify-center border-2 border-dashed border-white/10 rounded-3xl">
+            <div className="col-span-full py-20 flex flex-col items-center justify-center border-2 border-dashed border-app-border rounded-3xl">
               <div className="p-4 bg-white/5 rounded-full mb-4">
                 <WalletIcon className="w-12 h-12 text-slate-600" />
               </div>
