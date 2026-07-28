@@ -18,13 +18,13 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 bg-slate-900/50 backdrop-blur-xl border-r border-white/10 flex flex-col h-screen sticky top-0">
+    <aside className="w-64 bg-app-surface backdrop-blur-xl border-r border-app-border flex flex-col h-screen sticky top-0">
       <div className="p-6">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <span className="text-white font-bold text-xl">F</span>
+            <span className="text-app-ink font-bold text-xl">F</span>
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">Financial.</span>
+          <span className="text-app-ink font-bold text-lg tracking-tight">Financial.</span>
         </div>
 
         <nav className="space-y-2">
@@ -35,12 +35,12 @@ export const Sidebar = () => {
                 key={item.path}
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  isActive 
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
-                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                  isActive
+                    ? 'bg-app-accent text-app-accent-ink shadow-lg shadow-app-card'
+                    : 'text-app-muted hover:bg-app-surface-2 hover:text-app-ink'
                 }`}
               >
-                <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-blue-400'}`} />
+                <item.icon className={`w-5 h-5 ${isActive ? 'text-app-ink' : 'text-app-muted group-hover:text-app-accent'}`} />
                 <span className="font-medium">{item.label}</span>
                 {isActive && (
                   <motion.div 
@@ -54,20 +54,20 @@ export const Sidebar = () => {
         </nav>
       </div>
 
-      <div className="mt-auto p-6 border-t border-white/5">
+      <div className="mt-auto p-6 border-t border-app-border">
         <div className="flex items-center gap-3 mb-6 px-2">
-          <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
+          <div className="w-10 h-10 rounded-full bg-app-accent-soft border border-app-accent/20 flex items-center justify-center text-app-accent font-bold">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-white font-medium text-sm truncate">{user?.name}</span>
-            <span className="text-slate-500 text-xs truncate">{user?.email}</span>
+            <span className="text-app-ink font-medium text-sm truncate">{user?.name}</span>
+            <span className="text-app-muted text-xs truncate">{user?.email}</span>
           </div>
         </div>
 
         <button
           onClick={signOut}
-          className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-red-400 hover:bg-red-400/5 rounded-xl transition-all"
+          className="flex items-center gap-3 w-full px-4 py-3 text-app-muted hover:text-app-danger hover:bg-app-danger/5 rounded-xl transition-all"
         >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Sair</span>
