@@ -93,7 +93,7 @@ export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess, initialData
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-white/5 flex justify-between items-center">
           <h2 className="text-xl font-bold text-white">{initialData ? 'Editar Meta' : 'Nova Meta de Economia'}</h2>

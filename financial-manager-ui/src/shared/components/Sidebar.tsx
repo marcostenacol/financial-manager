@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
 import { motion } from 'framer-motion';
 
 export const Sidebar = () => {
   const { signOut, user } = useAuth();
   const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
@@ -18,8 +20,36 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-app-card flex flex-col h-[calc(100vh-2rem)] sticky top-4">
-      <div className="p-6">
+    <>
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="md:hidden fixed top-4 left-4 z-40 w-10 h-10 flex items-center justify-center bg-app-surface border border-app-border rounded-xl shadow-app-card text-app-ink"
+        aria-label="Abrir menu"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden fixed inset-0 z-40 bg-black/60"
+        />
+      )}
+
+      <aside
+        className={`w-64 bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-app-card flex flex-col h-[calc(100vh-2rem)] fixed md:sticky top-4 left-4 md:left-auto z-50 transition-transform duration-200 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)] md:translate-x-0'
+        }`}
+      >
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-app-muted hover:text-app-ink"
+          aria-label="Fechar menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="p-6">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <span className="text-app-ink font-bold text-xl">F</span>
@@ -34,6 +64,7 @@ export const Sidebar = () => {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                   isActive
                     ? 'bg-app-accent text-app-accent-ink shadow-app-card'
@@ -73,6 +104,7 @@ export const Sidebar = () => {
           <span className="font-medium">Sair</span>
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 };

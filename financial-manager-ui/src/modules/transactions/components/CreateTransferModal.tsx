@@ -108,7 +108,7 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-xl bg-[#1e293b] border border-white/10 rounded-[32px] shadow-2xl overflow-hidden"
+            className="relative w-full max-w-xl bg-[#1e293b] border border-white/10 rounded-[32px] shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <div className="p-8 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-blue-600/10 to-transparent">
               <div className="flex items-center gap-3">
