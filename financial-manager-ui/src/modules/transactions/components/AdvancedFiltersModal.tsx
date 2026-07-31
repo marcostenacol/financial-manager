@@ -56,13 +56,21 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
     if (isOpen) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       loadData();
-      setFilters(currentFilters);
+      setFilters({
+        ...currentFilters,
+        start_date: currentFilters.start_date ? currentFilters.start_date.split('T')[0] : undefined,
+        end_date: currentFilters.end_date ? currentFilters.end_date.split('T')[0] : undefined,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, currentFilters]);
 
   const handleApply = () => {
-    onApply(filters);
+    onApply({
+      ...filters,
+      start_date: filters.start_date ? new Date(filters.start_date).toISOString() : undefined,
+      end_date: filters.end_date ? new Date(filters.end_date).toISOString() : undefined,
+    });
     onClose();
   };
 

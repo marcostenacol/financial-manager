@@ -90,7 +90,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
         amount: Number(amount),
         type,
         category_id: categoryId || undefined,
-        occurred_at: occurredAt,
+        occurred_at: new Date(occurredAt).toISOString(),
         status: transaction.status,
       });
 

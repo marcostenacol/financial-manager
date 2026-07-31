@@ -51,6 +51,9 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       if (walletsData.length > 0) {
         setWalletId(walletsData[0].id);
       }
+      if (categoriesData.length > 0) {
+        setCategoryId(categoriesData[0].id);
+      }
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao carregar dados para transação'), 'error');
     }
@@ -74,8 +77,8 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
         amount: Number(amount),
         type,
         wallet_id: walletId,
-        category_id: categoryId || undefined,
-        occurred_at: occurredAt,
+        category_id: categoryId,
+        occurred_at: new Date(occurredAt).toISOString(),
         status: 'completed', // Por padrão efetivado para simplificar
       });
       
@@ -207,15 +210,16 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400 ml-1">Categoria (Opcional)</label>
+              <label className="text-sm font-medium text-slate-400 ml-1">Categoria</label>
               <div className="relative">
                 <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <select
+                  required
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none"
                 >
-                  <option value="" className="bg-slate-900">Sem categoria</option>
+                  <option value="" disabled className="bg-slate-900">Selecionar categoria</option>
                   {categories.map(category => (
                     <option key={category.id} value={category.id} className="bg-slate-900">{category.name}</option>
                   ))}
