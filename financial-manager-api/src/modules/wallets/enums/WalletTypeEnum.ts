@@ -1,4 +1,7 @@
 export enum WalletTypeEnum {
-  PERSONAL = 'personal',
-  BUSINESS = 'business',
+  CHECKING = 'checking',
+  SAVINGS = 'savings',
+  CREDIT = 'credit',
+  INVESTMENT = 'investment',
+  CASH = 'cash',
 }

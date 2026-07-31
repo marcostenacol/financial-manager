@@ -109,7 +109,7 @@ model Wallet {
   id       String  @id @default(uuid())
   userId   String  @map("user_id")
   name     String
-  type     String  // personal, business
+  type     String  // checking, savings, credit, investment, cash
   balance  Decimal @default(0) @db.Decimal(15, 2)
   currency String  @default("BRL")
   deletedAt DateTime? @map("deleted_at")

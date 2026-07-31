@@ -12,26 +12,26 @@ export class ReportRepository implements ReportRepositoryInterface {
         WHERE user_id = $1
       ),
       monthly_stats AS (
-        SELECT 
-          COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as income,
-          COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as expense
+        SELECT
+          COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as income,
+          COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
         FROM transactions t
         JOIN wallets w ON t.wallet_id = w.id
         WHERE w.user_id = $1
-          AND status = 'completed'
-          AND occurred_at >= date_trunc('month', now())
-          AND occurred_at < date_trunc('month', now() + interval '1 month')
+          AND t.status = 'completed'
+          AND t.occurred_at >= date_trunc('month', now())
+          AND t.occurred_at < date_trunc('month', now() + interval '1 month')
       ),
       last_month_stats AS (
-        SELECT 
-          COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as income,
-          COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as expense
+        SELECT
+          COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as income,
+          COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
         FROM transactions t
         JOIN wallets w ON t.wallet_id = w.id
         WHERE w.user_id = $1
-          AND status = 'completed'
-          AND occurred_at >= date_trunc('month', now() - interval '1 month')
-          AND occurred_at < date_trunc('month', now())
+          AND t.status = 'completed'
+          AND t.occurred_at >= date_trunc('month', now() - interval '1 month')
+          AND t.occurred_at < date_trunc('month', now())
       )
       SELECT 
         w.total_balance,
