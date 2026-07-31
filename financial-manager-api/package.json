@@ -43,7 +43,6 @@
     "@types/node-cron": "^3.0.11",
     "@types/pdfkit": "^0.17.6",
     "prisma": "^7.8.0",
-    "supertest": "^7.2.2",
     "tsc-alias": "^1.9.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
