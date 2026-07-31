@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity, Target, FileDown, FileSpreadsheet } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -396,9 +397,9 @@ export const DashboardPage = () => {
             <Target className="w-5 h-5 text-emerald-400" />
             Progresso das Metas
           </h3>
-          <button className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+          <Link to="/savings-goals" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
             Ver todas as metas
-          </button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
