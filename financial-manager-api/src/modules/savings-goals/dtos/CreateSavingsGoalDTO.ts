@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CreateSavingsGoalSchema = z.object({
+export const CreateSavingsGoalDTO = z.object({
   name: z.string().min(3).max(50),
   target_amount: z.number().positive(),
   current_amount: z.number().min(0).optional().default(0),
@@ -9,4 +9,4 @@ export const CreateSavingsGoalSchema = z.object({
   icon: z.string().optional().nullable(),
 });
 
-export type ICreateSavingsGoalDTO = z.infer<typeof CreateSavingsGoalSchema>;
+export type CreateSavingsGoalDTOType = z.infer<typeof CreateSavingsGoalDTO>;

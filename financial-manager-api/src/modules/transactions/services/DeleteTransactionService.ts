@@ -6,6 +6,7 @@ import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class DeleteTransactionService {
@@ -45,10 +46,10 @@ export class DeleteTransactionService {
     await this.transactionRepository.delete(id);
 
     // Invalida caches (incluindo listagens filtradas)
-    await this.cache.del(`wallet:detail:${wallet.id}`);
-    await this.cache.del(`wallets:user:${userId}`);
-    await this.cache.del(`transaction:detail:${id}`);
-    await this.cache.delPattern(`transactions:user:${userId}*`);
-    await this.cache.delPattern(`transactions:wallet:${wallet.id}*`);
+    await this.cache.del(CacheKeys.wallets.detail(wallet.id));
+    await this.cache.del(CacheKeys.wallets.list(userId));
+    await this.cache.del(CacheKeys.transactions.detail(id));
+    await this.cache.delPattern(CacheKeys.transactions.listPattern(userId));
+    await this.cache.delPattern(CacheKeys.transactions.byWalletPattern(wallet.id));
   }
 }

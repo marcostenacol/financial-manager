@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { Notification } from '@prisma/client';
 import { NotificationRepositoryInterface } from '../repositories/contracts/NotificationRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class ListNotificationsService {
@@ -13,7 +14,7 @@ export class ListNotificationsService {
   ) {}
 
   async execute(userId: string): Promise<Notification[]> {
-    const cacheKey = `notifications:user:${userId}`;
+    const cacheKey = CacheKeys.notifications.list(userId);
 
     const cachedNotifications = await this.cache.get<Notification[]>(cacheKey);
     if (cachedNotifications) {

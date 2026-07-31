@@ -5,7 +5,8 @@ import { CreateSavingsGoalService } from '../services/CreateSavingsGoalService';
 import { ListSavingsGoalsService } from '../services/ListSavingsGoalsService';
 import { UpdateSavingsGoalService } from '../services/UpdateSavingsGoalService';
 import { DeleteSavingsGoalService } from '../services/DeleteSavingsGoalService';
-import { CreateSavingsGoalSchema } from '../dtos/ICreateSavingsGoalDTO';
+import { CreateSavingsGoalDTO } from '../dtos/CreateSavingsGoalDTO';
+import { UpdateSavingsGoalDTO } from '../dtos/UpdateSavingsGoalDTO';
 
 @injectable()
 export class SavingsGoalController extends BaseController {
@@ -19,29 +20,29 @@ export class SavingsGoalController extends BaseController {
   }
 
   async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const userId = (request.user as any).sub;
+    const userId = request.user.sub;
     const goals = await this.listGoals.execute(userId);
     return this.success(reply, goals);
   }
 
   async store(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const data = CreateSavingsGoalSchema.parse(request.body);
-    const userId = (request.user as any).sub;
+    const data = CreateSavingsGoalDTO.parse(request.body);
+    const userId = request.user.sub;
     const goal = await this.createGoal.execute(data, userId);
     return this.success(reply, goal, 'Meta criada com sucesso', 201);
   }
 
   async update(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
-    const data = request.body as any;
-    const userId = (request.user as any).sub;
+    const data = UpdateSavingsGoalDTO.parse(request.body);
+    const userId = request.user.sub;
     const goal = await this.updateGoal.execute(id, data, userId);
     return this.success(reply, goal, 'Meta atualizada com sucesso');
   }
 
   async delete(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
-    const userId = (request.user as any).sub;
+    const userId = request.user.sub;
     await this.deleteGoal.execute(id, userId);
     return this.success(reply, null, 'Meta removida com sucesso');
   }

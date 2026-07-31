@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { ReportRepositoryInterface, DashboardOverviewData } from '../repositories/contracts/ReportRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class GetDashboardOverviewService {
@@ -12,7 +13,7 @@ export class GetDashboardOverviewService {
   ) {}
 
   async execute(userId: string): Promise<DashboardOverviewData> {
-    const cacheKey = `reports:overview:${userId}`;
+    const cacheKey = CacheKeys.reports.overview(userId);
     
     const cached = await this.cache.get<DashboardOverviewData>(cacheKey);
     if (cached) {

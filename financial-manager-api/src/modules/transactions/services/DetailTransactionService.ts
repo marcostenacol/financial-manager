@@ -3,6 +3,7 @@ import { Transaction } from '@prisma/client';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 interface TransactionWithWallet extends Transaction {
   wallet?: { userId: string } | null;
@@ -18,7 +19,7 @@ export class DetailTransactionService {
   ) {}
 
   async execute(id: string, userId: string): Promise<Transaction> {
-    const cacheKey = `transaction:detail:${id}`;
+    const cacheKey = CacheKeys.transactions.detail(id);
 
     const cached = await this.cache.get<TransactionWithWallet>(cacheKey);
     if (cached) {

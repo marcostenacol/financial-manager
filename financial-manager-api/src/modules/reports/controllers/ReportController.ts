@@ -18,7 +18,7 @@ export class ReportController extends BaseController {
   }
 
   async export(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const userId = (request.user as any).sub;
+    const userId = request.user.sub;
     const { format, start_date, end_date } = request.query as {
       format: 'pdf' | 'excel';
       start_date?: string;
@@ -38,13 +38,13 @@ export class ReportController extends BaseController {
   }
 
   async overview(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const userId = (request.user as any).sub;
+    const userId = request.user.sub;
     const data = await this.getOverview.execute(userId);
     return this.success(reply, data);
   }
 
   async expensesByCategory(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const userId = (request.user as any).sub;
+    const userId = request.user.sub;
     const { month, year } = request.query as { month: string; year: string };
     
     const now = new Date();
@@ -56,7 +56,7 @@ export class ReportController extends BaseController {
   }
 
   async evolution(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const userId = (request.user as any).sub;
+    const userId = request.user.sub;
     const data = await this.getEvolution.execute(userId);
     return this.success(reply, data);
   }

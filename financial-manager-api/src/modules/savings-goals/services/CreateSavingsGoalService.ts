@@ -1,8 +1,9 @@
 import { inject, injectable } from 'tsyringe';
 import { SavingsGoalRepositoryInterface } from '../repositories/contracts/SavingsGoalRepositoryInterface';
-import { ICreateSavingsGoalDTO } from '../dtos/ICreateSavingsGoalDTO';
+import { CreateSavingsGoalDTOType } from '../dtos/CreateSavingsGoalDTO';
 import { SavingsGoal } from '@prisma/client';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class CreateSavingsGoalService {
@@ -13,13 +14,13 @@ export class CreateSavingsGoalService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(data: ICreateSavingsGoalDTO, userId: string): Promise<SavingsGoal> {
+  async execute(data: CreateSavingsGoalDTOType, userId: string): Promise<SavingsGoal> {
     const goal = await this.savingsGoalRepository.create({
       ...data,
       userId,
     });
 
-    await this.cache.del(`savings-goals:user:${userId}`);
+    await this.cache.del(CacheKeys.savingsGoals.list(userId));
 
     return goal;
   }

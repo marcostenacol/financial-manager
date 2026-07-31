@@ -38,7 +38,7 @@ export class AuthController extends BaseController {
   }
 
   async logout(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    await this.logout_service.execute((request.user as any).sub);
+    await this.logout_service.execute(request.user.sub);
     return this.success(reply, null, 'Logout realizado com sucesso');
   }
 }

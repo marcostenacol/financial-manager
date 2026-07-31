@@ -2,6 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import { Profile } from '@prisma/client';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { ProfileRepositoryInterface } from '../repositories/contracts/ProfileRepositoryInterface';
 
 @injectable()
@@ -14,7 +15,7 @@ export class DetailProfileService {
   ) {}
 
   async execute(user_id: string): Promise<Profile> {
-    const cache_key = `profile:user:${user_id}`;
+    const cache_key = CacheKeys.profile.detail(user_id);
 
     // 1. Verificar cache
     const cached = await this.cache.get<Profile>(cache_key);

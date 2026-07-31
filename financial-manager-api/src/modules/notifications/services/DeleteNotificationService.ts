@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { NotificationRepositoryInterface } from '../repositories/contracts/NotificationRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class DeleteNotificationService {
@@ -21,6 +22,6 @@ export class DeleteNotificationService {
 
     await this.notificationRepository.delete(id);
 
-    await this.cache.del(`notifications:user:${userId}`);
+    await this.cache.del(CacheKeys.notifications.list(userId));
   }
 }

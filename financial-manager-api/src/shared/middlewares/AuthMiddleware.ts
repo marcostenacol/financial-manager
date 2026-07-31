@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { container } from 'tsyringe';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { AppError } from '@/shared/errors/AppError';
 
 export async function authMiddleware(
@@ -10,10 +11,10 @@ export async function authMiddleware(
   try {
     await request.jwtVerify();
     
-    const { sub: user_id } = request.user as { sub: string };
+    const { sub: user_id } = request.user;
     
     const cache = container.resolve<CacheTrait>(CacheTrait);
-    const cached_user = await cache.get(`auth:token:${user_id}`);
+    const cached_user = await cache.get(CacheKeys.auth.token(user_id));
 
     if (!cached_user) {
       // Sessão não encontrada no Redis: token foi revogado (logout) ou expirou no cache.

@@ -1,5 +1,5 @@
 import { Recurrence, Prisma } from '@prisma/client';
-import { RecurrenceRepositoryInterface } from './contracts/RecurrenceRepositoryInterface';
+import { RecurrenceRepositoryInterface, RecurrenceWithRelations } from './contracts/RecurrenceRepositoryInterface';
 import { prisma } from '@/shared/database/PrismaClient';
 import { injectable } from 'tsyringe';
 
@@ -24,7 +24,7 @@ export class RecurrenceRepository implements RecurrenceRepositoryInterface {
     });
   }
 
-  async findById(id: string): Promise<Recurrence | null> {
+  async findById(id: string): Promise<RecurrenceWithRelations | null> {
     return prisma.recurrence.findUnique({
       where: { id },
       include: {

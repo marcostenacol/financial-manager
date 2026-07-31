@@ -3,6 +3,7 @@ import { Recurrence } from '@prisma/client';
 import { RecurrenceRepositoryInterface } from '../repositories/contracts/RecurrenceRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class CancelRecurrenceService {
@@ -16,7 +17,7 @@ export class CancelRecurrenceService {
   async execute(recurrenceId: string, userId: string): Promise<Recurrence> {
     const recurrence = await this.recurrenceRepository.findById(recurrenceId);
 
-    if (!recurrence || (recurrence as any).wallet.userId !== userId) {
+    if (!recurrence || recurrence.wallet.userId !== userId) {
       throw new AppError('Recorrência não encontrada', 404);
     }
 
@@ -25,7 +26,7 @@ export class CancelRecurrenceService {
       isActive: false,
     });
 
-    await this.cache.del(`recurrences:user:${userId}`);
+    await this.cache.del(CacheKeys.recurrences.list(userId));
 
     return updated;
   }

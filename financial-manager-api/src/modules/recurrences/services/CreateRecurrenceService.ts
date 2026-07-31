@@ -5,6 +5,7 @@ import { CreateRecurrenceDTOType } from '../dtos/CreateRecurrenceDTO';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class CreateRecurrenceService {
@@ -36,7 +37,7 @@ export class CreateRecurrenceService {
       endsAt: data.ends_at ? new Date(data.ends_at) : undefined,
     });
 
-    await this.cache.del(`recurrences:user:${userId}`);
+    await this.cache.del(CacheKeys.recurrences.list(userId));
 
     return recurrence;
   }

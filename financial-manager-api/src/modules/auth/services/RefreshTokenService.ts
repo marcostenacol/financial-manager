@@ -3,6 +3,7 @@ import { FastifyInstance } from 'fastify';
 import crypto from 'crypto';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { AuthRepositoryInterface } from '../repositories/contracts/AuthRepositoryInterface';
 
 interface RefreshTokenResponse {
@@ -50,7 +51,7 @@ export class RefreshTokenService {
     await this.auth_repository.createRefreshToken(user_id, new_refresh_token, expires_at);
 
     // Atualiza cache do Redis
-    await this.cache.set(`auth:token:${user_id}`, { user_id }, 900);
+    await this.cache.set(CacheKeys.auth.token(user_id), { user_id }, 900);
 
     return {
       token: new_token,

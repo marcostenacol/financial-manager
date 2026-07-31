@@ -4,6 +4,7 @@ import { FastifyInstance } from 'fastify';
 import crypto from 'crypto';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { AuthRepositoryInterface } from '../repositories/contracts/AuthRepositoryInterface';
 import { LoginDTOType } from '../dtos/LoginDTO';
 
@@ -63,7 +64,7 @@ export class LoginService {
     await this.auth_repository.createRefreshToken(user.id, refresh_token, expires_at);
 
     // Salvar no Redis para validação rápida no middleware (Access Token)
-    await this.cache.set(`auth:token:${user.id}`, { user_id: user.id }, 900); // 15 min
+    await this.cache.set(CacheKeys.auth.token(user.id), { user_id: user.id }, 900); // 15 min
 
     return {
       user: {

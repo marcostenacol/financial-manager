@@ -6,6 +6,7 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class ProcessRecurrenceService {
@@ -58,7 +59,7 @@ export class ProcessRecurrenceService {
     await this.transactionRepository.create({
       description: `${recurrence.description} (Recorrente)`,
       amount: recurrence.amount,
-      type: recurrence.type as any,
+      type: recurrence.type as TransactionTypeEnum,
       status: TransactionStatusEnum.COMPLETED,
       walletId: recurrence.walletId,
       categoryId: recurrence.categoryId,
@@ -73,8 +74,8 @@ export class ProcessRecurrenceService {
         ? Number(wallet.balance) + Number(recurrence.amount)
         : Number(wallet.balance) - Number(recurrence.amount);
       
-      await this.walletRepository.update(wallet.id, { balance: newBalance as any });
-      await this.cache.del(`wallets:user:${wallet.userId}`);
+      await this.walletRepository.update(wallet.id, { balance: newBalance });
+      await this.cache.del(CacheKeys.wallets.list(wallet.userId));
     }
 
     // 3. Atualizar última data de processamento

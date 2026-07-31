@@ -1,10 +1,11 @@
 import { prisma } from '@/shared/database/PrismaClient';
 import { SavingsGoal } from '@prisma/client';
 import { SavingsGoalRepositoryInterface } from './contracts/SavingsGoalRepositoryInterface';
-import { ICreateSavingsGoalDTO } from '../dtos/ICreateSavingsGoalDTO';
+import { CreateSavingsGoalDTOType } from '../dtos/CreateSavingsGoalDTO';
+import { UpdateSavingsGoalDTOType } from '../dtos/UpdateSavingsGoalDTO';
 
 export class SavingsGoalRepository implements SavingsGoalRepositoryInterface {
-  async create(data: ICreateSavingsGoalDTO & { userId: string }): Promise<SavingsGoal> {
+  async create(data: CreateSavingsGoalDTOType & { userId: string }): Promise<SavingsGoal> {
     return prisma.savingsGoal.create({
       data: {
         name: data.name,
@@ -31,7 +32,7 @@ export class SavingsGoalRepository implements SavingsGoalRepositoryInterface {
     });
   }
 
-  async update(id: string, data: Partial<ICreateSavingsGoalDTO>): Promise<SavingsGoal> {
+  async update(id: string, data: UpdateSavingsGoalDTOType): Promise<SavingsGoal> {
     return prisma.savingsGoal.update({
       where: { id },
       data: {

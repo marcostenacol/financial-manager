@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { SavingsGoalRepositoryInterface } from '../repositories/contracts/SavingsGoalRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class DeleteSavingsGoalService {
@@ -24,6 +25,6 @@ export class DeleteSavingsGoalService {
 
     await this.savingsGoalRepository.delete(id);
 
-    await this.cache.del(`savings-goals:user:${userId}`);
+    await this.cache.del(CacheKeys.savingsGoals.list(userId));
   }
 }

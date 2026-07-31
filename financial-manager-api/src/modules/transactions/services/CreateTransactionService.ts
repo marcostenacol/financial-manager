@@ -7,6 +7,7 @@ import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class CreateTransactionService {
@@ -49,13 +50,13 @@ export class CreateTransactionService {
       });
 
       // Invalida cache da carteira e lista de carteiras
-      await this.cache.del(`wallet:detail:${wallet.id}`);
-      await this.cache.del(`wallets:user:${userId}`);
+      await this.cache.del(CacheKeys.wallets.detail(wallet.id));
+      await this.cache.del(CacheKeys.wallets.list(userId));
     }
 
     // Invalida cache de transações
-    await this.cache.del(`transactions:wallet:${wallet.id}`);
-    await this.cache.del(`transactions:user:${userId}`);
+    await this.cache.del(CacheKeys.transactions.byWallet(wallet.id));
+    await this.cache.del(CacheKeys.transactions.list(userId));
 
     return transaction;
   }

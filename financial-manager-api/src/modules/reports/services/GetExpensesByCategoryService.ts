@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { ReportRepositoryInterface, ExpenseByCategoryData } from '../repositories/contracts/ReportRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class GetExpensesByCategoryService {
@@ -12,7 +13,7 @@ export class GetExpensesByCategoryService {
   ) {}
 
   async execute(userId: string, month: number, year: number): Promise<ExpenseByCategoryData[]> {
-    const cacheKey = `reports:expenses-category:${userId}:${month}:${year}`;
+    const cacheKey = CacheKeys.reports.expensesByCategory(userId, month, year);
     
     const cached = await this.cache.get<ExpenseByCategoryData[]>(cacheKey);
     if (cached) {

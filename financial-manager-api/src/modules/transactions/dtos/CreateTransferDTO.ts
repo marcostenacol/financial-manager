@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CreateTransferSchema = z.object({
+export const CreateTransferDTO = z.object({
   description: z.string().min(3).max(255),
   amount: z.number().positive(),
   source_wallet_id: z.string().uuid(),
@@ -9,4 +9,4 @@ export const CreateTransferSchema = z.object({
   occurred_at: z.string().datetime().optional(),
 });
 
-export type ICreateTransferDTO = z.infer<typeof CreateTransferSchema>;
+export type CreateTransferDTOType = z.infer<typeof CreateTransferDTO>;

@@ -1,15 +1,11 @@
 import { injectable, inject } from 'tsyringe';
 import { Wallet, Prisma } from '@prisma/client';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { WalletRepositoryInterface } from '../repositories/contracts/WalletRepositoryInterface';
+import { CreateWalletDTOType } from '../dtos/CreateWalletDTO';
 
-interface CreateWalletDTO {
-  user_id: string;
-  name: string;
-  type: string;
-  balance?: number;
-  currency?: string;
-}
+type CreateWalletServiceInput = CreateWalletDTOType & { user_id: string };
 
 @injectable()
 export class CreateWalletService {
@@ -20,7 +16,7 @@ export class CreateWalletService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(data: CreateWalletDTO): Promise<Wallet> {
+  async execute(data: CreateWalletServiceInput): Promise<Wallet> {
     const wallet = await this.wallet_repository.create({
       userId: data.user_id,
       name: data.name,
@@ -30,7 +26,7 @@ export class CreateWalletService {
     });
 
     // Invalida cache de listagem
-    await this.cache.del(`wallets:user:${data.user_id}`);
+    await this.cache.del(CacheKeys.wallets.list(data.user_id));
 
     return wallet;
   }

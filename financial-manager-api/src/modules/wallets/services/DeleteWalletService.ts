@@ -1,6 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { WalletRepositoryInterface } from '../repositories/contracts/WalletRepositoryInterface';
 
 @injectable()
@@ -22,7 +23,7 @@ export class DeleteWalletService {
     await this.wallet_repository.delete(id);
 
     // Invalida cache
-    await this.cache.del(`wallets:user:${user_id}`);
-    await this.cache.del(`wallet:detail:${id}`);
+    await this.cache.del(CacheKeys.wallets.list(user_id));
+    await this.cache.del(CacheKeys.wallets.detail(id));
   }
 }

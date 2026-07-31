@@ -12,6 +12,8 @@ const pump = promisify(pipeline);
 import { UpdateProfileService } from '../services/UpdateProfileService';
 import { ChangeProfileTypeService } from '../services/ChangeProfileTypeService';
 import { UpdateAvatarService } from '../services/UpdateAvatarService';
+import { UpdateProfileDTO } from '../dtos/UpdateProfileDTO';
+import { ChangeProfileTypeDTO } from '../dtos/ChangeProfileTypeDTO';
 
 @injectable()
 export class ProfileController extends BaseController {
@@ -25,22 +27,22 @@ export class ProfileController extends BaseController {
   }
 
   async show(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const profile = await this.detail_profile.execute((request.user as any).sub);
+    const profile = await this.detail_profile.execute(request.user.sub);
     return this.success(reply, profile);
   }
 
   async update(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const data = request.body as any;
+    const data = UpdateProfileDTO.parse(request.body);
     const profile = await this.update_profile.execute({
-      user_id: (request.user as any).sub,
+      user_id: request.user.sub,
       ...data,
     });
     return this.success(reply, profile, 'Perfil atualizado com sucesso');
   }
 
   async changeType(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const { type } = request.body as { type: 'personal' | 'business' };
-    const profile = await this.change_type.execute((request.user as any).sub, type);
+    const { type } = ChangeProfileTypeDTO.parse(request.body);
+    const profile = await this.change_type.execute(request.user.sub, type);
     return this.success(reply, profile, 'Tipo de perfil alterado com sucesso');
   }
 
@@ -50,7 +52,7 @@ export class ProfileController extends BaseController {
       throw new AppError('Arquivo não enviado', 400);
     }
 
-    const userId = (request.user as any).sub;
+    const userId = request.user.sub;
     const extension = path.extname(data.filename);
     const fileName = `${userId}${extension}`;
     const filePath = path.resolve(__dirname, '..', '..', '..', '..', 'tmp', 'uploads', fileName);

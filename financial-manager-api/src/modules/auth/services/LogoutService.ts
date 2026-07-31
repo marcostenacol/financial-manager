@@ -1,5 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { AuthRepositoryInterface } from '../repositories/contracts/AuthRepositoryInterface';
 
 @injectable()
@@ -13,7 +14,7 @@ export class LogoutService {
 
   async execute(user_id: string): Promise<void> {
     // Invalida cache no Redis
-    await this.cache.del(`auth:token:${user_id}`);
+    await this.cache.del(CacheKeys.auth.token(user_id));
 
     // Deleta todos os refresh tokens do usuário no banco
     await this.auth_repository.deleteAllUserRefreshTokens(user_id);

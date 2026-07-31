@@ -2,13 +2,8 @@ import { inject, injectable } from 'tsyringe';
 import { Transaction } from '@prisma/client';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
-
-interface Filters {
-  wallet_id?: string;
-  category_id?: string;
-  start_date?: string;
-  end_date?: string;
-}
+import { CacheKeys } from '@/shared/cache/CacheKeys';
+import { ListTransactionsFilterDTOType } from '../dtos/ListTransactionsFilterDTO';
 
 @injectable()
 export class ListTransactionsService {
@@ -19,8 +14,8 @@ export class ListTransactionsService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, filters: Filters): Promise<Transaction[]> {
-    const cacheKey = `transactions:user:${userId}:${JSON.stringify(filters)}`;
+  async execute(userId: string, filters: ListTransactionsFilterDTOType): Promise<Transaction[]> {
+    const cacheKey = CacheKeys.transactions.list(userId, filters);
     
     const cachedTransactions = await this.cache.get<Transaction[]>(cacheKey);
     if (cachedTransactions) {

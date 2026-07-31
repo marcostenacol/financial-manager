@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { Recurrence } from '@prisma/client';
 import { RecurrenceRepositoryInterface } from '../repositories/contracts/RecurrenceRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class ListRecurrencesService {
@@ -13,7 +14,7 @@ export class ListRecurrencesService {
   ) {}
 
   async execute(userId: string): Promise<Recurrence[]> {
-    const cacheKey = `recurrences:user:${userId}`;
+    const cacheKey = CacheKeys.recurrences.list(userId);
     
     const cached = await this.cache.get<Recurrence[]>(cacheKey);
     if (cached) {

@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { CategoryRepositoryInterface } from '../repositories/contracts/CategoryRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class DeleteCategoryService {
@@ -32,6 +33,6 @@ export class DeleteCategoryService {
     
     await this.categoryRepository.delete(id);
 
-    await this.cache.del(`categories:user:${userId}`);
+    await this.cache.del(CacheKeys.categories.list(userId));
   }
 }

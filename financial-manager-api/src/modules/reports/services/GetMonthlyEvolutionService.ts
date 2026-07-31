@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { ReportRepositoryInterface, MonthlyEvolutionData } from '../repositories/contracts/ReportRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class GetMonthlyEvolutionService {
@@ -12,7 +13,7 @@ export class GetMonthlyEvolutionService {
   ) {}
 
   async execute(userId: string): Promise<MonthlyEvolutionData[]> {
-    const cacheKey = `reports:monthly-evolution:${userId}`;
+    const cacheKey = CacheKeys.reports.monthlyEvolution(userId);
     
     const cached = await this.cache.get<MonthlyEvolutionData[]>(cacheKey);
     if (cached) {

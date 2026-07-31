@@ -1,6 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 import { Profile } from '@prisma/client';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { ProfileRepositoryInterface } from '../repositories/contracts/ProfileRepositoryInterface';
 
 @injectable()
@@ -16,7 +17,7 @@ export class ChangeProfileTypeService {
     const profile = await this.profile_repository.update(user_id, { type });
 
     // Invalida cache
-    await this.cache.del(`profile:user:${user_id}`);
+    await this.cache.del(CacheKeys.profile.detail(user_id));
 
     return profile;
   }

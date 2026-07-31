@@ -1,8 +1,9 @@
 import { inject, injectable } from 'tsyringe';
 import { CategoryRepositoryInterface } from '../repositories/contracts/CategoryRepositoryInterface';
-import { IUpdateCategoryDTO } from '../dtos/IUpdateCategoryDTO';
+import { UpdateCategoryDTOType } from '../dtos/UpdateCategoryDTO';
 import { Category } from '@prisma/client';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class UpdateCategoryService {
@@ -13,7 +14,7 @@ export class UpdateCategoryService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(id: string, data: IUpdateCategoryDTO, userId: string): Promise<Category> {
+  async execute(id: string, data: UpdateCategoryDTOType, userId: string): Promise<Category> {
     const category = await this.categoryRepository.findById(id);
 
     if (!category) {
@@ -30,7 +31,7 @@ export class UpdateCategoryService {
 
     const updatedCategory = await this.categoryRepository.update(id, data);
 
-    await this.cache.del(`categories:user:${userId}`);
+    await this.cache.del(CacheKeys.categories.list(userId));
 
     return updatedCategory;
   }

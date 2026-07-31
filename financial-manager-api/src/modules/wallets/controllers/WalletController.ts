@@ -22,20 +22,20 @@ export class WalletController extends BaseController {
   }
 
   async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const wallets = await this.list_wallets.execute((request.user as any).sub);
+    const wallets = await this.list_wallets.execute(request.user.sub);
     return this.success(reply, wallets);
   }
 
   async show(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
-    const wallet = await this.detail_wallet.execute(id, (request.user as any).sub);
+    const wallet = await this.detail_wallet.execute(id, request.user.sub);
     return this.success(reply, wallet);
   }
 
   async store(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const data = CreateWalletDTO.parse(request.body);
     const wallet = await this.create_wallet.execute({
-      user_id: (request.user as any).sub,
+      user_id: request.user.sub,
       ...data,
     });
     return this.success(reply, wallet, 'Carteira criada com sucesso', 201);
@@ -46,7 +46,7 @@ export class WalletController extends BaseController {
     const data = UpdateWalletDTO.parse(request.body);
     const wallet = await this.update_wallet.execute({
       id,
-      user_id: (request.user as any).sub,
+      user_id: request.user.sub,
       ...data,
     });
     return this.success(reply, wallet, 'Carteira atualizada com sucesso');
@@ -54,7 +54,7 @@ export class WalletController extends BaseController {
 
   async delete(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
-    await this.delete_wallet.execute(id, (request.user as any).sub);
+    await this.delete_wallet.execute(id, request.user.sub);
     return this.success(reply, null, 'Carteira deletada com sucesso');
   }
 }

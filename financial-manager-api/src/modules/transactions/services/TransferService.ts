@@ -1,10 +1,11 @@
 import { inject, injectable } from 'tsyringe';
-import { ICreateTransferDTO } from '../dtos/ICreateTransferDTO';
+import { CreateTransferDTOType } from '../dtos/CreateTransferDTO';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { prisma } from '@/shared/database/PrismaClient';
 
 @injectable()
@@ -19,7 +20,7 @@ export class TransferService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(data: ICreateTransferDTO, userId: string): Promise<void> {
+  async execute(data: CreateTransferDTOType, userId: string): Promise<void> {
     const { source_wallet_id, destination_wallet_id, amount, description, occurred_at, category_id } = data;
 
     // 1. Validar posse das carteiras
@@ -84,9 +85,9 @@ export class TransferService {
 
     // 3. Limpar caches
     await Promise.all([
-      this.cache.del(`transactions:user:${userId}`),
-      this.cache.del(`wallets:user:${userId}`),
-      this.cache.del(`reports:overview:${userId}`),
+      this.cache.del(CacheKeys.transactions.list(userId)),
+      this.cache.del(CacheKeys.wallets.list(userId)),
+      this.cache.del(CacheKeys.reports.overview(userId)),
     ]);
   }
 }

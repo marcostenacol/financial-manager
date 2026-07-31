@@ -2,6 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import { Wallet } from '@prisma/client';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { WalletRepositoryInterface } from '../repositories/contracts/WalletRepositoryInterface';
 
 @injectable()
@@ -14,7 +15,7 @@ export class DetailWalletService {
   ) {}
 
   async execute(id: string, user_id: string): Promise<Wallet> {
-    const cache_key = `wallet:detail:${id}`;
+    const cache_key = CacheKeys.wallets.detail(id);
 
     const cached = await this.cache.get<Wallet>(cache_key);
     if (cached) {

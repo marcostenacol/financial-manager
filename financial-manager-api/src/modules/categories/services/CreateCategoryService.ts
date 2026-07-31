@@ -4,6 +4,7 @@ import { CategoryRepositoryInterface } from '../repositories/contracts/CategoryR
 import { CreateCategoryDTOType } from '../dtos/CreateCategoryDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 @injectable()
 export class CreateCategoryService {
@@ -26,7 +27,7 @@ export class CreateCategoryService {
       userId,
     });
 
-    await this.cache.del(`categories:user:${userId}`);
+    await this.cache.del(CacheKeys.categories.list(userId));
 
     return category;
   }
