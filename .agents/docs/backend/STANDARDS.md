@@ -156,8 +156,6 @@ Prefixo global: `/api/v1` registrado em `app.ts`.
 
 ## 12. Testes
 
-- Arquivo por caso de uso: `tests/{modulo}/{acao}.test.ts`.
-- Helper de auth: `tests/helpers/authenticatesForTesting.ts`.
-- Usar Supertest para chamadas HTTP de integração.
-- Banco de testes isolado (variável de ambiente `DATABASE_URL_TEST`).
-- **Nunca** rodar testes automaticamente — sempre recomendar ao usuário.
+- Arquivo por caso de uso: `tests/modules/{modulo}/{Ação}{Entidade}Service.spec.ts`.
+- Testes unitários via Vitest, com Repository/CacheTrait mockados no construtor do Service (`vi.fn()`) — não há teste de integração HTTP real hoje (Supertest foi removido por estar instalado sem uso: `DATABASE_URL`/`REDIS_URL` deste projeto apontam para o Postgres/Redis de produção, não há banco de teste isolado dedicado).
+- **Execução automática**: rode os testes (`npm test`) após cada implementação para validar a integridade, como já estava definido em `GEMINI.md`/`testing-tdd.md` — esta era a única referência do repositório ainda com o texto antigo.
