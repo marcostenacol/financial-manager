@@ -4,6 +4,7 @@ import { Plus, Target, TrendingUp, Calendar, Trash2, Edit2 } from 'lucide-react'
 import { useSavingsGoals, type SavingsGoal } from '../hooks/useSavingsGoals';
 import { CreateSavingsGoalModal } from '../components/CreateSavingsGoalModal';
 import { useToast } from '../../../shared/components/useToast';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const SavingsGoalsPage = () => {
   const { showToast } = useToast();
@@ -13,7 +14,7 @@ export const SavingsGoalsPage = () => {
 
   useEffect(() => {
      
-    loadGoals().catch(() => showToast('Erro ao carregar metas', 'error'));
+    loadGoals().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar metas'), 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -28,8 +29,8 @@ export const SavingsGoalsPage = () => {
     try {
       await deleteGoal(id);
       await loadGoals();
-    } catch {
-      showToast('Erro ao excluir meta', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao excluir meta'), 'error');
     }
   };
 
@@ -43,13 +44,13 @@ export const SavingsGoalsPage = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white">Metas de Economia</h1>
           <p className="text-slate-400">Poupe dinheiro para seus grandes objetivos</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
         >

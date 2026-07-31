@@ -4,6 +4,7 @@ import { Plus, RefreshCw, Clock, Wallet as WalletIcon, X } from 'lucide-react';
 import { useRecurrences, type Recurrence } from '../hooks/useRecurrences';
 import { CreateRecurrenceModal } from '../components/CreateRecurrenceModal';
 import { useToast } from '../../../shared/components/useToast';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const RecurrencesPage = () => {
   const { showToast } = useToast();
@@ -12,7 +13,7 @@ export const RecurrencesPage = () => {
 
   useEffect(() => {
      
-    loadRecurrences().catch(() => showToast('Erro ao carregar recorrências', 'error'));
+    loadRecurrences().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar recorrências'), 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -32,8 +33,8 @@ export const RecurrencesPage = () => {
     try {
       await cancelRecurrence(id);
       loadRecurrences();
-    } catch {
-      showToast('Erro ao cancelar recorrência', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao cancelar recorrência'), 'error');
     }
   };
 
@@ -41,8 +42,8 @@ export const RecurrencesPage = () => {
     try {
       await toggleRecurrence(id);
       loadRecurrences();
-    } catch {
-      showToast('Erro ao alternar status da recorrência', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao alternar status da recorrência'), 'error');
     }
   };
 
@@ -52,13 +53,13 @@ export const RecurrencesPage = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white">Recorrências</h1>
           <p className="text-slate-400">Gerencie seus gastos e ganhos automáticos</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
         >

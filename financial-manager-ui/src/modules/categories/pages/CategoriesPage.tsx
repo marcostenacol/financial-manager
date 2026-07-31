@@ -5,6 +5,7 @@ import { CreateCategoryModal } from '../components/CreateCategoryModal';
 import { UpdateCategoryModal } from '../components/UpdateCategoryModal';
 import { useToast } from '../../../shared/components/useToast';
 import { useCategories, type Category } from '../hooks/useCategories';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const CategoriesPage = () => {
   const { showToast } = useToast();
@@ -15,7 +16,7 @@ export const CategoriesPage = () => {
 
   useEffect(() => {
      
-    loadCategories().catch(() => showToast('Erro ao carregar categorias', 'error'));
+    loadCategories().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar categorias'), 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -33,13 +34,13 @@ export const CategoriesPage = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white">Categorias</h1>
           <p className="text-slate-400">Organize suas transações por grupos</p>
         </div>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
         >

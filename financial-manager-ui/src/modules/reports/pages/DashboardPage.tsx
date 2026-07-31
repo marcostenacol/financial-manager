@@ -5,6 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useReports, type DashboardOverview, type ExpenseByCategory, type MonthlyEvolution } from '../hooks/useReports';
 import { useSavingsGoals } from '../../savings-goals/hooks/useSavingsGoals';
 import { useToast } from '../../../shared/components/useToast';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 // Recharts requires literal color strings, not CSS var() — keep these in sync with the
 // CSS tokens in src/index.css (--success, --danger, --border, --muted, --surface).
@@ -46,8 +47,8 @@ export const DashboardPage = () => {
       setOverview(overviewData);
       setExpensesByCategory(expensesData);
       setEvolution(evolutionData);
-    } catch {
-      showToast('Erro ao carregar dashboard', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao carregar dashboard'), 'error');
     } finally {
       setLoading(false);
     }
@@ -97,8 +98,8 @@ export const DashboardPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch {
-      showToast('Erro ao exportar', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao exportar'), 'error');
     }
   };
 
@@ -119,14 +120,14 @@ export const DashboardPage = () => {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-app-ink">Dashboard</h1>
           <p className="text-app-muted">Bem-vindo de volta! Aqui está o resumo das suas finanças.</p>
         </div>
 
-        <div className="flex bg-app-surface p-1 rounded-2xl border border-app-border">
+        <div className="flex flex-wrap bg-app-surface p-1 rounded-2xl border border-app-border">
           {[
             { id: 'month', label: 'Este Mês' },
             { id: '7days', label: '7 dias' },
@@ -169,7 +170,7 @@ export const DashboardPage = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex gap-4 mb-8 p-4 bg-app-surface border border-app-border rounded-2xl items-end"
+          className="flex flex-wrap gap-4 mb-8 p-4 bg-app-surface border border-app-border rounded-2xl items-end"
         >
           <div className="space-y-1">
             <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500 ml-1">Início</label>

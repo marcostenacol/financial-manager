@@ -7,6 +7,7 @@ import { CreateTransferModal } from '../../transactions/components/CreateTransfe
 import { ArrowRightLeft } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets, type Wallet } from '../hooks/useWallets';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const WalletsPage = () => {
   const { showToast } = useToast();
@@ -18,7 +19,7 @@ export const WalletsPage = () => {
 
   useEffect(() => {
      
-    loadWallets().catch(() => showToast('Erro ao carregar carteiras', 'error'));
+    loadWallets().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar carteiras'), 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -45,13 +46,13 @@ export const WalletsPage = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-app-ink">Minhas Carteiras</h1>
           <p className="text-app-muted">Gerencie seu dinheiro em diferentes contas</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <button
             onClick={() => setIsTransferModalOpen(true)}
             className="bg-app-surface hover:bg-app-surface-2 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all border border-app-border active:scale-95"

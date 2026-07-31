@@ -18,6 +18,7 @@ import { AdvancedFiltersModal } from '../components/AdvancedFiltersModal';
 import { TransactionDetailModal } from '../components/TransactionDetailModal';
 import { useToast } from '../../../shared/components/useToast';
 import { useTransactions, type Transaction } from '../hooks/useTransactions';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const TransactionsPage = () => {
   const { showToast } = useToast();
@@ -55,8 +56,8 @@ export const TransactionsPage = () => {
       };
 
       await loadTransactions(params);
-    } catch {
-      showToast('Erro ao carregar transações', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao carregar transações'), 'error');
     }
   };
 
@@ -76,8 +77,8 @@ export const TransactionsPage = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch {
-      showToast('Erro ao exportar transações', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao exportar transações'), 'error');
     }
   };
 
@@ -98,8 +99,8 @@ export const TransactionsPage = () => {
       await deleteTransaction(selectedTransaction.id);
       setIsDetailModalOpen(false);
       fetchTransactions();
-    } catch {
-      showToast('Erro ao excluir transação', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao excluir transação'), 'error');
     }
   };
 
@@ -111,14 +112,14 @@ export const TransactionsPage = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-app-ink">Transações</h1>
           <p className="text-app-muted">Acompanhe seu fluxo de caixa detalhadamente</p>
         </div>
-        
-        <div className="flex items-center gap-3">
+
+        <div className="flex flex-wrap items-center gap-3">
           <div className="bg-app-surface border border-app-border rounded-2xl p-1 flex items-center">
             <button
               onClick={() => setFilterType('all')}

@@ -49,9 +49,9 @@ export const Sidebar = () => {
           <X className="w-5 h-5" />
         </button>
 
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto min-h-0 flex-1">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
             <span className="text-app-ink font-bold text-xl">F</span>
           </div>
           <span className="text-app-ink font-bold text-lg tracking-tight">Financial.</span>
@@ -71,12 +71,12 @@ export const Sidebar = () => {
                     : 'text-app-muted hover:bg-app-surface-2 hover:text-app-ink'
                 }`}
               >
-                <item.icon className={`w-5 h-5 ${isActive ? 'text-app-accent-ink' : 'text-app-muted group-hover:text-app-accent'}`} />
-                <span className="font-medium">{item.label}</span>
+                <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-app-accent-ink' : 'text-app-muted group-hover:text-app-accent'}`} />
+                <span className="font-medium truncate">{item.label}</span>
                 {isActive && (
-                  <motion.div 
+                  <motion.div
                     layoutId="active-pill"
-                    className="ml-auto w-1.5 h-1.5 bg-white rounded-full"
+                    className="ml-auto w-1.5 h-1.5 bg-white rounded-full shrink-0"
                   />
                 )}
               </Link>
@@ -85,7 +85,7 @@ export const Sidebar = () => {
         </nav>
       </div>
 
-      <div className="mt-auto p-6 border-t border-app-border">
+      <div className="shrink-0 p-6 border-t border-app-border">
         <div className="flex items-center gap-3 mb-6 px-2">
           <div className="w-10 h-10 rounded-full bg-app-accent-soft border border-app-accent/20 flex items-center justify-center text-app-accent font-bold">
             {user?.name?.charAt(0).toUpperCase()}

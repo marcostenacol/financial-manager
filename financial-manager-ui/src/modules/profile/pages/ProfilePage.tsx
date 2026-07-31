@@ -4,6 +4,7 @@ import { useAuth } from '../../../contexts/useAuth';
 import { useProfile } from '../hooks/useProfile';
 import { User, Mail, Shield, Save, UserCircle, Camera } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const ProfilePage = () => {
   const { user, signOut } = useAuth();
@@ -32,8 +33,8 @@ export const ProfilePage = () => {
         if (profile.avatar) {
           setAvatar(`${import.meta.env.VITE_API_URL || 'http://localhost:3333/api/v1'}/../../uploads/${profile.avatar}`);
         }
-      } catch {
-        showToast('Erro ao carregar perfil', 'error');
+      } catch (err) {
+        showToast(getErrorMessage(err, 'Erro ao carregar perfil'), 'error');
       }
     };
 
@@ -75,19 +76,19 @@ export const ProfilePage = () => {
 
       updateUser(updatedUser);
       setSuccess(true);
-    } catch {
-      showToast('Erro ao atualizar perfil', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao atualizar perfil'), 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] p-4 md:p-8">
+    <div className="p-4 md:p-8">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl mx-auto"
+        className="max-w-3xl mx-auto"
       >
         <div className="flex items-center gap-4 mb-8">
           <div className="p-3 bg-blue-500/20 rounded-2xl border border-blue-500/30">
