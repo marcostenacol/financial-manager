@@ -9,7 +9,7 @@ export class AuthRepository implements AuthRepositoryInterface {
   async findByEmail(email: string): Promise<User | null> {
     return prisma.user.findUnique({
       where: { email },
-      include: { role: true },
+      include: { role: true, profile: true },
     });
   }
 
