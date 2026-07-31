@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { LogIn, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../../contexts/useAuth';
+import { useToast } from '../../../shared/components/useToast';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +12,7 @@ export const LoginPage = () => {
   const [error, setError] = useState('');
 
   const { signIn } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -86,9 +88,13 @@ export const LoginPage = () => {
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+              <button
+                type="button"
+                onClick={() => showToast('Recuperação de senha ainda não está disponível. Entre em contato com o suporte.', 'info')}
+                className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
                 Esqueceu a senha?
-              </a>
+              </button>
             </div>
           </div>
 

@@ -34,6 +34,28 @@ describe('RegisterPage', () => {
     expect(screen.getByPlaceholderText('Seu nome completo')).toBeRequired();
     expect(screen.getByPlaceholderText('Seu e-mail')).toBeRequired();
     expect(screen.getByPlaceholderText('Crie uma senha')).toBeRequired();
+    expect(screen.getByPlaceholderText('Confirme sua senha')).toBeRequired();
+  });
+
+  it('shows an error and does not submit when passwords do not match', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <RegisterPage />
+      </MemoryRouter>,
+    );
+
+    await user.type(screen.getByPlaceholderText('Seu nome completo'), 'John Doe');
+    await user.type(screen.getByPlaceholderText('Seu e-mail'), 'john@example.com');
+    await user.type(screen.getByPlaceholderText('Crie uma senha'), 'secret123');
+    await user.type(screen.getByPlaceholderText('Confirme sua senha'), 'different123');
+    await user.click(screen.getByRole('button', { name: /cadastrar/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText('As senhas não coincidem.')).toBeInTheDocument(),
+    );
+    expect(api.post).not.toHaveBeenCalled();
+    expect(navigateMock).not.toHaveBeenCalled();
   });
 
   it('submits registration data and redirects to /login on success', async () => {
@@ -49,6 +71,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'John Doe');
     await user.type(screen.getByPlaceholderText('Seu e-mail'), 'john@example.com');
     await user.type(screen.getByPlaceholderText('Crie uma senha'), 'secret123');
+    await user.type(screen.getByPlaceholderText('Confirme sua senha'), 'secret123');
     await user.click(screen.getByRole('button', { name: /cadastrar/i }));
 
     await waitFor(() =>
@@ -78,6 +101,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByPlaceholderText('Seu nome completo'), 'John Doe');
     await user.type(screen.getByPlaceholderText('Seu e-mail'), 'john@example.com');
     await user.type(screen.getByPlaceholderText('Crie uma senha'), 'secret123');
+    await user.type(screen.getByPlaceholderText('Confirme sua senha'), 'secret123');
     await user.click(screen.getByRole('button', { name: /cadastrar/i }));
 
     await waitFor(() =>

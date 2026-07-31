@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { LoginPage } from './LoginPage';
+import { ToastProvider } from '../../../shared/components/Toast';
 import { useAuth } from '../../../contexts/useAuth';
 
 vi.mock('../../../contexts/useAuth', () => ({
@@ -28,9 +29,11 @@ describe('LoginPage', () => {
     vi.mocked(useAuth).mockReturnValue({ signIn } as unknown as ReturnType<typeof useAuth>);
 
     render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>,
+      <ToastProvider>
+        <MemoryRouter>
+          <LoginPage />
+        </MemoryRouter>
+      </ToastProvider>,
     );
 
     const emailInput = screen.getByPlaceholderText('Seu e-mail') as HTMLInputElement;
@@ -46,9 +49,11 @@ describe('LoginPage', () => {
 
     const user = userEvent.setup();
     render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>,
+      <ToastProvider>
+        <MemoryRouter>
+          <LoginPage />
+        </MemoryRouter>
+      </ToastProvider>,
     );
 
     await user.type(screen.getByPlaceholderText('Seu e-mail'), 'john@example.com');
@@ -65,9 +70,11 @@ describe('LoginPage', () => {
 
     const user = userEvent.setup();
     render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>,
+      <ToastProvider>
+        <MemoryRouter>
+          <LoginPage />
+        </MemoryRouter>
+      </ToastProvider>,
     );
 
     await user.type(screen.getByPlaceholderText('Seu e-mail'), 'john@example.com');
