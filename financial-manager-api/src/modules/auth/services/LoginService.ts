@@ -13,7 +13,7 @@ interface UserWithRelations {
   email: string;
   password: string;
   role: { slug: string };
-  profile?: { name?: string | null } | null;
+  profile?: { name?: string | null; avatar?: string | null } | null;
 }
 
 interface LoginResponse {
@@ -21,6 +21,7 @@ interface LoginResponse {
     id: string;
     email: string;
     name: string;
+    avatar?: string;
   };
   token: string;
   refresh_token: string;
@@ -71,6 +72,7 @@ export class LoginService {
         id: user.id,
         email: user.email,
         name: user.profile?.name || 'Usuário',
+        avatar: user.profile?.avatar || undefined,
       },
       token,
       refresh_token,

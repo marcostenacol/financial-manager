@@ -53,11 +53,17 @@ export class ProfileController extends BaseController {
     }
 
     const userId = request.user.sub;
+    const existingProfile = await this.detail_profile.execute(userId);
     const extension = path.extname(data.filename);
     const fileName = `${userId}${extension}`;
-    const filePath = path.resolve(__dirname, '..', '..', '..', '..', 'tmp', 'uploads', fileName);
+    const uploadsDir = path.resolve(__dirname, '..', '..', '..', '..', 'tmp', 'uploads');
+    const filePath = path.join(uploadsDir, fileName);
 
     await pump(data.file, fs.createWriteStream(filePath));
+
+    if (existingProfile.avatar && existingProfile.avatar !== fileName) {
+      await fs.promises.unlink(path.join(uploadsDir, existingProfile.avatar)).catch(() => undefined);
+    }
 
     const profile = await this.update_avatar.execute(userId, fileName);
     return this.success(reply, profile, 'Avatar atualizado com sucesso');
