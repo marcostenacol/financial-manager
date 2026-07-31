@@ -33,6 +33,10 @@ export const ProfilePage = () => {
         setSavedType(profile.type || 'personal');
         if (profile.avatar) {
           setAvatar(getAvatarUrl(profile.avatar));
+
+          if (user.avatar !== profile.avatar) {
+            updateUser({ ...user, avatar: profile.avatar });
+          }
         }
       } catch (err) {
         showToast(getErrorMessage(err, 'Erro ao carregar perfil'), 'error');
