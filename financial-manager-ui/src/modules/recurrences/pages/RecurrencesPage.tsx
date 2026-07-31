@@ -48,8 +48,11 @@ export const RecurrencesPage = () => {
   };
 
   const isExpired = (recurrence: Recurrence) => {
-    if (!recurrence.endsAt) return false;
-    return new Date(recurrence.endsAt) < new Date();
+    // endsAt só é preenchido pela ação de cancelar (não há campo de data de término na criação),
+    // então a própria presença do valor já indica "cancelada" — sem depender de comparar
+    // relógio do servidor com o do cliente, que causava a recorrência aparecer como
+    // "Pausada" até a página ser recarregada.
+    return !!recurrence.endsAt;
   };
 
   return (
