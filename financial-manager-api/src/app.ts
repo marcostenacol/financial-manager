@@ -42,6 +42,7 @@ app.register(fastifyCors, {
     ? (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean)
     : ['http://localhost:5173'],
   credentials: true,
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 });
 
 app.register(fastifyJwt, {
