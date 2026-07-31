@@ -29,6 +29,7 @@ describe('TransferService', () => {
     } as any;
     cacheTrait = {
       del: vi.fn(),
+      delPattern: vi.fn(),
     } as any;
 
     transferService = new TransferService(transactionRepository, walletRepository, cacheTrait);

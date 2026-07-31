@@ -85,7 +85,7 @@ export class TransferService {
 
     // 3. Limpar caches
     await Promise.all([
-      this.cache.del(CacheKeys.transactions.list(userId)),
+      this.cache.delPattern(CacheKeys.transactions.listPattern(userId)),
       this.cache.del(CacheKeys.wallets.list(userId)),
       this.cache.del(CacheKeys.reports.overview(userId)),
     ]);
