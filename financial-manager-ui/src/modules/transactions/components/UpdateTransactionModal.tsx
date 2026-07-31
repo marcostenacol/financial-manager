@@ -5,6 +5,7 @@ import { useToast } from '../../../shared/components/useToast';
 import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface Wallet {
   id: string;
@@ -59,8 +60,8 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       ]);
       setWallets(walletsData);
       setCategories(categoriesData);
-    } catch {
-      showToast('Erro ao carregar dados para transação', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao carregar dados para transação'), 'error');
     }
   };
 
@@ -95,8 +96,8 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
 
       onSuccess();
       onClose();
-    } catch {
-      showToast('Erro ao atualizar transação', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao atualizar transação'), 'error');
     } finally {
       setLoading(false);
     }
@@ -110,8 +111,8 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       await deleteTransaction(transaction.id);
       onSuccess();
       onClose();
-    } catch {
-      showToast('Erro ao deletar transação', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao deletar transação'), 'error');
     } finally {
       setDeleting(false);
     }

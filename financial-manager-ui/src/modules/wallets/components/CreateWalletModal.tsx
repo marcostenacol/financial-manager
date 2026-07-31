@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../hooks/useWallets';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface CreateWalletModalProps {
   isOpen: boolean;
@@ -45,8 +46,8 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       setName('');
       setType('checking');
       setBalance('');
-    } catch {
-      showToast('Erro ao criar carteira', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao criar carteira'), 'error');
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Palette, Tag, Trash2 } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useCategories } from '../hooks/useCategories';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface Category {
   id: string;
@@ -57,8 +58,8 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
       
       onSuccess();
       onClose();
-    } catch {
-      showToast('Erro ao atualizar categoria', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao atualizar categoria'), 'error');
     } finally {
       setLoading(false);
     }
@@ -72,8 +73,8 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
       await deleteCategory(category.id);
       onSuccess();
       onClose();
-    } catch {
-      showToast('Erro ao deletar categoria', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao deletar categoria'), 'error');
       alert('Não foi possível excluir esta categoria. Verifique se existem transações vinculadas a ela.');
     } finally {
       setDeleting(false);

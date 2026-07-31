@@ -4,6 +4,7 @@ import { X, Filter, Calendar, Tag, Wallet as WalletIcon, CheckCircle } from 'luc
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface Category {
   id: string;
@@ -46,8 +47,8 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
       ]);
       setCategories(categoriesData);
       setWallets(walletsData);
-    } catch {
-      showToast('Erro ao carregar dados de filtro', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao carregar dados de filtro'), 'error');
     }
   };
 

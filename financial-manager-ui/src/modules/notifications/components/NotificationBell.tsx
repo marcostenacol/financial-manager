@@ -3,6 +3,7 @@ import { Bell, Check, CheckCheck, Info, AlertTriangle, AlertCircle, CheckCircle2
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNotifications } from '../hooks/useNotifications';
 import { useToast } from '../../../shared/components/useToast';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const NotificationBell = () => {
   const { showToast } = useToast();
@@ -12,9 +13,9 @@ export const NotificationBell = () => {
 
   useEffect(() => {
      
-    loadNotifications().catch(() => showToast('Erro ao carregar notificações', 'error'));
+    loadNotifications().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar notificações'), 'error'));
     const interval = setInterval(() => {
-      loadNotifications().catch(() => showToast('Erro ao carregar notificações', 'error'));
+      loadNotifications().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar notificações'), 'error'));
     }, 60000); // Atualiza a cada minuto
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -36,8 +37,8 @@ export const NotificationBell = () => {
     try {
       await markAsRead(id);
       loadNotifications();
-    } catch {
-      showToast('Erro ao marcar como lida', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao marcar como lida'), 'error');
     }
   };
 
@@ -45,8 +46,8 @@ export const NotificationBell = () => {
     try {
       await markAllAsRead();
       loadNotifications();
-    } catch {
-      showToast('Erro ao marcar todas como lidas', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao marcar todas como lidas'), 'error');
     }
   };
 

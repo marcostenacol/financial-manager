@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Save, Type, Palette, ArrowUpCircle, ArrowDownCircle, Layers } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useCategories } from '../hooks/useCategories';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface CreateCategoryModalProps {
   isOpen: boolean;
@@ -41,8 +42,8 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
       setName('');
       setColor(PREDEFINED_COLORS[0]);
       setType('expense');
-    } catch {
-      showToast('Erro ao criar categoria', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao criar categoria'), 'error');
     } finally {
       setLoading(false);
     }

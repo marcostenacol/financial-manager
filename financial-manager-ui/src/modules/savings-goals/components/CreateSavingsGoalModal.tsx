@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Save, Target, Palette, Calendar, TrendingUp } from 'lucide-react';
 import { useSavingsGoals } from '../hooks/useSavingsGoals';
 import { useToast } from '../../../shared/components/useToast';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface CreateSavingsGoalModalProps {
   isOpen: boolean;
@@ -72,8 +73,8 @@ export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess, initialData
 
       onSuccess();
       onClose();
-    } catch {
-      showToast('Erro ao salvar meta', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao salvar meta'), 'error');
     } finally {
       setLoading(false);
     }

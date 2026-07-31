@@ -5,6 +5,7 @@ import { useToast } from '../../../shared/components/useToast';
 import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface Wallet {
   id: string;
@@ -50,8 +51,8 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       if (walletsData.length > 0) {
         setWalletId(walletsData[0].id);
       }
-    } catch {
-      showToast('Erro ao carregar dados para transação', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao carregar dados para transação'), 'error');
     }
   };
 
@@ -83,8 +84,8 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       // Reset
       setDescription('');
       setAmount('');
-    } catch {
-      showToast('Erro ao criar transação', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao criar transação'), 'error');
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins, Trash2 } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../hooks/useWallets';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface Wallet {
   id: string;
@@ -58,8 +59,8 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
       
       onSuccess();
       onClose();
-    } catch {
-      showToast('Erro ao atualizar carteira', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao atualizar carteira'), 'error');
     } finally {
       setLoading(false);
     }
@@ -73,8 +74,8 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
       await deleteWallet(wallet.id);
       onSuccess();
       onClose();
-    } catch {
-      showToast('Erro ao deletar carteira', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao deletar carteira'), 'error');
       alert('Não foi possível excluir esta carteira. Verifique se existem transações ativas.');
     } finally {
       setDeleting(false);

@@ -6,6 +6,7 @@ import { useToast } from '../../../shared/components/useToast';
 import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface Wallet {
   id: string;
@@ -49,8 +50,8 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
       ]);
       setWallets(walletsData);
       setCategories(categoriesData.filter((c: Category) => c.type === 'both' || c.type === 'expense'));
-    } catch {
-      showToast('Erro ao carregar dados para transferência', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao carregar dados para transferência'), 'error');
     }
   };
 

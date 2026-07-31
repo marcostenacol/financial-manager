@@ -5,6 +5,7 @@ import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
 import { useRecurrences } from '../hooks/useRecurrences';
 import { useToast } from '../../../shared/components/useToast';
+import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface CreateRecurrenceModalProps {
   isOpen: boolean;
@@ -33,8 +34,8 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
 
       if (loadedWallets.length > 0) setWalletId(loadedWallets[0].id);
       if (loadedCategories.length > 0) setCategoryId(loadedCategories[0].id);
-    } catch {
-      showToast('Erro ao carregar dados', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao carregar dados'), 'error');
     }
   };
 
@@ -63,8 +64,8 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
 
       onSuccess();
       onClose();
-    } catch {
-      showToast('Erro ao criar recorrência', 'error');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao criar recorrência'), 'error');
     } finally {
       setLoading(false);
     }
