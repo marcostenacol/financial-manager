@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
+import { getAvatarUrl } from '../lib/getAvatarUrl';
 import { motion } from 'framer-motion';
 
 export const Sidebar = () => {
@@ -87,8 +88,12 @@ export const Sidebar = () => {
 
       <div className="shrink-0 p-6 border-t border-app-border">
         <div className="flex items-center gap-3 mb-6 px-2">
-          <div className="w-10 h-10 rounded-full bg-app-accent-soft border border-app-accent/20 flex items-center justify-center text-app-accent font-bold">
-            {user?.name?.charAt(0).toUpperCase()}
+          <div className="w-10 h-10 rounded-full bg-app-accent-soft border border-app-accent/20 flex items-center justify-center text-app-accent font-bold overflow-hidden shrink-0">
+            {getAvatarUrl(user?.avatar) ? (
+              <img src={getAvatarUrl(user?.avatar)!} alt={user?.name} className="w-full h-full object-cover" />
+            ) : (
+              user?.name?.charAt(0).toUpperCase()
+            )}
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-app-ink font-medium text-sm truncate">{user?.name}</span>

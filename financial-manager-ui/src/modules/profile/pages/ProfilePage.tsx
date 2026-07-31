@@ -5,6 +5,7 @@ import { useProfile } from '../hooks/useProfile';
 import { User, Mail, Shield, Save, UserCircle, Camera } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 
 export const ProfilePage = () => {
   const { user, signOut } = useAuth();
@@ -31,7 +32,7 @@ export const ProfilePage = () => {
         setType(profile.type || 'personal');
         setSavedType(profile.type || 'personal');
         if (profile.avatar) {
-          setAvatar(`${import.meta.env.VITE_API_URL || 'http://localhost:3333/api/v1'}/../../uploads/${profile.avatar}`);
+          setAvatar(getAvatarUrl(profile.avatar));
         }
       } catch (err) {
         showToast(getErrorMessage(err, 'Erro ao carregar perfil'), 'error');
