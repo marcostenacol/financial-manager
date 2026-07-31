@@ -15,6 +15,8 @@ services:
       NODE_ENV: ${NODE_ENV}
       PORT: ${PORT:-3000}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+    volumes:
+      - api_uploads:/app/dist/tmp/uploads
     depends_on:
       cache:
         condition: service_healthy
@@ -58,3 +60,4 @@ networks:
 
 volumes:
   redis_data:
+  api_uploads:
