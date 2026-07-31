@@ -42,6 +42,7 @@ describe('RegisterService', () => {
 
     expect(user).toHaveProperty('id');
     expect(user.email).toBe(userData.email);
+    expect(user).not.toHaveProperty('password');
   });
 
   it('should not be able to register a user with an existing email', async () => {

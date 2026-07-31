@@ -13,7 +13,7 @@ export class RegisterService {
     private auth_repository: AuthRepositoryInterface,
   ) {}
 
-  async execute(data: RegisterDTOType): Promise<User> {
+  async execute(data: RegisterDTOType): Promise<Omit<User, 'password'>> {
     const user_exists = await this.auth_repository.findByEmail(data.email);
 
     if (user_exists) {
@@ -36,6 +36,8 @@ export class RegisterService {
       role.id,
     );
 
-    return user;
+    const { password: _password, ...user_without_password } = user;
+
+    return user_without_password;
   }
 }

@@ -186,6 +186,8 @@ Após a correção, `tsc -b --noEmit` só reporta imports não usados (TS6133) �
 
 Todos seguem o padrão real do módulo (um Service por ação, registro em `src/shared/container/index.ts`, checagem de posse via `wallet.userId !== userId` antes de mutar).
 
+**Testes de regressão adicionados (2026-07-27)** pros 4 Services novos, seguindo a convenção real do projeto (mock de Repository/Cache via `vi.fn()`, ver `rules/testing.md`): `tests/modules/recurrences/ToggleRecurrenceService.spec.ts` (4 casos, incluindo checagem de posse), `tests/modules/recurrences/CancelRecurrenceService.spec.ts` (3 casos), `tests/modules/notifications/MarkAllNotificationsAsReadService.spec.ts` (1 caso), `tests/modules/transactions/ExportTransactionsService.spec.ts` (3 casos, incluindo escaping de CSV e lista vazia). Total 15 testes novos, todos passando (`npx vitest run`). `ExportReportService` (PDF/Excel) não tem teste — geração de buffer binário via `pdfkit`/`exceljs` é mais cara de testar unitariamente; ficou como lacuna conhecida, não coberta nesta passagem.
+
 ## Auditoria de Segurança/Qualidade — 2026-07-27
 
 Levantamento feito nesta data, com correções aplicadas apenas nos itens de prioridade de segurança listados abaixo (commit `[SECURITY]`). Os demais itens são débito técnico conhecido, deliberadamente não tocados nesta passagem — não corrigir de passagem sem pedido explícito (Regra de Preservação de Código).
