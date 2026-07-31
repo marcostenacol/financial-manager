@@ -52,7 +52,7 @@ export const Sidebar = () => {
         <div className="p-6 overflow-y-auto min-h-0 flex-1">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-blue-500/20 shrink-0">
-            <img src="/favicon.svg" alt="Croesus" className="w-full h-full object-cover" />
+            <img src="/favicon.svg?v=2" alt="Croesus" className="w-full h-full object-cover" />
           </div>
           <span className="text-app-ink font-bold text-lg tracking-tight">Croesus</span>
         </div>
