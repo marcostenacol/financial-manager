@@ -1,5 +1,5 @@
 import { Transaction, Prisma } from '@prisma/client';
-import { TransactionRepositoryInterface } from './contracts/TransactionRepositoryInterface';
+import { TransactionRepositoryInterface, PaginatedTransactions } from './contracts/TransactionRepositoryInterface';
 import { prisma } from '@/shared/database/PrismaClient';
 import { injectable } from 'tsyringe';
 
@@ -49,21 +49,34 @@ export class TransactionRepository implements TransactionRepositoryInterface {
     });
   }
 
-  async findByUserId(userId: string, filters?: any): Promise<Transaction[]> {
-    return prisma.transaction.findMany({
-      where: {
-        wallet: {
-          userId,
+  async findByUserId(
+    userId: string,
+    filters: Prisma.TransactionWhereInput,
+    pagination: { skip: number; take: number },
+  ): Promise<PaginatedTransactions> {
+    const where: Prisma.TransactionWhereInput = {
+      wallet: {
+        userId,
+      },
+      ...filters,
+    };
+
+    const [data, total] = await Promise.all([
+      prisma.transaction.findMany({
+        where,
+        include: {
+          category: true,
+          wallet: true,
         },
-        ...filters,
-      },
-      include: {
-        category: true,
-        wallet: true,
-      },
-      orderBy: {
-        occurredAt: 'desc',
-      },
-    });
+        orderBy: {
+          occurredAt: 'desc',
+        },
+        skip: pagination.skip,
+        take: pagination.take,
+      }),
+      prisma.transaction.count({ where }),
+    ]);
+
+    return { data, total };
   }
 }

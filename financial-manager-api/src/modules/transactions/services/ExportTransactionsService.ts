@@ -9,7 +9,7 @@ export class ExportTransactionsService {
   ) {}
 
   async execute(userId: string): Promise<string> {
-    const transactions = await this.listTransactions.execute(userId, {});
+    const { transactions } = await this.listTransactions.execute(userId, { page: 1, per_page: 1_000_000 });
 
     const header = ['Data', 'Descrição', 'Tipo', 'Valor', 'Carteira', 'Categoria'];
     const rows = transactions.map((transaction: any) => [

@@ -17,9 +17,11 @@ export class ExportReportService {
   ) {}
 
   async execute(userId: string, filters: ExportReportFilters): Promise<Buffer> {
-    const transactions = await this.listTransactions.execute(userId, {
+    const { transactions } = await this.listTransactions.execute(userId, {
       start_date: filters.start_date,
       end_date: filters.end_date,
+      page: 1,
+      per_page: 1_000_000,
     });
 
     if (filters.format === 'excel') {

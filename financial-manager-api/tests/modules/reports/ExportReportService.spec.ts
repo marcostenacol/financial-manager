@@ -27,7 +27,7 @@ describe('ExportReportService', () => {
   });
 
   it('should generate a valid Excel workbook with translated type and formatted values', async () => {
-    vi.spyOn(listTransactions, 'execute').mockResolvedValue(sampleTransactions as any);
+    vi.spyOn(listTransactions, 'execute').mockResolvedValue({ transactions: sampleTransactions, total: sampleTransactions.length } as any);
 
     const buffer = await exportReportService.execute('user-1', { format: 'excel' });
 
@@ -44,7 +44,7 @@ describe('ExportReportService', () => {
   });
 
   it('should generate a valid PDF buffer', async () => {
-    vi.spyOn(listTransactions, 'execute').mockResolvedValue(sampleTransactions as any);
+    vi.spyOn(listTransactions, 'execute').mockResolvedValue({ transactions: sampleTransactions, total: sampleTransactions.length } as any);
 
     const buffer = await exportReportService.execute('user-1', { format: 'pdf' });
 
@@ -53,7 +53,7 @@ describe('ExportReportService', () => {
   });
 
   it('should forward start_date/end_date filters to ListTransactionsService', async () => {
-    vi.spyOn(listTransactions, 'execute').mockResolvedValue([] as any);
+    vi.spyOn(listTransactions, 'execute').mockResolvedValue({ transactions: [], total: 0 } as any);
 
     await exportReportService.execute('user-1', {
       format: 'excel',
@@ -64,6 +64,8 @@ describe('ExportReportService', () => {
     expect(listTransactions.execute).toHaveBeenCalledWith('user-1', {
       start_date: '2024-01-01T00:00:00.000Z',
       end_date: '2024-01-31T00:00:00.000Z',
+      page: 1,
+      per_page: 1_000_000,
     });
   });
 });

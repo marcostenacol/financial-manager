@@ -15,16 +15,19 @@ describe('ExportTransactionsService', () => {
   });
 
   it('should generate a CSV with header and one row per transaction', async () => {
-    vi.spyOn(listTransactions, 'execute').mockResolvedValue([
-      {
-        occurredAt: new Date('2024-05-01'),
-        description: 'Salário',
-        type: 'income',
-        amount: 1000,
-        wallet: { name: 'Carteira Principal' },
-        category: { name: 'Trabalho' },
-      },
-    ] as any);
+    vi.spyOn(listTransactions, 'execute').mockResolvedValue({
+      transactions: [
+        {
+          occurredAt: new Date('2024-05-01'),
+          description: 'Salário',
+          type: 'income',
+          amount: 1000,
+          wallet: { name: 'Carteira Principal' },
+          category: { name: 'Trabalho' },
+        },
+      ],
+      total: 1,
+    } as any);
 
     const csv = await exportTransactionsService.execute('user-1');
     const lines = csv.split('\n');
@@ -35,16 +38,19 @@ describe('ExportTransactionsService', () => {
   });
 
   it('should escape fields containing the CSV delimiter', async () => {
-    vi.spyOn(listTransactions, 'execute').mockResolvedValue([
-      {
-        occurredAt: new Date('2024-05-01'),
-        description: 'Almoço; jantar',
-        type: 'expense',
-        amount: 50,
-        wallet: { name: 'Carteira' },
-        category: { name: 'Alimentação' },
-      },
-    ] as any);
+    vi.spyOn(listTransactions, 'execute').mockResolvedValue({
+      transactions: [
+        {
+          occurredAt: new Date('2024-05-01'),
+          description: 'Almoço; jantar',
+          type: 'expense',
+          amount: 50,
+          wallet: { name: 'Carteira' },
+          category: { name: 'Alimentação' },
+        },
+      ],
+      total: 1,
+    } as any);
 
     const csv = await exportTransactionsService.execute('user-1');
 
@@ -52,7 +58,7 @@ describe('ExportTransactionsService', () => {
   });
 
   it('should return only the header when there are no transactions', async () => {
-    vi.spyOn(listTransactions, 'execute').mockResolvedValue([]);
+    vi.spyOn(listTransactions, 'execute').mockResolvedValue({ transactions: [], total: 0 } as any);
 
     const csv = await exportTransactionsService.execute('user-1');
 
