@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../../contexts/useAuth';
-import { api } from '../../../services/api';
+import { useProfile } from '../hooks/useProfile';
 import { User, Mail, Shield, Save, UserCircle, Camera } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 
 export const ProfilePage = () => {
   const { user, signOut } = useAuth();
+  const { getProfile, updateProfile, changeProfileType, updateAvatar } = useProfile();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -23,8 +24,7 @@ export const ProfilePage = () => {
 
     const loadProfile = async () => {
       try {
-        const response = await api.get('/profile/me');
-        const profile = response.data.data;
+        const profile = await getProfile();
         setName(profile.name || '');
         setBio(profile.bio || '');
         setType(profile.type || 'personal');
@@ -59,24 +59,18 @@ export const ProfilePage = () => {
     setSuccess(false);
 
     try {
-      await api.put('/profile/me', { name, bio });
+      await updateProfile({ name, bio });
       let updatedUser = { ...user!, name, bio };
 
       if (type !== savedType) {
-        const typeResponse = await api.patch('/profile/me/type', { type });
-        updatedUser = { ...updatedUser, type: typeResponse.data.data.type };
-        setSavedType(typeResponse.data.data.type);
+        const updatedProfile = await changeProfileType(type as 'personal' | 'business');
+        updatedUser = { ...updatedUser, type: updatedProfile.type };
+        setSavedType(updatedProfile.type);
       }
 
       if (avatarFile) {
-        const formData = new FormData();
-        formData.append('avatar', avatarFile);
-        const avatarResponse = await api.patch('/profile/me/avatar', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        updatedUser = { ...updatedUser, avatar: avatarResponse.data.data.avatar };
+        const updatedProfile = await updateAvatar(avatarFile);
+        updatedUser = { ...updatedUser, avatar: updatedProfile.avatar ?? undefined };
       }
 
       updateUser(updatedUser);

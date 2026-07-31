@@ -1,40 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Target, TrendingUp, Calendar, Trash2, Edit2 } from 'lucide-react';
-import { api } from '../../../services/api';
+import { useSavingsGoals, type SavingsGoal } from '../hooks/useSavingsGoals';
 import { CreateSavingsGoalModal } from '../components/CreateSavingsGoalModal';
 import { useToast } from '../../../shared/components/useToast';
 
-interface SavingsGoal {
-  id: string;
-  name: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string | null;
-  color: string;
-}
-
 export const SavingsGoalsPage = () => {
   const { showToast } = useToast();
-  const [goals, setGoals] = useState<SavingsGoal[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { goals, loading, loadGoals, deleteGoal } = useSavingsGoals();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | undefined>();
 
-  const loadGoals = async () => {
-    try {
-      const response = await api.get('/savings-goals');
-      setGoals(response.data.data);
-    } catch {
-      showToast('Erro ao carregar metas', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadGoals();
+     
+    loadGoals().catch(() => showToast('Erro ao carregar metas', 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -47,7 +26,7 @@ export const SavingsGoalsPage = () => {
     if (!window.confirm('Tem certeza que deseja excluir esta meta?')) return;
 
     try {
-      await api.delete(`/savings-goals/${id}`);
+      await deleteGoal(id);
       await loadGoals();
     } catch {
       showToast('Erro ao excluir meta', 'error');

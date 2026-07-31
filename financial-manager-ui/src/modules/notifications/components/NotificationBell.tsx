@@ -1,37 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bell, Check, CheckCheck, Info, AlertTriangle, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api } from '../../../services/api';
+import { useNotifications } from '../hooks/useNotifications';
 import { useToast } from '../../../shared/components/useToast';
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  readAt: string | null;
-  createdAt: string;
-}
 
 export const NotificationBell = () => {
   const { showToast } = useToast();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { notifications, loadNotifications, markAsRead, markAllAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const loadNotifications = async () => {
-    try {
-      const response = await api.get('/notifications');
-      setNotifications(response.data.data);
-    } catch {
-      showToast('Erro ao carregar notificações', 'error');
-    }
-  };
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadNotifications();
-    const interval = setInterval(loadNotifications, 60000); // Atualiza a cada minuto
+     
+    loadNotifications().catch(() => showToast('Erro ao carregar notificações', 'error'));
+    const interval = setInterval(() => {
+      loadNotifications().catch(() => showToast('Erro ao carregar notificações', 'error'));
+    }, 60000); // Atualiza a cada minuto
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -50,7 +34,7 @@ export const NotificationBell = () => {
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      await api.patch(`/notifications/${id}/read`);
+      await markAsRead(id);
       loadNotifications();
     } catch {
       showToast('Erro ao marcar como lida', 'error');
@@ -59,7 +43,7 @@ export const NotificationBell = () => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await api.patch('/notifications/read-all');
+      await markAllAsRead();
       loadNotifications();
     } catch {
       showToast('Erro ao marcar todas como lidas', 'error');

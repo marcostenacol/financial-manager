@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity, Target, FileDown, FileSpreadsheet } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { api } from '../../../services/api';
+import { useReports, type DashboardOverview, type ExpenseByCategory, type MonthlyEvolution } from '../hooks/useReports';
+import { useSavingsGoals } from '../../savings-goals/hooks/useSavingsGoals';
 import { useToast } from '../../../shared/components/useToast';
 
 // Recharts requires literal color strings, not CSS var() — keep these in sync with the
@@ -15,64 +16,36 @@ const CHART_COLORS = {
   tooltipBg: '#0f172a',
 };
 
-interface DashboardOverview {
-  total_balance: number;
-  monthly_income: number;
-  monthly_expense: number;
-  last_month_income: number;
-  last_month_expense: number;
-}
-
-interface ExpenseByCategory {
-  category_name: string;
-  color: string;
-  total: number;
-  percentage: number;
-}
-
-interface MonthlyEvolution {
-  month_name: string;
-  income: number;
-  expense: number;
-  balance: number;
-}
-
-interface SavingsGoal {
-  id: string;
-  name: string;
-  targetAmount: number;
-  currentAmount: number;
-  color: string;
-}
-
 export const DashboardPage = () => {
   const { showToast } = useToast();
+  const { getOverview, getExpensesByCategory, getMonthlyEvolution, exportReport } = useReports();
+  const { goals: allGoals, loadGoals } = useSavingsGoals();
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [expensesByCategory, setExpensesByCategory] = useState<ExpenseByCategory[]>([]);
   const [evolution, setEvolution] = useState<MonthlyEvolution[]>([]);
-  const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [start_date, setStartDate] = useState<string>('');
   const [end_date, setEndDate] = useState<string>('');
   const [active_preset, setActivePreset] = useState('month');
 
+  const goals = allGoals.slice(0, 3);
+
   const loadDashboardData = async () => {
     try {
-      const params = {
+      const range = {
         start_date: start_date || undefined,
         end_date: end_date || undefined,
       };
 
-      const [overviewRes, expensesRes, evolutionRes, goalsRes] = await Promise.all([
-        api.get('/reports/overview', { params }),
-        api.get('/reports/expenses-by-category'),
-        api.get('/reports/evolution'),
-        api.get('/savings-goals'),
+      const [overviewData, expensesData, evolutionData] = await Promise.all([
+        getOverview(range),
+        getExpensesByCategory(),
+        getMonthlyEvolution(),
+        loadGoals(),
       ]);
-      setOverview(overviewRes.data.data);
-      setExpensesByCategory(expensesRes.data.data);
-      setEvolution(evolutionRes.data.data);
-      setGoals(goalsRes.data.data.slice(0, 3));
+      setOverview(overviewData);
+      setExpensesByCategory(expensesData);
+      setEvolution(evolutionData);
     } catch {
       showToast('Erro ao carregar dashboard', 'error');
     } finally {
@@ -112,16 +85,12 @@ export const DashboardPage = () => {
 
   const handleExport = async (format: 'pdf' | 'excel') => {
     try {
-      const response = await api.get('/reports/export', {
-        params: {
-          format,
-          start_date: start_date || undefined,
-          end_date: end_date || undefined,
-        },
-        responseType: 'blob',
+      const blob = await exportReport(format, {
+        start_date: start_date || undefined,
+        end_date: end_date || undefined,
       });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `relatorio.${format === 'pdf' ? 'pdf' : 'xlsx'}`);

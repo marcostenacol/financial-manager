@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import axios from 'axios';
-import { api } from '../../../services/api';
+import { useRegister } from '../hooks/useRegister';
 
 export const RegisterPage = () => {
   const [name, setName] = useState('');
@@ -12,6 +12,7 @@ export const RegisterPage = () => {
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
+  const { register } = useRegister();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +20,7 @@ export const RegisterPage = () => {
     setError('');
 
     try {
-      await api.post('/auth/register', { name, email, password });
+      await register({ name, email, password });
       navigate('/login', { state: { message: 'Conta criada com sucesso! Faça login para continuar.' } });
     } catch (err) {
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;

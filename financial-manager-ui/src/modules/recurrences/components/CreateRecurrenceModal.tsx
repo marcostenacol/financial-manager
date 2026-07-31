@@ -1,18 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, RefreshCw, Calendar, Wallet as WalletIcon, Tag, Clock, FileText } from 'lucide-react';
-import { api } from '../../../services/api';
+import { useWallets } from '../../wallets/hooks/useWallets';
+import { useCategories } from '../../categories/hooks/useCategories';
+import { useRecurrences } from '../hooks/useRecurrences';
 import { useToast } from '../../../shared/components/useToast';
-
-interface Wallet {
-  id: string;
-  name: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-}
 
 interface CreateRecurrenceModalProps {
   isOpen: boolean;
@@ -22,6 +14,9 @@ interface CreateRecurrenceModalProps {
 
 export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecurrenceModalProps) => {
   const { showToast } = useToast();
+  const { wallets, loadWallets } = useWallets();
+  const { categories, loadCategories } = useCategories();
+  const { createRecurrence } = useRecurrences();
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState<'income' | 'expense'>('expense');
@@ -29,22 +24,15 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
   const [categoryId, setCategoryId] = useState('');
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('monthly');
   const [startsAt, setStartsAt] = useState(new Date().toISOString().split('T')[0]);
-  
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+
   const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
     try {
-      const [walletsRes, categoriesRes] = await Promise.all([
-        api.get('/wallets'),
-        api.get('/categories'),
-      ]);
-      setWallets(walletsRes.data.data);
-      setCategories(categoriesRes.data.data);
+      const [loadedWallets, loadedCategories] = await Promise.all([loadWallets(), loadCategories()]);
 
-      if (walletsRes.data.data.length > 0) setWalletId(walletsRes.data.data[0].id);
-      if (categoriesRes.data.data.length > 0) setCategoryId(categoriesRes.data.data[0].id);
+      if (loadedWallets.length > 0) setWalletId(loadedWallets[0].id);
+      if (loadedCategories.length > 0) setCategoryId(loadedCategories[0].id);
     } catch {
       showToast('Erro ao carregar dados', 'error');
     }
@@ -63,7 +51,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
     setLoading(true);
 
     try {
-      await api.post('/recurrences', {
+      await createRecurrence({
         description,
         amount: Number(amount),
         type,
@@ -72,7 +60,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
         period,
         starts_at: new Date(startsAt).toISOString(),
       });
-      
+
       onSuccess();
       onClose();
     } catch {

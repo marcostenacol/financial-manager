@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, Target, Palette, Calendar, TrendingUp } from 'lucide-react';
-import { api } from '../../../services/api';
+import { useSavingsGoals } from '../hooks/useSavingsGoals';
 import { useToast } from '../../../shared/components/useToast';
 
 interface CreateSavingsGoalModalProps {
@@ -26,6 +26,7 @@ const PRESET_COLORS = [
 
 export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess, initialData }: CreateSavingsGoalModalProps) => {
   const { showToast } = useToast();
+  const { createGoal, updateGoal } = useSavingsGoals();
   const [name, setName] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [currentAmount, setCurrentAmount] = useState('0');
@@ -64,11 +65,11 @@ export const CreateSavingsGoalModal = ({ isOpen, onClose, onSuccess, initialData
       };
 
       if (initialData) {
-        await api.put(`/savings-goals/${initialData.id}`, data);
+        await updateGoal(initialData.id, data);
       } else {
-        await api.post('/savings-goals', data);
+        await createGoal(data);
       }
-      
+
       onSuccess();
       onClose();
     } catch {

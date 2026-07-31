@@ -1,43 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, RefreshCw, Clock, Wallet as WalletIcon, X } from 'lucide-react';
-import { api } from '../../../services/api';
+import { useRecurrences, type Recurrence } from '../hooks/useRecurrences';
 import { CreateRecurrenceModal } from '../components/CreateRecurrenceModal';
 import { useToast } from '../../../shared/components/useToast';
 
-interface Recurrence {
-  id: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  period: 'daily' | 'weekly' | 'monthly' | 'yearly';
-  startsAt: string;
-  endsAt: string | null;
-  wallet?: { name: string };
-  category?: { name: string; color: string };
-  isActive: boolean;
-}
-
 export const RecurrencesPage = () => {
   const { showToast } = useToast();
-  const [recurrences, setRecurrences] = useState<Recurrence[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { recurrences, loading, loadRecurrences, cancelRecurrence, toggleRecurrence } = useRecurrences();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const loadRecurrences = async () => {
-    try {
-      const response = await api.get('/recurrences');
-      setRecurrences(response.data.data);
-    } catch {
-      showToast('Erro ao carregar recorrências', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadRecurrences();
+     
+    loadRecurrences().catch(() => showToast('Erro ao carregar recorrências', 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -55,7 +30,7 @@ export const RecurrencesPage = () => {
     if (!confirm('Tem certeza que deseja cancelar esta recorrência definitivamente?')) return;
 
     try {
-      await api.patch(`/recurrences/${id}/cancel`);
+      await cancelRecurrence(id);
       loadRecurrences();
     } catch {
       showToast('Erro ao cancelar recorrência', 'error');
@@ -64,7 +39,7 @@ export const RecurrencesPage = () => {
 
   const handleToggleActive = async (id: string) => {
     try {
-      await api.patch(`/recurrences/${id}/toggle`);
+      await toggleRecurrence(id);
       loadRecurrences();
     } catch {
       showToast('Erro ao alternar status da recorrência', 'error');
