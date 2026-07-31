@@ -1,6 +1,7 @@
 # System Agent rules and docs
 .agents/
 GEMINI.md
+.claude/
 
 # OS files
 .DS_Store
