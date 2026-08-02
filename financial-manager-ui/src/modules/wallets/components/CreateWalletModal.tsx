@@ -4,6 +4,7 @@ import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins } 
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../hooks/useWallets';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
 interface CreateWalletModalProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
   const { createWallet } = useWallets();
   const [name, setName] = useState('');
   const [type, setType] = useState('checking');
-  const [balance, setBalance] = useState('');
+  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
@@ -37,7 +38,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       await createWallet({
         name,
         type,
-        balance: Number(balance),
+        balance,
         currency: 'BRL',
       });
       onSuccess();
@@ -45,7 +46,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       // Reset form
       setName('');
       setType('checking');
-      setBalance('');
+      setBalance(0);
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao criar carteira'), 'error');
     } finally {
@@ -114,13 +115,10 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
             <label className="text-sm font-medium text-slate-400 ml-1">Saldo Inicial</label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-lg">R$</span>
-              <input
-                type="number"
-                step="0.01"
+              <CurrencyInput
                 required
                 value={balance}
-                onChange={(e) => setBalance(e.target.value)}
-                placeholder="0,00"
+                onChange={setBalance}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-xl font-mono"
               />
             </div>

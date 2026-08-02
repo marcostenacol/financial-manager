@@ -7,6 +7,7 @@ import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
 interface Wallet {
   id: string;
@@ -37,7 +38,7 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
   const [error, setError] = useState('');
 
   const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(0);
   const [sourceWalletId, setSourceWalletId] = useState('');
   const [destinationWalletId, setDestinationWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -71,7 +72,7 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
     try {
       await transfer({
         description,
-        amount: Number(amount),
+        amount,
         source_wallet_id: sourceWalletId,
         destination_wallet_id: destinationWalletId,
         category_id: categoryId,
@@ -81,7 +82,7 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
       onClose();
       // Reset form
       setDescription('');
-      setAmount('');
+      setAmount(0);
       setSourceWalletId('');
       setDestinationWalletId('');
       setCategoryId('');
@@ -183,13 +184,10 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-400 ml-1">Valor (R$)</label>
-                  <input
-                    type="number"
+                  <CurrencyInput
                     required
-                    step="0.01"
-                    placeholder="0,00"
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={setAmount}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-xl font-bold"
                   />
                 </div>

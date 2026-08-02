@@ -6,6 +6,7 @@ import { useCategories } from '../../categories/hooks/useCategories';
 import { useRecurrences } from '../hooks/useRecurrences';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
 interface CreateRecurrenceModalProps {
   isOpen: boolean;
@@ -19,7 +20,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
   const { categories, loadCategories } = useCategories();
   const { createRecurrence } = useRecurrences();
   const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(0);
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -54,7 +55,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
     try {
       await createRecurrence({
         description,
-        amount: Number(amount),
+        amount,
         type,
         wallet_id: walletId,
         category_id: categoryId,
@@ -143,13 +144,10 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
               <label className="text-sm font-medium text-slate-400 ml-1">Valor</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">R$</span>
-                <input
-                  type="number"
-                  step="0.01"
+                <CurrencyInput
                   required
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="0,00"
+                  onChange={setAmount}
                   className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-mono"
                 />
               </div>

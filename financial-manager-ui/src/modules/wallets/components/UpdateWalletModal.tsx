@@ -4,6 +4,7 @@ import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins, T
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../hooks/useWallets';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
 interface Wallet {
   id: string;
@@ -32,7 +33,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
   const { updateWallet, deleteWallet } = useWallets();
   const [name, setName] = useState('');
   const [type, setType] = useState<'checking' | 'savings' | 'credit' | 'investment' | 'cash'>('checking');
-  const [balance, setBalance] = useState('');
+  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -41,7 +42,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(wallet.name);
       setType(wallet.type);
-      setBalance(wallet.balance.toString());
+      setBalance(Number(wallet.balance));
     }
   }, [isOpen, wallet]);
 
@@ -54,7 +55,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
       await updateWallet(wallet.id, {
         name,
         type,
-        balance: Number(balance),
+        balance,
       });
       
       onSuccess();
@@ -152,13 +153,11 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-400 ml-1">Saldo Atual (R$)</label>
-              <input
-                type="number"
-                step="0.01"
+              <CurrencyInput
                 required
+                allowNegative
                 value={balance}
-                onChange={(e) => setBalance(e.target.value)}
-                placeholder="0,00"
+                onChange={setBalance}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-2xl font-bold"
               />
             </div>
