@@ -10,6 +10,8 @@ export const RecurrencesPage = () => {
   const { showToast } = useToast();
   const { recurrences, loading, loadRecurrences, cancelRecurrence, toggleRecurrence } = useRecurrences();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const [showCancelled, setShowCancelled] = useState(false);
 
   useEffect(() => {
      
@@ -28,22 +30,38 @@ export const RecurrencesPage = () => {
   };
 
   const handleCancel = async (id: string) => {
-    if (!confirm('Tem certeza que deseja cancelar esta recorrência definitivamente?')) return;
+    if (pendingIds.has(id) || !confirm('Tem certeza que deseja cancelar esta recorrência definitivamente?')) return;
 
+    setPendingIds((prev) => new Set(prev).add(id));
     try {
       await cancelRecurrence(id);
       loadRecurrences();
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao cancelar recorrência'), 'error');
+    } finally {
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
   const handleToggleActive = async (id: string) => {
+    if (pendingIds.has(id)) return;
+
+    setPendingIds((prev) => new Set(prev).add(id));
     try {
       await toggleRecurrence(id);
       loadRecurrences();
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao alternar status da recorrência'), 'error');
+    } finally {
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
@@ -55,6 +73,8 @@ export const RecurrencesPage = () => {
     return !!recurrence.endsAt;
   };
 
+  const visibleRecurrences = showCancelled ? recurrences : recurrences.filter((recurrence) => !isExpired(recurrence));
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
@@ -62,13 +82,24 @@ export const RecurrencesPage = () => {
           <h1 className="text-3xl font-bold text-white">Recorrências</h1>
           <p className="text-slate-400">Gerencie seus gastos e ganhos automáticos</p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
-        >
-          <Plus className="w-5 h-5" />
-          Nova Recorrência
-        </button>
+        <div className="flex items-center gap-4">
+          <label className="flex items-center gap-2 text-sm text-slate-400 select-none cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showCancelled}
+              onChange={(e) => setShowCancelled(e.target.checked)}
+              className="accent-blue-600"
+            />
+            Mostrar canceladas
+          </label>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+          >
+            <Plus className="w-5 h-5" />
+            Nova Recorrência
+          </button>
+        </div>
       </div>
 
       <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
@@ -81,7 +112,7 @@ export const RecurrencesPage = () => {
         ) : (
           <div className="divide-y divide-white/5">
             <AnimatePresence>
-              {recurrences.map((recurrence) => (
+              {visibleRecurrences.map((recurrence) => (
                 <motion.div
                   key={recurrence.id}
                   initial={{ opacity: 0, y: 10 }}
@@ -127,16 +158,18 @@ export const RecurrencesPage = () => {
                     
                     {!isExpired(recurrence) && (
                       <div className="flex items-center gap-2">
-                        <button 
+                        <button
                           onClick={() => handleToggleActive(recurrence.id)}
-                          className={`p-2 rounded-xl transition-all ${recurrence.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
+                          disabled={pendingIds.has(recurrence.id)}
+                          className={`p-2 rounded-xl transition-all disabled:opacity-50 ${recurrence.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
                           title={recurrence.isActive ? 'Pausar' : 'Ativar'}
                         >
                           <RefreshCw className={`w-5 h-5 ${!recurrence.isActive ? 'animate-pulse' : ''}`} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleCancel(recurrence.id)}
-                          className="p-2 hover:bg-red-500/10 text-slate-600 hover:text-red-400 rounded-xl transition-all"
+                          disabled={pendingIds.has(recurrence.id)}
+                          className="p-2 hover:bg-red-500/10 text-slate-600 hover:text-red-400 rounded-xl transition-all disabled:opacity-50"
                           title="Cancelar Definitivamente"
                         >
                           <X className="w-5 h-5" />
@@ -148,13 +181,19 @@ export const RecurrencesPage = () => {
               ))}
             </AnimatePresence>
 
-            {recurrences.length === 0 && !loading && (
+            {visibleRecurrences.length === 0 && !loading && (
               <div className="p-20 flex flex-col items-center justify-center text-center">
                 <div className="p-4 bg-white/5 rounded-full mb-4">
                   <RefreshCw className="w-12 h-12 text-slate-600" />
                 </div>
-                <h3 className="text-white font-bold text-lg">Nenhuma recorrência</h3>
-                <p className="text-slate-500 mt-1">Configure pagamentos recorrentes para automatizar seu fluxo.</p>
+                <h3 className="text-white font-bold text-lg">
+                  {recurrences.length === 0 ? 'Nenhuma recorrência' : 'Nenhuma recorrência ativa'}
+                </h3>
+                <p className="text-slate-500 mt-1">
+                  {recurrences.length === 0
+                    ? 'Configure pagamentos recorrentes para automatizar seu fluxo.'
+                    : 'Todas as recorrências foram canceladas. Marque "Mostrar canceladas" para vê-las.'}
+                </p>
               </div>
             )}
           </div>
