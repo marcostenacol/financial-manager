@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { SavingsGoalRepositoryInterface } from '../repositories/contracts/SavingsGoalRepositoryInterface';
 import { CreateSavingsGoalDTOType } from '../dtos/CreateSavingsGoalDTO';
 import { SavingsGoal } from '@prisma/client';
+import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 
@@ -15,6 +16,10 @@ export class CreateSavingsGoalService {
   ) {}
 
   async execute(data: CreateSavingsGoalDTOType, userId: string): Promise<SavingsGoal> {
+    if ((data.current_amount ?? 0) > data.target_amount) {
+      throw new AppError('O valor já poupado não pode ser maior que o valor alvo', 422);
+    }
+
     const goal = await this.savingsGoalRepository.create({
       ...data,
       userId,

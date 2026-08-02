@@ -1,4 +1,6 @@
 import { inject, injectable } from 'tsyringe';
+import { Prisma } from '@prisma/client';
+import { AppError } from '@/shared/errors/AppError';
 import { CategoryRepositoryInterface } from '../repositories/contracts/CategoryRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
@@ -16,22 +18,25 @@ export class DeleteCategoryService {
     const category = await this.categoryRepository.findById(id);
 
     if (!category) {
-      throw new Error('Categoria não encontrada');
+      throw new AppError('Categoria não encontrada', 404);
     }
 
     if (category.userId && category.userId !== userId) {
-      throw new Error('Você não tem permissão para deletar esta categoria');
+      throw new AppError('Você não tem permissão para deletar esta categoria', 403);
     }
 
     if (!category.userId) {
-      throw new Error('Categorias de sistema não podem ser deletadas');
+      throw new AppError('Categorias de sistema não podem ser deletadas', 403);
     }
 
-    // Nota: O banco de dados deve tratar a integridade referencial ou 
-    // podemos mover as transações para uma categoria padrão antes de deletar.
-    // Para simplificar, assumimos que categorias com transações não podem ser deletadas (Restrição SQL)
-    
-    await this.categoryRepository.delete(id);
+    try {
+      await this.categoryRepository.delete(id);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        throw new AppError('Não é possível excluir uma categoria com transações ou recorrências vinculadas', 409);
+      }
+      throw error;
+    }
 
     await this.cache.del(CacheKeys.categories.list(userId));
   }

@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { SavingsGoalRepositoryInterface } from '../repositories/contracts/SavingsGoalRepositoryInterface';
 import { UpdateSavingsGoalDTOType } from '../dtos/UpdateSavingsGoalDTO';
 import { SavingsGoal } from '@prisma/client';
+import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 
@@ -18,11 +19,18 @@ export class UpdateSavingsGoalService {
     const goal = await this.savingsGoalRepository.findById(id);
 
     if (!goal) {
-      throw new Error('Meta não encontrada');
+      throw new AppError('Meta não encontrada', 404);
     }
 
     if (goal.userId !== userId) {
-      throw new Error('Você não tem permissão para editar esta meta');
+      throw new AppError('Você não tem permissão para editar esta meta', 403);
+    }
+
+    const effectiveTarget = data.target_amount ?? Number(goal.targetAmount);
+    const effectiveCurrent = data.current_amount ?? Number(goal.currentAmount);
+
+    if (effectiveCurrent > effectiveTarget) {
+      throw new AppError('O valor já poupado não pode ser maior que o valor alvo', 422);
     }
 
     const updatedGoal = await this.savingsGoalRepository.update(id, data);

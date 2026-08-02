@@ -36,4 +36,13 @@ describe('CreateSavingsGoalService', () => {
     expect(result.name).toBe(data.name);
     expect(cacheTrait.del).toHaveBeenCalledWith(`savings-goals:user:${userId}`);
   });
+
+  it('should throw when current_amount exceeds target_amount', async () => {
+    const data = { name: 'Viagem', target_amount: 100, current_amount: 500 } as any;
+
+    await expect(createSavingsGoalService.execute(data, 'user-id')).rejects.toThrow(
+      'O valor já poupado não pode ser maior que o valor alvo',
+    );
+    expect(savingsGoalRepository.create).not.toHaveBeenCalled();
+  });
 });

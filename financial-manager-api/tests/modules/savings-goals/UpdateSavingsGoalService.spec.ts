@@ -49,4 +49,37 @@ describe('UpdateSavingsGoalService', () => {
       updateSavingsGoalService.execute('goal-id', {} as any, 'user-id'),
     ).rejects.toThrow('Você não tem permissão para editar esta meta');
   });
+
+  it('should throw when the updated current_amount would exceed the existing target_amount', async () => {
+    const userId = 'user-id';
+    const goalId = 'goal-id';
+
+    vi.spyOn(savingsGoalRepository, 'findById').mockResolvedValue({
+      id: goalId,
+      userId,
+      targetAmount: 100,
+      currentAmount: 50,
+    } as any);
+
+    await expect(
+      updateSavingsGoalService.execute(goalId, { current_amount: 500 } as any, userId),
+    ).rejects.toThrow('O valor já poupado não pode ser maior que o valor alvo');
+    expect(savingsGoalRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('should throw when lowering target_amount below the existing current_amount', async () => {
+    const userId = 'user-id';
+    const goalId = 'goal-id';
+
+    vi.spyOn(savingsGoalRepository, 'findById').mockResolvedValue({
+      id: goalId,
+      userId,
+      targetAmount: 1000,
+      currentAmount: 800,
+    } as any);
+
+    await expect(
+      updateSavingsGoalService.execute(goalId, { target_amount: 500 } as any, userId),
+    ).rejects.toThrow('O valor já poupado não pode ser maior que o valor alvo');
+  });
 });

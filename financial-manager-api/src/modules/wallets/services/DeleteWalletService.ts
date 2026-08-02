@@ -1,4 +1,5 @@
 import { injectable, inject } from 'tsyringe';
+import { Prisma } from '@prisma/client';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
@@ -20,7 +21,14 @@ export class DeleteWalletService {
       throw new AppError('Carteira não encontrada', 404);
     }
 
-    await this.wallet_repository.delete(id);
+    try {
+      await this.wallet_repository.delete(id);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        throw new AppError('Não é possível excluir uma carteira com transações ou recorrências vinculadas', 409);
+      }
+      throw error;
+    }
 
     // Invalida cache
     await this.cache.del(CacheKeys.wallets.list(user_id));
