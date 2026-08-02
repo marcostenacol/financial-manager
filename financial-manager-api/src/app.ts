@@ -30,7 +30,9 @@ const app: FastifyInstance = fastify({
 container.registerInstance<FastifyInstance>('Fastify', app);
 
 // Plugins
-app.register(fastifyHelmet);
+app.register(fastifyHelmet, {
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+});
 
 app.register(fastifyRateLimit, {
   max: 100,
