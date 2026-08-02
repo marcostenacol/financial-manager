@@ -99,5 +99,39 @@ describe('AuthContext', () => {
 
     await waitFor(() => expect(screen.getByTestId('user')).toHaveTextContent('no-user'));
     expect(localStorage.getItem('@FinancialManager:token')).toBeNull();
+    expect(api.post).toHaveBeenCalledWith('/auth/logout');
+  });
+
+  it('signOut clears local session even if the backend call fails', async () => {
+    vi.mocked(api.post)
+      .mockResolvedValueOnce({
+        data: {
+          data: {
+            token: 'access-token',
+            refresh_token: 'refresh-token',
+            user: { id: '1', name: 'John', email: 'john@example.com' },
+          },
+        },
+      })
+      .mockRejectedValueOnce(new Error('network error'));
+
+    render(
+      <AuthProvider>
+        <TestConsumer />
+      </AuthProvider>,
+    );
+
+    const user = userEvent.setup();
+    await act(async () => {
+      await user.click(screen.getByText('sign-in'));
+    });
+    await waitFor(() => expect(screen.getByTestId('user')).toHaveTextContent('john@example.com'));
+
+    await act(async () => {
+      await user.click(screen.getByText('sign-out'));
+    });
+
+    await waitFor(() => expect(screen.getByTestId('user')).toHaveTextContent('no-user'));
+    expect(localStorage.getItem('@FinancialManager:token')).toBeNull();
   });
 });

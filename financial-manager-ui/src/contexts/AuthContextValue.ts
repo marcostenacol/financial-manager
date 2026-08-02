@@ -13,7 +13,7 @@ export interface AuthContextData {
   user: User | null;
   loading: boolean;
   signIn(data: object): Promise<void>;
-  signOut(): void;
+  signOut(): Promise<void>;
   updateUser(user: User): void;
 }
 

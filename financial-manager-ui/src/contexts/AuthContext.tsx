@@ -33,11 +33,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(user);
   }, []);
 
-  const signOut = useCallback(() => {
-    localStorage.removeItem('@FinancialManager:token');
-    localStorage.removeItem('@FinancialManager:refreshToken');
-    localStorage.removeItem('@FinancialManager:user');
-    setUser(null);
+  const signOut = useCallback(async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Mesmo se a revogação no backend falhar (ex: rede indisponível),
+      // a sessão local é encerrada de qualquer forma.
+    } finally {
+      localStorage.removeItem('@FinancialManager:token');
+      localStorage.removeItem('@FinancialManager:refreshToken');
+      localStorage.removeItem('@FinancialManager:user');
+      setUser(null);
+    }
   }, []);
 
   const updateUser = useCallback((updatedUser: User) => {
