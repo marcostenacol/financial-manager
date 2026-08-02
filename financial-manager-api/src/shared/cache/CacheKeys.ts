@@ -29,7 +29,9 @@ export const CacheKeys = {
     list: (userId: string): string => `notifications:user:${userId}`,
   },
   reports: {
-    overview: (userId: string): string => `reports:overview:${userId}`,
+    overview: (userId: string, range?: { start_date?: string; end_date?: string }): string =>
+      `reports:overview:${userId}:${range?.start_date ?? ''}:${range?.end_date ?? ''}`,
+    overviewPattern: (userId: string): string => `reports:overview:${userId}:*`,
     expensesByCategory: (userId: string, month: number, year: number): string =>
       `reports:expenses-category:${userId}:${month}:${year}`,
     expensesByCategoryPattern: (userId: string): string => `reports:expenses-category:${userId}:*`,

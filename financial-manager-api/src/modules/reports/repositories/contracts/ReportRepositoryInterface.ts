@@ -20,8 +20,13 @@ export interface MonthlyEvolutionData {
   balance: number;
 }
 
+export interface DashboardOverviewRange {
+  start_date?: string;
+  end_date?: string;
+}
+
 export interface ReportRepositoryInterface {
-  getDashboardOverview(userId: string): Promise<DashboardOverviewData>;
+  getDashboardOverview(userId: string, range?: DashboardOverviewRange): Promise<DashboardOverviewData>;
   getExpensesByCategory(userId: string, month: number, year: number): Promise<ExpenseByCategoryData[]>;
   getMonthlyEvolution(userId: string): Promise<MonthlyEvolutionData[]>;
 }

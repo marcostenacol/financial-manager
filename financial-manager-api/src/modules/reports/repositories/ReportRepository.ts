@@ -1,17 +1,53 @@
 import { prisma } from '@/shared/database/PrismaClient';
-import { DashboardOverviewData, ExpenseByCategoryData, MonthlyEvolutionData, ReportRepositoryInterface } from './contracts/ReportRepositoryInterface';
+import { DashboardOverviewData, DashboardOverviewRange, ExpenseByCategoryData, MonthlyEvolutionData, ReportRepositoryInterface } from './contracts/ReportRepositoryInterface';
 import { injectable } from 'tsyringe';
+
+interface DashboardPeriod {
+  periodStart: Date;
+  periodEnd: Date;
+  previousStart: Date;
+  previousEnd: Date;
+}
 
 @injectable()
 export class ReportRepository implements ReportRepositoryInterface {
-  async getDashboardOverview(userId: string): Promise<DashboardOverviewData> {
+  private resolvePeriod(range?: DashboardOverviewRange): DashboardPeriod {
+    if (range?.start_date || range?.end_date) {
+      const periodStart = range.start_date ? new Date(range.start_date) : new Date(0);
+      const periodEnd = range.end_date
+        ? new Date(new Date(range.end_date).getTime() + 24 * 60 * 60 * 1000)
+        : new Date();
+      const durationMs = periodEnd.getTime() - periodStart.getTime();
+
+      return {
+        periodStart,
+        periodEnd,
+        previousStart: new Date(periodStart.getTime() - durationMs),
+        previousEnd: periodStart,
+      };
+    }
+
+    const now = new Date();
+    const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    return {
+      periodStart,
+      periodEnd: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+      previousStart: new Date(now.getFullYear(), now.getMonth() - 1, 1),
+      previousEnd: periodStart,
+    };
+  }
+
+  async getDashboardOverview(userId: string, range?: DashboardOverviewRange): Promise<DashboardOverviewData> {
+    const { periodStart, periodEnd, previousStart, previousEnd } = this.resolvePeriod(range);
+
     const results = await prisma.$queryRawUnsafe<any[]>(`
       WITH wallet_stats AS (
         SELECT COALESCE(SUM(balance), 0) as total_balance
         FROM wallets
         WHERE user_id = $1
       ),
-      monthly_stats AS (
+      period_stats AS (
         SELECT
           COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as income,
           COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
@@ -19,10 +55,10 @@ export class ReportRepository implements ReportRepositoryInterface {
         JOIN wallets w ON t.wallet_id = w.id
         WHERE w.user_id = $1
           AND t.status = 'completed'
-          AND t.occurred_at >= date_trunc('month', now())
-          AND t.occurred_at < date_trunc('month', now() + interval '1 month')
+          AND t.occurred_at >= $2
+          AND t.occurred_at < $3
       ),
-      last_month_stats AS (
+      previous_period_stats AS (
         SELECT
           COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as income,
           COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
@@ -30,17 +66,17 @@ export class ReportRepository implements ReportRepositoryInterface {
         JOIN wallets w ON t.wallet_id = w.id
         WHERE w.user_id = $1
           AND t.status = 'completed'
-          AND t.occurred_at >= date_trunc('month', now() - interval '1 month')
-          AND t.occurred_at < date_trunc('month', now())
+          AND t.occurred_at >= $4
+          AND t.occurred_at < $5
       )
-      SELECT 
+      SELECT
         w.total_balance,
-        m.income as monthly_income,
-        m.expense as monthly_expense,
-        l.income as last_month_income,
-        l.expense as last_month_expense
-      FROM wallet_stats w, monthly_stats m, last_month_stats l
-    `, userId);
+        p.income as monthly_income,
+        p.expense as monthly_expense,
+        pp.income as last_month_income,
+        pp.expense as last_month_expense
+      FROM wallet_stats w, period_stats p, previous_period_stats pp
+    `, userId, periodStart, periodEnd, previousStart, previousEnd);
 
     const data = results[0];
 

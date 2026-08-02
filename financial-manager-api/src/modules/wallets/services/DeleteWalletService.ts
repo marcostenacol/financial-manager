@@ -25,6 +25,6 @@ export class DeleteWalletService {
     // Invalida cache
     await this.cache.del(CacheKeys.wallets.list(user_id));
     await this.cache.del(CacheKeys.wallets.detail(id));
-    await this.cache.del(CacheKeys.reports.overview(user_id));
+    await this.cache.delPattern(CacheKeys.reports.overviewPattern(user_id));
   }
 }

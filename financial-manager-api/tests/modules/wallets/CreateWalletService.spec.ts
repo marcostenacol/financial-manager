@@ -15,6 +15,7 @@ describe('CreateWalletService', () => {
 
     cacheTrait = {
       del: vi.fn(),
+      delPattern: vi.fn(),
     } as any;
 
     createWalletService = new CreateWalletService(walletRepository, cacheTrait);

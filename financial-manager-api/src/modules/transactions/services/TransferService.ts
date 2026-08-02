@@ -87,7 +87,7 @@ export class TransferService {
     await Promise.all([
       this.cache.delPattern(CacheKeys.transactions.listPattern(userId)),
       this.cache.del(CacheKeys.wallets.list(userId)),
-      this.cache.del(CacheKeys.reports.overview(userId)),
+      this.cache.delPattern(CacheKeys.reports.overviewPattern(userId)),
     ]);
   }
 }

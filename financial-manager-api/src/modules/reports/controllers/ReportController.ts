@@ -39,7 +39,8 @@ export class ReportController extends BaseController {
 
   async overview(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const data = await this.getOverview.execute(userId);
+    const { start_date, end_date } = request.query as { start_date?: string; end_date?: string };
+    const data = await this.getOverview.execute(userId, { start_date, end_date });
     return this.success(reply, data);
   }
 
