@@ -32,6 +32,7 @@ export const CacheKeys = {
     overview: (userId: string): string => `reports:overview:${userId}`,
     expensesByCategory: (userId: string, month: number, year: number): string =>
       `reports:expenses-category:${userId}:${month}:${year}`,
+    expensesByCategoryPattern: (userId: string): string => `reports:expenses-category:${userId}:*`,
     monthlyEvolution: (userId: string): string => `reports:monthly-evolution:${userId}`,
   },
 } as const;

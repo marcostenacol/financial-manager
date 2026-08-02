@@ -52,5 +52,7 @@ export class DeleteTransactionService {
     await this.cache.delPattern(CacheKeys.transactions.listPattern(userId));
     await this.cache.delPattern(CacheKeys.transactions.byWalletPattern(wallet.id));
     await this.cache.del(CacheKeys.reports.overview(userId));
+    await this.cache.del(CacheKeys.reports.monthlyEvolution(userId));
+    await this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(userId));
   }
 }
