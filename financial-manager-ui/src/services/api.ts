@@ -12,6 +12,13 @@ interface QueuedRequest {
 let isRefreshing = false;
 let failedQueue: QueuedRequest[] = [];
 
+const AUTH_ENDPOINTS_WITHOUT_RETRY = ['/auth/login', '/auth/register', '/auth/refresh'];
+
+const isAuthEndpoint = (url?: string): boolean => {
+  if (!url) return false;
+  return AUTH_ENDPOINTS_WITHOUT_RETRY.some((endpoint) => url.includes(endpoint));
+};
+
 const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -46,7 +53,7 @@ api.interceptors.response.use(
   (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint(originalRequest.url)) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
