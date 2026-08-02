@@ -9,6 +9,13 @@ import { pipeline } from 'stream';
 import { promisify } from 'util';
 
 const pump = promisify(pipeline);
+
+const ALLOWED_AVATAR_MIME_TYPES: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+};
 import { UpdateProfileService } from '../services/UpdateProfileService';
 import { ChangeProfileTypeService } from '../services/ChangeProfileTypeService';
 import { UpdateAvatarService } from '../services/UpdateAvatarService';
@@ -55,14 +62,23 @@ export class ProfileController extends BaseController {
       throw new AppError('Arquivo não enviado', 400);
     }
 
+    const extension = ALLOWED_AVATAR_MIME_TYPES[data.mimetype];
+    if (!extension) {
+      throw new AppError('Formato de imagem não suportado. Envie JPEG, PNG, WEBP ou GIF.', 415);
+    }
+
     const userId = request.user.sub;
     const existingProfile = await this.detail_profile.execute(userId);
-    const extension = path.extname(data.filename);
     const fileName = `${userId}${extension}`;
     const uploadsDir = path.resolve(__dirname, '..', '..', '..', '..', 'tmp', 'uploads');
     const filePath = path.join(uploadsDir, fileName);
 
     await pump(data.file, fs.createWriteStream(filePath));
+
+    if (data.file.truncated) {
+      await fs.promises.unlink(filePath).catch(() => undefined);
+      throw new AppError('Arquivo excede o tamanho máximo permitido (5MB)', 413);
+    }
 
     if (existingProfile.avatar && existingProfile.avatar !== fileName) {
       await fs.promises.unlink(path.join(uploadsDir, existingProfile.avatar)).catch(() => undefined);

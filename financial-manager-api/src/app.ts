@@ -65,7 +65,11 @@ app.register(fastifySwaggerUi, {
   routePrefix: '/docs',
 });
 
-app.register(multipart);
+app.register(multipart, {
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+});
 
 app.register(fastifyStatic, {
   root: path.resolve(__dirname, '..', 'tmp', 'uploads'),

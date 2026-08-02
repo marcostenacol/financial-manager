@@ -1,7 +1,7 @@
 import { injectable } from 'tsyringe';
 import { User, Role, RefreshToken } from '@prisma/client';
 import { prisma } from '@/shared/database/PrismaClient';
-import { AuthRepositoryInterface } from './contracts/AuthRepositoryInterface';
+import { AuthRepositoryInterface, UserWithRole } from './contracts/AuthRepositoryInterface';
 import { RegisterDTOType } from '../dtos/RegisterDTO';
 
 @injectable()
@@ -32,6 +32,13 @@ export class AuthRepository implements AuthRepositoryInterface {
   async findById(user_id: string): Promise<User | null> {
     return prisma.user.findUnique({
       where: { id: user_id },
+    });
+  }
+
+  async findByIdWithRole(user_id: string): Promise<UserWithRole | null> {
+    return prisma.user.findUnique({
+      where: { id: user_id },
+      include: { role: true },
     });
   }
 

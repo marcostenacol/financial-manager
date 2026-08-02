@@ -7,6 +7,7 @@ import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { AuthRepositoryInterface } from '../repositories/contracts/AuthRepositoryInterface';
 import { LoginDTOType } from '../dtos/LoginDTO';
+import { parseDurationToMs } from '@/shared/lib/parseDuration';
 
 interface UserWithRelations {
   id: string;
@@ -51,21 +52,27 @@ export class LoginService {
       throw new AppError('E-mail ou senha incorretos', 401);
     }
 
+    const access_token_expires_in = process.env.JWT_EXPIRES_IN as string;
+    const refresh_token_expires_in_ms = parseDurationToMs(process.env.JWT_REFRESH_EXPIRES_IN as string);
+
     // Gerar Access Token (JWT)
     const token = this.fastify.jwt.sign(
       { role: user.role.slug },
-      { sub: user.id, expiresIn: '15m' }, // Token curto: 15 min
+      { sub: user.id, expiresIn: access_token_expires_in },
     );
 
     // Gerar Refresh Token
     const refresh_token = crypto.randomBytes(40).toString('hex');
-    const expires_at = new Date();
-    expires_at.setDate(expires_at.getDate() + 7); // Expira em 7 dias
+    const expires_at = new Date(Date.now() + refresh_token_expires_in_ms);
 
     await this.auth_repository.createRefreshToken(user.id, refresh_token, expires_at);
 
     // Salvar no Redis para validação rápida no middleware (Access Token)
-    await this.cache.set(CacheKeys.auth.token(user.id), { user_id: user.id }, 900); // 15 min
+    await this.cache.set(
+      CacheKeys.auth.token(user.id),
+      { user_id: user.id },
+      Math.floor(parseDurationToMs(access_token_expires_in) / 1000),
+    );
 
     return {
       user: {

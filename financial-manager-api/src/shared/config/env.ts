@@ -4,8 +4,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL é obrigatória').url('DATABASE_URL deve ser uma URL válida'),
   REDIS_URL: z.string().min(1, 'REDIS_URL é obrigatória').url('REDIS_URL deve ser uma URL válida'),
   JWT_SECRET: z.string().min(1, 'JWT_SECRET é obrigatória'),
-  JWT_EXPIRES_IN: z.string().min(1, 'JWT_EXPIRES_IN é obrigatória'),
-  JWT_REFRESH_EXPIRES_IN: z.string().min(1, 'JWT_REFRESH_EXPIRES_IN é obrigatória'),
+  JWT_EXPIRES_IN: z.string().regex(/^\d+(s|m|h|d)$/, 'JWT_EXPIRES_IN deve seguir o formato "15m", "1h", "1d" etc.'),
+  JWT_REFRESH_EXPIRES_IN: z.string().regex(/^\d+(s|m|h|d)$/, 'JWT_REFRESH_EXPIRES_IN deve seguir o formato "15m", "1h", "7d" etc.'),
 });
 
 function validateEnv(): void {
