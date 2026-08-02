@@ -67,7 +67,7 @@ api.interceptors.response.use(
 
       return new Promise((resolve, reject) => {
         api
-          .post('/auth/refresh-token', { refresh_token: refreshToken })
+          .post('/auth/refresh', { refresh_token: refreshToken })
           .then((response) => {
             const { token, refresh_token } = response.data.data;
 
