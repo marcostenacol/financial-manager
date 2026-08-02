@@ -363,23 +363,25 @@ export const DashboardPage = () => {
                   }}
                   itemStyle={{ color: '#fff' }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="income" 
-                  stroke={CHART_COLORS.income} 
+                <Area
+                  type="monotone"
+                  dataKey="income"
+                  stroke={CHART_COLORS.income}
                   strokeWidth={3}
-                  fillOpacity={1} 
-                  fill="url(#colorIncome)" 
+                  fillOpacity={1}
+                  fill="url(#colorIncome)"
                   name="Receita"
+                  isAnimationActive={false}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="expense" 
-                  stroke={CHART_COLORS.expense} 
+                <Area
+                  type="monotone"
+                  dataKey="expense"
+                  stroke={CHART_COLORS.expense}
                   strokeWidth={3}
-                  fillOpacity={1} 
-                  fill="url(#colorExpense)" 
+                  fillOpacity={1}
+                  fill="url(#colorExpense)"
                   name="Despesa"
+                  isAnimationActive={false}
                 />
               </AreaChart>
             </ResponsiveContainer>
