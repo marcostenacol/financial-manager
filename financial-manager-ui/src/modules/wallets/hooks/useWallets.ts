@@ -58,5 +58,9 @@ export function useWallets() {
     return response.data.data as Wallet;
   }, []);
 
-  return { wallets, loading, loadWallets, createWallet, updateWallet, deleteWallet, setPrimaryWallet };
+  const clearAllWallets = useCallback(async () => {
+    await api.delete('/wallets/clear-all');
+  }, []);
+
+  return { wallets, loading, loadWallets, createWallet, updateWallet, deleteWallet, setPrimaryWallet, clearAllWallets };
 }

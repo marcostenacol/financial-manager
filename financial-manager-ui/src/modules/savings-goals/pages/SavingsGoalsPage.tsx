@@ -3,15 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Target, TrendingUp, Calendar, Trash2, Edit2 } from 'lucide-react';
 import { useSavingsGoals, type SavingsGoal } from '../hooks/useSavingsGoals';
 import { CreateSavingsGoalModal } from '../components/CreateSavingsGoalModal';
+import { ConfirmDangerModal } from '../../../shared/components/ConfirmDangerModal';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const SavingsGoalsPage = () => {
   const { showToast } = useToast();
-  const { goals, loading, loadGoals, deleteGoal } = useSavingsGoals();
+  const { goals, loading, loadGoals, deleteGoal, clearAllGoals } = useSavingsGoals();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | undefined>();
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
 
   useEffect(() => {
      
@@ -51,6 +53,17 @@ export const SavingsGoalsPage = () => {
     return Math.min(Math.round((current / target) * 100), 100);
   };
 
+  const handleClearAll = async () => {
+    try {
+      await clearAllGoals();
+      setIsClearAllModalOpen(false);
+      loadGoals();
+      showToast('Metas removidas com sucesso', 'success');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao limpar metas'), 'error');
+    }
+  };
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
@@ -58,13 +71,22 @@ export const SavingsGoalsPage = () => {
           <h1 className="text-3xl font-bold text-white">Metas de Economia</h1>
           <p className="text-slate-400">Poupe dinheiro para seus grandes objetivos</p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
-        >
-          <Plus className="w-5 h-5" />
-          Nova Meta
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+          >
+            <Plus className="w-5 h-5" />
+            Nova Meta
+          </button>
+          <button
+            onClick={() => setIsClearAllModalOpen(true)}
+            className="bg-white/5 hover:bg-red-500/10 text-white hover:text-red-400 p-3 rounded-2xl border border-white/10 transition-all active:scale-95"
+            title="Limpar todas as metas"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -157,11 +179,25 @@ export const SavingsGoalsPage = () => {
         </div>
       )}
 
-      <CreateSavingsGoalModal 
+      <CreateSavingsGoalModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSuccess={loadGoals}
         initialData={editingGoal}
+      />
+
+      <ConfirmDangerModal
+        isOpen={isClearAllModalOpen}
+        onClose={() => setIsClearAllModalOpen(false)}
+        title="Limpar todas as metas"
+        warning="Remove permanentemente todas as suas metas de economia. Não afeta carteiras, transações ou recorrências."
+        actions={[
+          {
+            label: 'Limpar metas',
+            description: 'Remove todas as metas de economia cadastradas.',
+            onClick: handleClearAll,
+          },
+        ]}
       />
     </div>
   );

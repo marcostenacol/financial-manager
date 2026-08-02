@@ -52,5 +52,9 @@ export function useRecurrences() {
     await api.patch(`/recurrences/${id}/toggle`);
   }, []);
 
-  return { recurrences, loading, loadRecurrences, createRecurrence, cancelRecurrence, toggleRecurrence };
+  const clearAllRecurrences = useCallback(async () => {
+    await api.delete('/recurrences/clear-all');
+  }, []);
+
+  return { recurrences, loading, loadRecurrences, createRecurrence, cancelRecurrence, toggleRecurrence, clearAllRecurrences };
 }

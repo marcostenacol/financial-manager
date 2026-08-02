@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, RefreshCw, Clock, Wallet as WalletIcon, X } from 'lucide-react';
+import { Plus, RefreshCw, Clock, Wallet as WalletIcon, X, Trash2 } from 'lucide-react';
 import { useRecurrences, type Recurrence } from '../hooks/useRecurrences';
 import { CreateRecurrenceModal } from '../components/CreateRecurrenceModal';
+import { ConfirmDangerModal } from '../../../shared/components/ConfirmDangerModal';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const RecurrencesPage = () => {
   const { showToast } = useToast();
-  const { recurrences, loading, loadRecurrences, cancelRecurrence, toggleRecurrence } = useRecurrences();
+  const { recurrences, loading, loadRecurrences, cancelRecurrence, toggleRecurrence, clearAllRecurrences } = useRecurrences();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const [showCancelled, setShowCancelled] = useState(false);
+  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
 
   useEffect(() => {
      
@@ -75,6 +77,17 @@ export const RecurrencesPage = () => {
 
   const visibleRecurrences = showCancelled ? recurrences : recurrences.filter((recurrence) => !isExpired(recurrence));
 
+  const handleClearAll = async () => {
+    try {
+      await clearAllRecurrences();
+      setIsClearAllModalOpen(false);
+      loadRecurrences();
+      showToast('Recorrências removidas com sucesso', 'success');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao limpar recorrências'), 'error');
+    }
+  };
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
@@ -92,6 +105,13 @@ export const RecurrencesPage = () => {
             />
             Mostrar canceladas
           </label>
+          <button
+            onClick={() => setIsClearAllModalOpen(true)}
+            className="bg-white/5 hover:bg-red-500/10 text-white hover:text-red-400 p-3 rounded-2xl border border-white/10 transition-all active:scale-95"
+            title="Limpar todas as recorrências"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
@@ -200,10 +220,24 @@ export const RecurrencesPage = () => {
         )}
       </div>
 
-      <CreateRecurrenceModal 
+      <CreateRecurrenceModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={loadRecurrences}
+      />
+
+      <ConfirmDangerModal
+        isOpen={isClearAllModalOpen}
+        onClose={() => setIsClearAllModalOpen(false)}
+        title="Limpar todas as recorrências"
+        warning="Remove todas as suas recorrências. As transações que elas já geraram no passado continuam existindo, só deixam de estar vinculadas a uma recorrência."
+        actions={[
+          {
+            label: 'Limpar recorrências',
+            description: 'Remove todas as recorrências configuradas. Não afeta transações já lançadas.',
+            onClick: handleClearAll,
+          },
+        ]}
       />
     </div>
   );

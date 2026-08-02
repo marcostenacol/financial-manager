@@ -94,6 +94,10 @@ export function useTransactions() {
     return response.data as Blob;
   }, []);
 
+  const clearAllTransactions = useCallback(async (resetBalances: boolean) => {
+    await api.delete('/transactions/clear-all', { data: { reset_balances: resetBalances } });
+  }, []);
+
   return {
     transactions,
     total,
@@ -104,5 +108,6 @@ export function useTransactions() {
     deleteTransaction,
     transfer,
     exportTransactions,
+    clearAllTransactions,
   };
 }

@@ -10,19 +10,21 @@ import {
   Wallet as WalletIcon,
   RefreshCw,
   ChevronRight,
-  Download
+  Download,
+  Trash2
 } from 'lucide-react';
 import { CreateTransactionModal } from '../components/CreateTransactionModal';
 import { UpdateTransactionModal } from '../components/UpdateTransactionModal';
 import { AdvancedFiltersModal } from '../components/AdvancedFiltersModal';
 import { TransactionDetailModal } from '../components/TransactionDetailModal';
+import { ConfirmDangerModal } from '../../../shared/components/ConfirmDangerModal';
 import { useToast } from '../../../shared/components/useToast';
 import { useTransactions, type Transaction } from '../hooks/useTransactions';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const TransactionsPage = () => {
   const { showToast } = useToast();
-  const { transactions, total, loading, loadTransactions, deleteTransaction, exportTransactions } = useTransactions();
+  const { transactions, total, loading, loadTransactions, deleteTransaction, exportTransactions, clearAllTransactions } = useTransactions();
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -35,6 +37,7 @@ export const TransactionsPage = () => {
   const [advancedFilters, setAdvancedFilters] = useState({});
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
 
   // Debounce para busca
   useEffect(() => {
@@ -108,6 +111,17 @@ export const TransactionsPage = () => {
     }
   };
 
+  const handleClearAll = async (resetBalances: boolean) => {
+    try {
+      await clearAllTransactions(resetBalances);
+      setIsClearAllModalOpen(false);
+      fetchTransactions();
+      showToast('Transações removidas com sucesso', 'success');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao limpar transações'), 'error');
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -153,7 +167,15 @@ export const TransactionsPage = () => {
             <Download className="w-6 h-6 text-blue-400" />
           </button>
 
-          <button 
+          <button
+            onClick={() => setIsClearAllModalOpen(true)}
+            className="bg-app-surface hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95"
+            title="Limpar todas as transações"
+          >
+            <Trash2 className="w-6 h-6" />
+          </button>
+
+          <button
             onClick={() => setIsModalOpen(true)}
             className="bg-app-accent hover:bg-app-accent/90 text-app-accent-ink p-3 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/20"
           >
@@ -321,6 +343,25 @@ export const TransactionsPage = () => {
         onDelete={handleDelete}
         deleting={isDeleting}
         transaction={selectedTransaction}
+      />
+
+      <ConfirmDangerModal
+        isOpen={isClearAllModalOpen}
+        onClose={() => setIsClearAllModalOpen(false)}
+        title="Limpar todas as transações"
+        warning="Essa ação remove permanentemente todas as suas transações. Escolha o que fazer com o saldo das carteiras."
+        actions={[
+          {
+            label: 'Excluir mantendo o saldo atual',
+            description: 'As transações somem, mas o saldo de cada carteira continua o mesmo de hoje.',
+            onClick: () => handleClearAll(false),
+          },
+          {
+            label: 'Excluir e zerar o saldo',
+            description: 'As transações somem e o saldo de cada carteira volta para R$ 0,00.',
+            onClick: () => handleClearAll(true),
+          },
+        ]}
       />
     </div>
   );

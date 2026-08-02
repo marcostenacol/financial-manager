@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical, Star } from 'lucide-react';
+import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical, Star, Trash2 } from 'lucide-react';
 import { CreateWalletModal } from '../components/CreateWalletModal';
 import { UpdateWalletModal } from '../components/UpdateWalletModal';
 import { CreateTransferModal } from '../../transactions/components/CreateTransferModal';
 import { ArrowRightLeft } from 'lucide-react';
+import { ConfirmDangerModal } from '../../../shared/components/ConfirmDangerModal';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets, type Wallet } from '../hooks/useWallets';
+import { useSavingsGoals } from '../../savings-goals/hooks/useSavingsGoals';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const WalletsPage = () => {
   const { showToast } = useToast();
-  const { wallets, loading, loadWallets, setPrimaryWallet } = useWallets();
+  const { wallets, loading, loadWallets, setPrimaryWallet, clearAllWallets } = useWallets();
+  const { clearAllGoals } = useSavingsGoals();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
 
   useEffect(() => {
@@ -48,6 +52,29 @@ export const WalletsPage = () => {
     }
   };
 
+  const handleClearWallets = async () => {
+    try {
+      await clearAllWallets();
+      setIsClearAllModalOpen(false);
+      loadWallets();
+      showToast('Carteiras removidas com sucesso', 'success');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao excluir carteiras'), 'error');
+    }
+  };
+
+  const handleResetEverything = async () => {
+    try {
+      await clearAllWallets();
+      await clearAllGoals();
+      setIsClearAllModalOpen(false);
+      loadWallets();
+      showToast('Todos os dados foram removidos', 'success');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao zerar tudo'), 'error');
+    }
+  };
+
   const getWalletGradient = (type: string) => {
     switch (type) {
       case 'credit': return 'from-purple-600 to-indigo-600';
@@ -78,6 +105,13 @@ export const WalletsPage = () => {
           >
             <Plus className="w-5 h-5" />
             Nova Carteira
+          </button>
+          <button
+            onClick={() => setIsClearAllModalOpen(true)}
+            className="bg-app-surface hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95"
+            title="Excluir carteiras"
+          >
+            <Trash2 className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -178,6 +212,25 @@ export const WalletsPage = () => {
         onClose={() => setIsUpdateModalOpen(false)}
         onSuccess={loadWallets}
         wallet={selectedWallet}
+      />
+
+      <ConfirmDangerModal
+        isOpen={isClearAllModalOpen}
+        onClose={() => setIsClearAllModalOpen(false)}
+        title="Excluir carteiras"
+        warning="Excluir uma carteira remove também todas as transações e recorrências vinculadas a ela — não tem como desfazer."
+        actions={[
+          {
+            label: 'Excluir carteiras',
+            description: 'Remove todas as suas carteiras, transações e recorrências. Metas de economia continuam.',
+            onClick: handleClearWallets,
+          },
+          {
+            label: 'Zerar tudo',
+            description: 'Remove carteiras, transações, recorrências e também todas as metas de economia.',
+            onClick: handleResetEverything,
+          },
+        ]}
       />
     </div>
   );

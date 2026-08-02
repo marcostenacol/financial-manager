@@ -55,5 +55,9 @@ export function useSavingsGoals() {
     await api.delete(`/savings-goals/${id}`);
   }, []);
 
-  return { goals, loading, loadGoals, createGoal, updateGoal, deleteGoal };
+  const clearAllGoals = useCallback(async () => {
+    await api.delete('/savings-goals/clear-all');
+  }, []);
+
+  return { goals, loading, loadGoals, createGoal, updateGoal, deleteGoal, clearAllGoals };
 }
