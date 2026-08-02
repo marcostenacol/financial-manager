@@ -57,6 +57,7 @@ export class CreateTransactionService {
     // Invalida cache de transações
     await this.cache.del(CacheKeys.transactions.byWallet(wallet.id));
     await this.cache.delPattern(CacheKeys.transactions.listPattern(userId));
+    await this.cache.del(CacheKeys.reports.overview(userId));
 
     return transaction;
   }

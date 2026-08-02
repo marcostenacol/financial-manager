@@ -27,6 +27,7 @@ export class CreateWalletService {
 
     // Invalida cache de listagem
     await this.cache.del(CacheKeys.wallets.list(data.user_id));
+    await this.cache.del(CacheKeys.reports.overview(data.user_id));
 
     return wallet;
   }
