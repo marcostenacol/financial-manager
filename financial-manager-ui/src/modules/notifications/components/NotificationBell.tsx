@@ -9,6 +9,8 @@ export const NotificationBell = () => {
   const { showToast } = useToast();
   const { notifications, loadNotifications, markAsRead, markAllAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const [isMarkingAll, setIsMarkingAll] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,20 +36,34 @@ export const NotificationBell = () => {
   const unreadCount = notifications.filter(n => !n.readAt).length;
 
   const handleMarkAsRead = async (id: string) => {
+    if (pendingIds.has(id)) return;
+
+    setPendingIds((prev) => new Set(prev).add(id));
     try {
       await markAsRead(id);
       loadNotifications();
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao marcar como lida'), 'error');
+    } finally {
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
   const handleMarkAllAsRead = async () => {
+    if (isMarkingAll) return;
+
+    setIsMarkingAll(true);
     try {
       await markAllAsRead();
       loadNotifications();
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao marcar todas como lidas'), 'error');
+    } finally {
+      setIsMarkingAll(false);
     }
   };
 
@@ -98,9 +114,10 @@ export const NotificationBell = () => {
             <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
               <h3 className="text-sm font-bold text-white">Notificações</h3>
               {unreadCount > 0 && (
-                <button 
+                <button
                   onClick={handleMarkAllAsRead}
-                  className="text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase tracking-widest flex items-center gap-1"
+                  disabled={isMarkingAll}
+                  className="text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase tracking-widest flex items-center gap-1 disabled:opacity-50"
                 >
                   <CheckCheck className="w-3 h-3" />
                   Ler tudo
@@ -140,9 +157,10 @@ export const NotificationBell = () => {
                           </p>
                           
                           {!notification.readAt && (
-                            <button 
+                            <button
                               onClick={() => handleMarkAsRead(notification.id)}
-                              className="mt-2 text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase tracking-widest flex items-center gap-1"
+                              disabled={pendingIds.has(notification.id)}
+                              className="mt-2 text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase tracking-widest flex items-center gap-1 disabled:opacity-50"
                             >
                               <Check className="w-3 h-3" />
                               Marcar como lida

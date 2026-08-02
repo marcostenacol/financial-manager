@@ -34,6 +34,7 @@ export const TransactionsPage = () => {
   const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState({});
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Debounce para busca
   useEffect(() => {
@@ -93,14 +94,17 @@ export const TransactionsPage = () => {
   };
 
   const handleDelete = async () => {
-    if (!selectedTransaction || !window.confirm('Tem certeza que deseja excluir esta transação?')) return;
+    if (isDeleting || !selectedTransaction || !window.confirm('Tem certeza que deseja excluir esta transação?')) return;
 
+    setIsDeleting(true);
     try {
       await deleteTransaction(selectedTransaction.id);
       setIsDetailModalOpen(false);
       fetchTransactions();
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao excluir transação'), 'error');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -310,11 +314,12 @@ export const TransactionsPage = () => {
         currentFilters={advancedFilters}
       />
 
-      <TransactionDetailModal 
+      <TransactionDetailModal
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        deleting={isDeleting}
         transaction={selectedTransaction}
       />
     </div>

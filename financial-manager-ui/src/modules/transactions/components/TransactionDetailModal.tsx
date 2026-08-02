@@ -17,10 +17,11 @@ interface TransactionDetailModalProps {
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  deleting?: boolean;
   transaction: Transaction | null;
 }
 
-export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, transaction }: TransactionDetailModalProps) => {
+export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, deleting, transaction }: TransactionDetailModalProps) => {
   if (!isOpen || !transaction) return null;
 
   const isIncome = transaction.type === 'income';
@@ -52,7 +53,8 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, tran
             </button>
             <button
               onClick={onDelete}
-              className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-red-400"
+              disabled={deleting}
+              className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-red-400 disabled:opacity-50"
               title="Excluir Transação"
             >
               <Trash2 className="w-5 h-5" />

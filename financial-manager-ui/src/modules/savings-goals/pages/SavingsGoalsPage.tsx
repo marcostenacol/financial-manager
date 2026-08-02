@@ -11,6 +11,7 @@ export const SavingsGoalsPage = () => {
   const { goals, loading, loadGoals, deleteGoal } = useSavingsGoals();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | undefined>();
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
      
@@ -24,13 +25,20 @@ export const SavingsGoalsPage = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Tem certeza que deseja excluir esta meta?')) return;
+    if (pendingIds.has(id) || !window.confirm('Tem certeza que deseja excluir esta meta?')) return;
 
+    setPendingIds((prev) => new Set(prev).add(id));
     try {
       await deleteGoal(id);
       await loadGoals();
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao excluir meta'), 'error');
+    } finally {
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
@@ -91,9 +99,10 @@ export const SavingsGoalsPage = () => {
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDelete(goal.id)}
-                        className="p-2 text-slate-500 hover:text-red-400 transition-colors"
+                        disabled={pendingIds.has(goal.id)}
+                        className="p-2 text-slate-500 hover:text-red-400 transition-colors disabled:opacity-50"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
