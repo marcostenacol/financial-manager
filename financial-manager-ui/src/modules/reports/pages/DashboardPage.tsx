@@ -270,8 +270,9 @@ export const DashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Gastos por Categoria */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
           className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
@@ -313,8 +314,9 @@ export const DashboardPage = () => {
 
         {/* Evolução Mensal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
           className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
