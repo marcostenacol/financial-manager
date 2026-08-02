@@ -38,5 +38,9 @@ export function useProfile() {
     return response.data.data as Profile;
   }, []);
 
-  return { getProfile, updateProfile, changeProfileType, updateAvatar };
+  const changePassword = useCallback(async (current_password: string, new_password: string) => {
+    await api.patch('/profile/me/password', { current_password, new_password });
+  }, []);
+
+  return { getProfile, updateProfile, changeProfileType, updateAvatar, changePassword };
 }

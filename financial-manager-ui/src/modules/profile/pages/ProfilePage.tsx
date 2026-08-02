@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../../contexts/useAuth';
 import { useProfile } from '../hooks/useProfile';
-import { User, Mail, Shield, Save, UserCircle, Camera } from 'lucide-react';
+import { User, Mail, Shield, Save, UserCircle, Camera, KeyRound } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
+import { ChangePasswordModal } from '../components/ChangePasswordModal';
 
 export const ProfilePage = () => {
   const { user, signOut } = useAuth();
@@ -19,6 +20,7 @@ export const ProfilePage = () => {
   const [savedType, setSavedType] = useState('personal');
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const { updateUser } = useAuth();
 
   useEffect(() => {
@@ -205,6 +207,15 @@ export const ProfilePage = () => {
                   </button>
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setIsChangePasswordOpen(true)}
+                className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl border border-white/10 text-slate-300 hover:bg-white/5 transition-all font-medium"
+              >
+                <KeyRound className="w-5 h-5" />
+                Trocar Senha
+              </button>
             </div>
 
             {success && (
@@ -243,6 +254,11 @@ export const ProfilePage = () => {
           </button>
         </div>
       </motion.div>
+
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
     </div>
   );
 };

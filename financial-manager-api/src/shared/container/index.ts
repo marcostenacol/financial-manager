@@ -41,6 +41,7 @@ import { DetailProfileService } from '@/modules/profile/services/DetailProfileSe
 import { UpdateProfileService } from '@/modules/profile/services/UpdateProfileService';
 import { ChangeProfileTypeService } from '@/modules/profile/services/ChangeProfileTypeService';
 import { UpdateAvatarService } from '@/modules/profile/services/UpdateAvatarService';
+import { ChangePasswordService } from '@/modules/profile/services/ChangePasswordService';
 import { CreateWalletService } from '@/modules/wallets/services/CreateWalletService';
 import { ListWalletsService } from '@/modules/wallets/services/ListWalletsService';
 import { UpdateWalletService } from '@/modules/wallets/services/UpdateWalletService';
@@ -86,6 +87,7 @@ container.registerSingleton<DetailProfileService>('DetailProfileService', Detail
 container.registerSingleton<UpdateProfileService>('UpdateProfileService', UpdateProfileService);
 container.registerSingleton<ChangeProfileTypeService>('ChangeProfileTypeService', ChangeProfileTypeService);
 container.registerSingleton<UpdateAvatarService>('UpdateAvatarService', UpdateAvatarService);
+container.registerSingleton<ChangePasswordService>('ChangePasswordService', ChangePasswordService);
 container.registerSingleton<CreateWalletService>('CreateWalletService', CreateWalletService);
 container.registerSingleton<ListWalletsService>('ListWalletsService', ListWalletsService);
 container.registerSingleton<UpdateWalletService>('UpdateWalletService', UpdateWalletService);

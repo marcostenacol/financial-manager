@@ -12,8 +12,10 @@ const pump = promisify(pipeline);
 import { UpdateProfileService } from '../services/UpdateProfileService';
 import { ChangeProfileTypeService } from '../services/ChangeProfileTypeService';
 import { UpdateAvatarService } from '../services/UpdateAvatarService';
+import { ChangePasswordService } from '../services/ChangePasswordService';
 import { UpdateProfileDTO } from '../dtos/UpdateProfileDTO';
 import { ChangeProfileTypeDTO } from '../dtos/ChangeProfileTypeDTO';
+import { ChangePasswordDTO } from '../dtos/ChangePasswordDTO';
 
 @injectable()
 export class ProfileController extends BaseController {
@@ -22,6 +24,7 @@ export class ProfileController extends BaseController {
     @inject('UpdateProfileService') private update_profile: UpdateProfileService,
     @inject('ChangeProfileTypeService') private change_type: ChangeProfileTypeService,
     @inject('UpdateAvatarService') private update_avatar: UpdateAvatarService,
+    @inject('ChangePasswordService') private change_password: ChangePasswordService,
   ) {
     super();
   }
@@ -67,5 +70,14 @@ export class ProfileController extends BaseController {
 
     const profile = await this.update_avatar.execute(userId, fileName);
     return this.success(reply, profile, 'Avatar atualizado com sucesso');
+  }
+
+  async changePassword(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const data = ChangePasswordDTO.parse(request.body);
+    await this.change_password.execute({
+      user_id: request.user.sub,
+      ...data,
+    });
+    return this.success(reply, null, 'Senha alterada com sucesso');
   }
 }

@@ -12,4 +12,5 @@ export async function profileRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put('/me', controller.update.bind(controller));
   fastify.patch('/me/type', controller.changeType.bind(controller));
   fastify.patch('/me/avatar', controller.avatar.bind(controller));
+  fastify.patch('/me/password', controller.changePassword.bind(controller));
 }

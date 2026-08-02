@@ -29,6 +29,19 @@ export class AuthRepository implements AuthRepositoryInterface {
     });
   }
 
+  async findById(user_id: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { id: user_id },
+    });
+  }
+
+  async updatePassword(user_id: string, hashed_password: string): Promise<void> {
+    await prisma.user.update({
+      where: { id: user_id },
+      data: { password: hashed_password },
+    });
+  }
+
   async findRoleBySlug(slug: string): Promise<Role | null> {
     return prisma.role.findUnique({
       where: { slug },
