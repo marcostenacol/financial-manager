@@ -36,4 +36,19 @@ export class WalletRepository implements WalletRepositoryInterface {
       where: { id },
     });
   }
+
+  async setPrimary(id: string, user_id: string): Promise<Wallet> {
+    const [, wallet] = await prisma.$transaction([
+      prisma.wallet.updateMany({
+        where: { userId: user_id, isPrimary: true },
+        data: { isPrimary: false },
+      }),
+      prisma.wallet.update({
+        where: { id },
+        data: { isPrimary: true },
+      }),
+    ]);
+
+    return wallet;
+  }
 }

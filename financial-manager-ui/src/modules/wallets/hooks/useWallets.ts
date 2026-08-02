@@ -7,6 +7,7 @@ export interface Wallet {
   type: 'checking' | 'savings' | 'credit' | 'investment' | 'cash';
   balance: number;
   currency: string;
+  isPrimary: boolean;
 }
 
 export interface CreateWalletInput {
@@ -52,5 +53,10 @@ export function useWallets() {
     await api.delete(`/wallets/${id}`);
   }, []);
 
-  return { wallets, loading, loadWallets, createWallet, updateWallet, deleteWallet };
+  const setPrimaryWallet = useCallback(async (id: string) => {
+    const response = await api.patch(`/wallets/${id}/primary`);
+    return response.data.data as Wallet;
+  }, []);
+
+  return { wallets, loading, loadWallets, createWallet, updateWallet, deleteWallet, setPrimaryWallet };
 }

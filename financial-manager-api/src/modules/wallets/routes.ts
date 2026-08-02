@@ -13,4 +13,5 @@ export async function walletRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/', controller.store.bind(controller));
   fastify.put('/:id', controller.update.bind(controller));
   fastify.delete('/:id', controller.delete.bind(controller));
+  fastify.patch('/:id/primary', controller.setPrimary.bind(controller));
 }

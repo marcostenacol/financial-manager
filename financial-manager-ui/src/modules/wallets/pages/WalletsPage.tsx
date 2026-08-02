@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical } from 'lucide-react';
+import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical, Star } from 'lucide-react';
 import { CreateWalletModal } from '../components/CreateWalletModal';
 import { UpdateWalletModal } from '../components/UpdateWalletModal';
 import { CreateTransferModal } from '../../transactions/components/CreateTransferModal';
@@ -11,7 +11,7 @@ import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const WalletsPage = () => {
   const { showToast } = useToast();
-  const { wallets, loading, loadWallets } = useWallets();
+  const { wallets, loading, loadWallets, setPrimaryWallet } = useWallets();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
@@ -26,6 +26,18 @@ export const WalletsPage = () => {
   const handleEdit = (wallet: Wallet) => {
     setSelectedWallet(wallet);
     setIsUpdateModalOpen(true);
+  };
+
+  const handleSetPrimary = async (e: React.MouseEvent, wallet: Wallet) => {
+    e.stopPropagation();
+    if (wallet.isPrimary) return;
+
+    try {
+      await setPrimaryWallet(wallet.id);
+      await loadWallets();
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao definir carteira principal'), 'error');
+    }
   };
 
   const getWalletIcon = (type: string) => {
@@ -96,13 +108,29 @@ export const WalletsPage = () => {
                     <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md border border-white/20">
                       {getWalletIcon(wallet.type)}
                     </div>
-                    <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                      <MoreVertical className="w-5 h-5 text-white/70" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={(e) => handleSetPrimary(e, wallet)}
+                        title={wallet.isPrimary ? 'Carteira principal' : 'Definir como principal'}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                      >
+                        <Star className={`w-5 h-5 ${wallet.isPrimary ? 'text-yellow-300 fill-yellow-300' : 'text-white/70'}`} />
+                      </button>
+                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                        <MoreVertical className="w-5 h-5 text-white/70" />
+                      </button>
+                    </div>
                   </div>
 
                   <div>
-                    <p className="text-white/60 text-sm font-medium mb-1 uppercase tracking-wider">{wallet.name}</p>
+                    <p className="text-white/60 text-sm font-medium mb-1 uppercase tracking-wider flex items-center gap-2">
+                      {wallet.name}
+                      {wallet.isPrimary && (
+                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] normal-case tracking-normal font-bold">
+                          Principal
+                        </span>
+                      )}
+                    </p>
                     <h2 className="text-3xl font-bold text-white tracking-tight">
                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: wallet.currency }).format(wallet.balance)}
                     </h2>

@@ -49,7 +49,8 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       setCategories(categoriesData);
 
       if (walletsData.length > 0) {
-        setWalletId(walletsData[0].id);
+        const primaryWallet = walletsData.find((wallet) => wallet.isPrimary);
+        setWalletId((primaryWallet ?? walletsData[0]).id);
       }
       if (categoriesData.length > 0) {
         setCategoryId(categoriesData[0].id);
