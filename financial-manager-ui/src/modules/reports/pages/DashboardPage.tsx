@@ -219,7 +219,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-6 rounded-3xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-6 rounded-3xl"
         >
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-emerald-500/20 rounded-2xl text-emerald-400">
@@ -245,7 +245,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-6 rounded-3xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-6 rounded-3xl"
         >
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-red-500/20 rounded-2xl text-red-400">
@@ -273,7 +273,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -317,7 +317,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -394,7 +394,7 @@ export const DashboardPage = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mt-8 bg-app-surface backdrop-blur-xl border border-app-border shadow-app-card p-8 rounded-3xl"
+        className="mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
       >
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-xl font-bold text-white flex items-center gap-2">
