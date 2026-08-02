@@ -17,10 +17,13 @@ export function errorHandler(
   }
 
   if (error instanceof ZodError) {
+    const fieldErrors = error.flatten().fieldErrors;
+    const firstFieldMessage = Object.values(fieldErrors).flat().find((message): message is string => Boolean(message));
+
     reply.status(422).send({
       success: false,
-      message: 'Erro de validação',
-      data: error.flatten().fieldErrors,
+      message: firstFieldMessage ?? 'Erro de validação',
+      data: fieldErrors,
     });
     return;
   }
