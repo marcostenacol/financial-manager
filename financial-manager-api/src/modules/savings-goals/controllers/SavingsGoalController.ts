@@ -5,6 +5,7 @@ import { CreateSavingsGoalService } from '../services/CreateSavingsGoalService';
 import { ListSavingsGoalsService } from '../services/ListSavingsGoalsService';
 import { UpdateSavingsGoalService } from '../services/UpdateSavingsGoalService';
 import { DeleteSavingsGoalService } from '../services/DeleteSavingsGoalService';
+import { ClearAllSavingsGoalsService } from '../services/ClearAllSavingsGoalsService';
 import { CreateSavingsGoalDTO } from '../dtos/CreateSavingsGoalDTO';
 import { UpdateSavingsGoalDTO } from '../dtos/UpdateSavingsGoalDTO';
 
@@ -15,6 +16,7 @@ export class SavingsGoalController extends BaseController {
     @inject('ListSavingsGoalsService') private listGoals: ListSavingsGoalsService,
     @inject('UpdateSavingsGoalService') private updateGoal: UpdateSavingsGoalService,
     @inject('DeleteSavingsGoalService') private deleteGoal: DeleteSavingsGoalService,
+    @inject('ClearAllSavingsGoalsService') private clearAllGoals: ClearAllSavingsGoalsService,
   ) {
     super();
   }
@@ -45,5 +47,11 @@ export class SavingsGoalController extends BaseController {
     const userId = request.user.sub;
     await this.deleteGoal.execute(id, userId);
     return this.success(reply, null, 'Meta removida com sucesso');
+  }
+
+  async clearAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = request.user.sub;
+    await this.clearAllGoals.execute(userId);
+    return this.success(reply, null, 'Metas removidas com sucesso');
   }
 }

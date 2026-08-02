@@ -8,10 +8,12 @@ import { UpdateTransactionService } from '../services/UpdateTransactionService';
 import { DeleteTransactionService } from '../services/DeleteTransactionService';
 import { TransferService } from '../services/TransferService';
 import { ExportTransactionsService } from '../services/ExportTransactionsService';
+import { ClearAllTransactionsService } from '../services/ClearAllTransactionsService';
 import { CreateTransferDTO } from '../dtos/CreateTransferDTO';
 import { CreateTransactionDTO } from '../dtos/CreateTransactionDTO';
 import { UpdateTransactionDTO } from '../dtos/UpdateTransactionDTO';
 import { ListTransactionsFilterDTO } from '../dtos/ListTransactionsFilterDTO';
+import { ClearAllTransactionsDTO } from '../dtos/ClearAllTransactionsDTO';
 
 @injectable()
 export class TransactionController extends BaseController {
@@ -23,6 +25,7 @@ export class TransactionController extends BaseController {
     @inject('DeleteTransactionService') private deleteTransaction: DeleteTransactionService,
     @inject('TransferService') private transferService: TransferService,
     @inject('ExportTransactionsService') private exportTransactions: ExportTransactionsService,
+    @inject('ClearAllTransactionsService') private clearAllTransactions: ClearAllTransactionsService,
   ) {
     super();
   }
@@ -70,6 +73,13 @@ export class TransactionController extends BaseController {
     const userId = request.user.sub;
     await this.deleteTransaction.execute(id, userId);
     return this.success(reply, null, 'Transação removida com sucesso');
+  }
+
+  async clearAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = request.user.sub;
+    const { reset_balances } = ClearAllTransactionsDTO.parse(request.body ?? {});
+    await this.clearAllTransactions.execute(userId, reset_balances);
+    return this.success(reply, null, 'Transações removidas com sucesso');
   }
 
   async transfer(request: FastifyRequest, reply: FastifyReply): Promise<void> {

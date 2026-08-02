@@ -37,6 +37,12 @@ export class WalletRepository implements WalletRepositoryInterface {
     });
   }
 
+  async deleteAllByUserId(user_id: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).wallet.deleteMany({
+      where: { userId: user_id },
+    });
+  }
+
   async setPrimary(id: string, user_id: string): Promise<Wallet> {
     const [, wallet] = await prisma.$transaction([
       prisma.wallet.updateMany({

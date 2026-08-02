@@ -79,4 +79,17 @@ export class TransactionRepository implements TransactionRepositoryInterface {
 
     return { data, total };
   }
+
+  async deleteAllByUserId(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).transaction.deleteMany({
+      where: { wallet: { userId } },
+    });
+  }
+
+  async nullifyRecurrenceForUser(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).transaction.updateMany({
+      where: { wallet: { userId }, recurrenceId: { not: null } },
+      data: { recurrenceId: null },
+    });
+  }
 }

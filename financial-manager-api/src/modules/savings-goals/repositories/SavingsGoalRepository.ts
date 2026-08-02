@@ -51,4 +51,10 @@ export class SavingsGoalRepository implements SavingsGoalRepositoryInterface {
       where: { id },
     });
   }
+
+  async deleteAllByUserId(userId: string): Promise<void> {
+    await prisma.savingsGoal.deleteMany({
+      where: { userId },
+    });
+  }
 }

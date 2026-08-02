@@ -7,6 +7,7 @@ import { UpdateWalletService } from '../services/UpdateWalletService';
 import { DeleteWalletService } from '../services/DeleteWalletService';
 import { DetailWalletService } from '../services/DetailWalletService';
 import { SetPrimaryWalletService } from '../services/SetPrimaryWalletService';
+import { ClearAllWalletsService } from '../services/ClearAllWalletsService';
 import { CreateWalletDTO } from '../dtos/CreateWalletDTO';
 import { UpdateWalletDTO } from '../dtos/UpdateWalletDTO';
 
@@ -19,6 +20,7 @@ export class WalletController extends BaseController {
     @inject('DeleteWalletService') private delete_wallet: DeleteWalletService,
     @inject('DetailWalletService') private detail_wallet: DetailWalletService,
     @inject('SetPrimaryWalletService') private set_primary_wallet: SetPrimaryWalletService,
+    @inject('ClearAllWalletsService') private clear_all_wallets: ClearAllWalletsService,
   ) {
     super();
   }
@@ -64,5 +66,10 @@ export class WalletController extends BaseController {
     const { id } = request.params as { id: string };
     const wallet = await this.set_primary_wallet.execute(id, request.user.sub);
     return this.success(reply, wallet, 'Carteira principal definida com sucesso');
+  }
+
+  async clearAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    await this.clear_all_wallets.execute(request.user.sub);
+    return this.success(reply, null, 'Carteiras removidas com sucesso');
   }
 }

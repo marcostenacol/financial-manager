@@ -8,4 +8,5 @@ export interface SavingsGoalRepositoryInterface {
   findById(id: string): Promise<SavingsGoal | null>;
   update(id: string, data: UpdateSavingsGoalDTOType): Promise<SavingsGoal>;
   delete(id: string): Promise<void>;
+  deleteAllByUserId(userId: string): Promise<void>;
 }

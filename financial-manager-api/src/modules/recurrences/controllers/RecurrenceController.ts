@@ -5,6 +5,7 @@ import { CreateRecurrenceService } from '../services/CreateRecurrenceService';
 import { ListRecurrencesService } from '../services/ListRecurrencesService';
 import { ToggleRecurrenceService } from '../services/ToggleRecurrenceService';
 import { CancelRecurrenceService } from '../services/CancelRecurrenceService';
+import { ClearAllRecurrencesService } from '../services/ClearAllRecurrencesService';
 import { CreateRecurrenceDTO } from '../dtos/CreateRecurrenceDTO';
 
 @injectable()
@@ -14,6 +15,7 @@ export class RecurrenceController extends BaseController {
     @inject('ListRecurrencesService') private listRecurrences: ListRecurrencesService,
     @inject('ToggleRecurrenceService') private toggleRecurrence: ToggleRecurrenceService,
     @inject('CancelRecurrenceService') private cancelRecurrence: CancelRecurrenceService,
+    @inject('ClearAllRecurrencesService') private clearAllRecurrences: ClearAllRecurrencesService,
   ) {
     super();
   }
@@ -43,5 +45,11 @@ export class RecurrenceController extends BaseController {
     const userId = request.user.sub;
     const recurrence = await this.cancelRecurrence.execute(id, userId);
     return this.success(reply, recurrence, 'Recorrência cancelada com sucesso');
+  }
+
+  async clearAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = request.user.sub;
+    await this.clearAllRecurrences.execute(userId);
+    return this.success(reply, null, 'Recorrências removidas com sucesso');
   }
 }

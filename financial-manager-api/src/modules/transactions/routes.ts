@@ -10,6 +10,7 @@ export async function transactionRoutes(fastify: FastifyInstance): Promise<void>
 
   fastify.get('/', (request, reply) => controller.index(request, reply));
   fastify.get('/export', (request, reply) => controller.export(request, reply));
+  fastify.delete('/clear-all', (request, reply) => controller.clearAll(request, reply));
   fastify.get('/:id', (request, reply) => controller.show(request, reply));
   fastify.post('/', (request, reply) => controller.store(request, reply));
   fastify.put('/:id', (request, reply) => controller.update(request, reply));
