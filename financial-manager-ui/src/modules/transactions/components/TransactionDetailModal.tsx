@@ -4,7 +4,7 @@ import { X, Pencil, Trash2, ArrowUpCircle, ArrowDownCircle, Calendar, Tag, Walle
 interface Transaction {
   id: string;
   description: string;
-  amount: number;
+  amount: number | string;
   type: 'income' | 'expense' | 'transfer';
   status: 'pending' | 'completed' | 'cancelled';
   occurredAt: string;
@@ -75,7 +75,7 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, tran
             <div>
               <p className="text-slate-400 text-sm">{transaction.description}</p>
               <p className={`text-2xl font-bold font-mono ${isIncome ? 'text-emerald-400' : 'text-red-400'}`}>
-                {isIncome ? '+' : '-'} R$ {transaction.amount.toFixed(2)}
+                {isIncome ? '+' : '-'} {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(transaction.amount))}
               </p>
             </div>
           </div>
