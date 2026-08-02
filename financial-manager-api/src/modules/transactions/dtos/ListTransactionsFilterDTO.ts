@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
+import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 
 export const ListTransactionsFilterDTO = z.object({
   wallet_id: z.string().uuid().optional(),
@@ -7,6 +8,7 @@ export const ListTransactionsFilterDTO = z.object({
   start_date: z.string().datetime().optional(),
   end_date: z.string().datetime().optional(),
   type: z.nativeEnum(TransactionTypeEnum).optional(),
+  status: z.nativeEnum(TransactionStatusEnum).optional(),
   search: z.string().optional(),
   page: z.coerce.number().int().positive().default(1),
   per_page: z.coerce.number().int().positive().max(100).default(10),
