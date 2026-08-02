@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { Prisma, Transaction } from '@prisma/client';
+import { prisma } from '@/shared/database/PrismaClient';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { CreateTransactionDTOType } from '../dtos/CreateTransactionDTO';
@@ -28,27 +29,31 @@ export class CreateTransactionService {
       throw new AppError('Carteira não encontrada', 404);
     }
 
-    const transaction = await this.transactionRepository.create({
-      walletId: data.wallet_id,
-      categoryId: data.category_id,
-      type: data.type,
-      amount: new Prisma.Decimal(data.amount),
-      description: data.description,
-      status: data.status,
-      occurredAt: new Date(data.occurred_at),
+    const amount = new Prisma.Decimal(data.amount);
+    const isCompleted = data.status === TransactionStatusEnum.COMPLETED;
+    const balanceDelta = data.type === TransactionTypeEnum.INCOME ? amount : amount.negated();
+
+    const transaction = await prisma.$transaction(async (tx) => {
+      const createdTransaction = await this.transactionRepository.create({
+        walletId: data.wallet_id,
+        categoryId: data.category_id,
+        type: data.type,
+        amount,
+        description: data.description,
+        status: data.status,
+        occurredAt: new Date(data.occurred_at),
+      }, tx);
+
+      if (isCompleted) {
+        await this.walletRepository.update(wallet.id, {
+          balance: { increment: balanceDelta },
+        }, tx);
+      }
+
+      return createdTransaction;
     });
 
-    // Se a transação estiver concluída, atualiza o saldo da carteira
-    if (data.status === TransactionStatusEnum.COMPLETED) {
-      const amount = new Prisma.Decimal(data.amount);
-      const newBalance = data.type === TransactionTypeEnum.INCOME
-        ? new Prisma.Decimal(wallet.balance).plus(amount)
-        : new Prisma.Decimal(wallet.balance).minus(amount);
-
-      await this.walletRepository.update(wallet.id, {
-        balance: newBalance,
-      });
-
+    if (isCompleted) {
       // Invalida cache da carteira e lista de carteiras
       await this.cache.del(CacheKeys.wallets.detail(wallet.id));
       await this.cache.del(CacheKeys.wallets.list(userId));

@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
-import { Recurrence } from '@prisma/client';
+import { Prisma, Recurrence } from '@prisma/client';
+import { prisma } from '@/shared/database/PrismaClient';
 import { RecurrenceRepositoryInterface } from '../repositories/contracts/RecurrenceRepositoryInterface';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
@@ -55,32 +56,46 @@ export class ProcessRecurrenceService {
   }
 
   private async process(recurrence: Recurrence, now: Date): Promise<void> {
-    // 1. Criar transação
-    await this.transactionRepository.create({
-      description: `${recurrence.description} (Recorrente)`,
-      amount: recurrence.amount,
-      type: recurrence.type as TransactionTypeEnum,
-      status: TransactionStatusEnum.COMPLETED,
-      walletId: recurrence.walletId,
-      categoryId: recurrence.categoryId,
-      recurrenceId: recurrence.id,
-      occurredAt: now,
-    });
-
-    // 2. Atualizar saldo da carteira
     const wallet = await this.walletRepository.findById(recurrence.walletId);
-    if (wallet) {
-      const newBalance = recurrence.type === TransactionTypeEnum.INCOME
-        ? Number(wallet.balance) + Number(recurrence.amount)
-        : Number(wallet.balance) - Number(recurrence.amount);
-      
-      await this.walletRepository.update(wallet.id, { balance: newBalance });
-      await this.cache.del(CacheKeys.wallets.list(wallet.userId));
-    }
 
-    // 3. Atualizar última data de processamento
-    await this.recurrenceRepository.update(recurrence.id, {
-      lastProcessedAt: now,
+    const balanceDelta = recurrence.type === TransactionTypeEnum.INCOME
+      ? new Prisma.Decimal(recurrence.amount)
+      : new Prisma.Decimal(recurrence.amount).negated();
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Criar transação
+      await this.transactionRepository.create({
+        description: `${recurrence.description} (Recorrente)`,
+        amount: recurrence.amount,
+        type: recurrence.type as TransactionTypeEnum,
+        status: TransactionStatusEnum.COMPLETED,
+        walletId: recurrence.walletId,
+        categoryId: recurrence.categoryId,
+        recurrenceId: recurrence.id,
+        occurredAt: now,
+      }, tx);
+
+      // 2. Atualizar saldo da carteira
+      if (wallet) {
+        await this.walletRepository.update(wallet.id, {
+          balance: { increment: balanceDelta },
+        }, tx);
+      }
+
+      // 3. Atualizar última data de processamento
+      await this.recurrenceRepository.update(recurrence.id, {
+        lastProcessedAt: now,
+      }, tx);
     });
+
+    if (wallet) {
+      await this.cache.del(CacheKeys.wallets.list(wallet.userId));
+      await this.cache.del(CacheKeys.wallets.detail(wallet.id));
+      await this.cache.delPattern(CacheKeys.transactions.listPattern(wallet.userId));
+      await this.cache.delPattern(CacheKeys.transactions.byWalletPattern(wallet.id));
+      await this.cache.delPattern(CacheKeys.reports.overviewPattern(wallet.userId));
+      await this.cache.del(CacheKeys.reports.monthlyEvolution(wallet.userId));
+      await this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(wallet.userId));
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { Prisma } from '@prisma/client';
+import { prisma } from '@/shared/database/PrismaClient';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
@@ -33,17 +34,21 @@ export class DeleteTransactionService {
       throw new AppError('Acesso negado', 403);
     }
 
-    // Se estava concluída, reverte o impacto no saldo
-    if (transaction.status === TransactionStatusEnum.COMPLETED) {
-      const amount = Number(transaction.amount);
-      const revertedBalance = transaction.type === TransactionTypeEnum.INCOME 
-        ? Number(wallet.balance) - amount 
-        : Number(wallet.balance) + amount;
-      
-      await this.walletRepository.update(wallet.id, { balance: new Prisma.Decimal(revertedBalance) });
-    }
+    const wasCompleted = transaction.status === TransactionStatusEnum.COMPLETED;
+    const signedAmount = transaction.type === TransactionTypeEnum.INCOME
+      ? new Prisma.Decimal(transaction.amount)
+      : new Prisma.Decimal(transaction.amount).negated();
 
-    await this.transactionRepository.delete(id);
+    await prisma.$transaction(async (tx) => {
+      // Se estava concluída, reverte o impacto no saldo (delta invertido)
+      if (wasCompleted) {
+        await this.walletRepository.update(wallet.id, {
+          balance: { increment: signedAmount.negated() },
+        }, tx);
+      }
+
+      await this.transactionRepository.delete(id, tx);
+    });
 
     // Invalida caches (incluindo listagens filtradas)
     await this.cache.del(CacheKeys.wallets.detail(wallet.id));

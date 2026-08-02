@@ -24,8 +24,8 @@ export class WalletRepository implements WalletRepositoryInterface {
     });
   }
 
-  async update(id: string, data: Prisma.WalletUncheckedUpdateInput): Promise<Wallet> {
-    return prisma.wallet.update({
+  async update(id: string, data: Prisma.WalletUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<Wallet> {
+    return (tx ?? prisma).wallet.update({
       where: { id },
       data,
     });

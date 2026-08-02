@@ -6,7 +6,7 @@ export type RecurrenceWithRelations = Prisma.RecurrenceGetPayload<{
 
 export interface RecurrenceRepositoryInterface {
   create(data: Prisma.RecurrenceUncheckedCreateInput): Promise<Recurrence>;
-  update(id: string, data: Prisma.RecurrenceUncheckedUpdateInput): Promise<Recurrence>;
+  update(id: string, data: Prisma.RecurrenceUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<Recurrence>;
   delete(id: string): Promise<void>;
   findById(id: string): Promise<RecurrenceWithRelations | null>;
   findByUserId(userId: string): Promise<Recurrence[]>;

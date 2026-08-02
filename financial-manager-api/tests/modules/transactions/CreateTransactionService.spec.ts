@@ -1,4 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mock do Prisma antes dos imports que o utilizam
+vi.mock('@/shared/database/PrismaClient', () => ({
+  prisma: {
+    $transaction: vi.fn((callback) => callback({})),
+  },
+}));
+
 import { CreateTransactionService } from '@/modules/transactions/services/CreateTransactionService';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
@@ -50,7 +58,11 @@ describe('CreateTransactionService', () => {
     const result = await createTransactionService.execute(data as any, userId);
 
     expect(result).toHaveProperty('id');
-    expect(walletRepository.update).toHaveBeenCalledWith(walletId, { balance: new Prisma.Decimal(1500) });
+    expect(walletRepository.update).toHaveBeenCalledWith(
+      walletId,
+      { balance: { increment: new Prisma.Decimal(1000) } },
+      expect.anything(),
+    );
     expect(cacheTrait.del).toHaveBeenCalled();
   });
 
@@ -73,7 +85,11 @@ describe('CreateTransactionService', () => {
     const result = await createTransactionService.execute(data as any, userId);
 
     expect(result).toHaveProperty('id');
-    expect(walletRepository.update).toHaveBeenCalledWith(walletId, { balance: new Prisma.Decimal(300) });
+    expect(walletRepository.update).toHaveBeenCalledWith(
+      walletId,
+      { balance: { increment: new Prisma.Decimal(200).negated() } },
+      expect.anything(),
+    );
   });
 
   it('should not update balance if status is pending', async () => {

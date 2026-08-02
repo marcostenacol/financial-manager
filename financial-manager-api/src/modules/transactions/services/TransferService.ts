@@ -86,8 +86,14 @@ export class TransferService {
     // 3. Limpar caches
     await Promise.all([
       this.cache.delPattern(CacheKeys.transactions.listPattern(userId)),
+      this.cache.delPattern(CacheKeys.transactions.byWalletPattern(source_wallet_id)),
+      this.cache.delPattern(CacheKeys.transactions.byWalletPattern(destination_wallet_id)),
       this.cache.del(CacheKeys.wallets.list(userId)),
+      this.cache.del(CacheKeys.wallets.detail(source_wallet_id)),
+      this.cache.del(CacheKeys.wallets.detail(destination_wallet_id)),
       this.cache.delPattern(CacheKeys.reports.overviewPattern(userId)),
+      this.cache.del(CacheKeys.reports.monthlyEvolution(userId)),
+      this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(userId)),
     ]);
   }
 }

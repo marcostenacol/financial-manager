@@ -6,9 +6,9 @@ export interface PaginatedTransactions {
 }
 
 export interface TransactionRepositoryInterface {
-  create(data: Prisma.TransactionUncheckedCreateInput): Promise<Transaction>;
-  update(id: string, data: Prisma.TransactionUncheckedUpdateInput): Promise<Transaction>;
-  delete(id: string): Promise<void>;
+  create(data: Prisma.TransactionUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Transaction>;
+  update(id: string, data: Prisma.TransactionUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<Transaction>;
+  delete(id: string, tx?: Prisma.TransactionClient): Promise<void>;
   findById(id: string): Promise<Transaction | null>;
   findAllByWalletId(walletId: string, filters?: any): Promise<Transaction[]>;
   findByUserId(

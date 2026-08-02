@@ -1,4 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mock do Prisma antes dos imports que o utilizam
+vi.mock('@/shared/database/PrismaClient', () => ({
+  prisma: {
+    $transaction: vi.fn((callback) => callback({})),
+  },
+}));
+
+import { Prisma } from '@prisma/client';
 import { ProcessRecurrenceService } from '@/modules/recurrences/services/ProcessRecurrenceService';
 import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositories/contracts/RecurrenceRepositoryInterface';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
@@ -29,6 +38,7 @@ describe('ProcessRecurrenceService', () => {
 
     cacheTrait = {
       del: vi.fn(),
+      delPattern: vi.fn(),
     } as any;
 
     processRecurrenceService = new ProcessRecurrenceService(
@@ -63,10 +73,14 @@ describe('ProcessRecurrenceService', () => {
     await processRecurrenceService.execute();
 
     expect(transactionRepository.create).toHaveBeenCalled();
-    expect(walletRepository.update).toHaveBeenCalledWith('wallet-1', { balance: 950 as any });
+    expect(walletRepository.update).toHaveBeenCalledWith(
+      'wallet-1',
+      { balance: { increment: new Prisma.Decimal(50).negated() } },
+      expect.anything(),
+    );
     expect(recurrenceRepository.update).toHaveBeenCalledWith('rec-1', expect.objectContaining({
       lastProcessedAt: expect.any(Date)
-    }));
+    }), expect.anything());
   });
 
   it('should not process a recurrence that was recently processed', async () => {

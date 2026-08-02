@@ -5,21 +5,21 @@ import { injectable } from 'tsyringe';
 
 @injectable()
 export class TransactionRepository implements TransactionRepositoryInterface {
-  async create(data: Prisma.TransactionUncheckedCreateInput): Promise<Transaction> {
-    return prisma.transaction.create({
+  async create(data: Prisma.TransactionUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Transaction> {
+    return (tx ?? prisma).transaction.create({
       data,
     });
   }
 
-  async update(id: string, data: Prisma.TransactionUncheckedUpdateInput): Promise<Transaction> {
-    return prisma.transaction.update({
+  async update(id: string, data: Prisma.TransactionUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<Transaction> {
+    return (tx ?? prisma).transaction.update({
       where: { id },
       data,
     });
   }
 
-  async delete(id: string): Promise<void> {
-    await prisma.transaction.delete({
+  async delete(id: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).transaction.delete({
       where: { id },
     });
   }

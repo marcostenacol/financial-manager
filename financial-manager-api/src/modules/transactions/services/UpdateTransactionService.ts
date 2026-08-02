@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { Transaction, Prisma } from '@prisma/client';
+import { prisma } from '@/shared/database/PrismaClient';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { UpdateTransactionDTOType } from '../dtos/UpdateTransactionDTO';
@@ -34,37 +35,39 @@ export class UpdateTransactionService {
       throw new AppError('Acesso negado', 403);
     }
 
-    // Se o status anterior era concluído, reverte o impacto no saldo
-    if (transaction.status === TransactionStatusEnum.COMPLETED) {
-      const amount = Number(transaction.amount);
-      const revertedBalance = transaction.type === TransactionTypeEnum.INCOME 
-        ? Number(wallet.balance) - amount 
-        : Number(wallet.balance) + amount;
-      
-      await this.walletRepository.update(wallet.id, { balance: new Prisma.Decimal(revertedBalance) });
-    }
+    const wasCompleted = transaction.status === TransactionStatusEnum.COMPLETED;
+    const oldSignedAmount = transaction.type === TransactionTypeEnum.INCOME
+      ? new Prisma.Decimal(transaction.amount)
+      : new Prisma.Decimal(transaction.amount).negated();
 
-    // Atualiza a transação
-    const updatedTransaction = await this.transactionRepository.update(id, {
-      description: data.description,
-      amount: data.amount,
-      type: data.type,
-      status: data.status,
-      categoryId: data.category_id,
-      occurredAt: data.occurred_at ? new Date(data.occurred_at) : undefined,
+    const newType = data.type ?? transaction.type;
+    const newAmount = data.amount !== undefined ? new Prisma.Decimal(data.amount) : new Prisma.Decimal(transaction.amount);
+    const newStatus = data.status ?? transaction.status;
+    const willBeCompleted = newStatus === TransactionStatusEnum.COMPLETED;
+    const newSignedAmount = newType === TransactionTypeEnum.INCOME ? newAmount : newAmount.negated();
+
+    // Delta líquido: remove o impacto antigo (se estava concluída) e aplica o novo (se ficará concluída)
+    const balanceDelta = (willBeCompleted ? newSignedAmount : new Prisma.Decimal(0))
+      .minus(wasCompleted ? oldSignedAmount : new Prisma.Decimal(0));
+
+    const updatedTransaction = await prisma.$transaction(async (tx) => {
+      const updated = await this.transactionRepository.update(id, {
+        description: data.description,
+        amount: data.amount,
+        type: data.type,
+        status: data.status,
+        categoryId: data.category_id,
+        occurredAt: data.occurred_at ? new Date(data.occurred_at) : undefined,
+      }, tx);
+
+      if (!balanceDelta.isZero()) {
+        await this.walletRepository.update(wallet.id, {
+          balance: { increment: balanceDelta },
+        }, tx);
+      }
+
+      return updated;
     });
-
-    // Se o novo status for concluído, aplica o novo impacto
-    if (updatedTransaction.status === TransactionStatusEnum.COMPLETED) {
-      const currentWallet = await this.walletRepository.findById(wallet.id);
-      const amount = Number(updatedTransaction.amount);
-      
-      const newBalance = updatedTransaction.type === TransactionTypeEnum.INCOME 
-        ? Number(currentWallet!.balance) + amount 
-        : Number(currentWallet!.balance) - amount;
-
-      await this.walletRepository.update(wallet.id, { balance: new Prisma.Decimal(newBalance) });
-    }
 
     // Invalida caches (incluindo listagens filtradas)
     await this.cache.del(CacheKeys.wallets.detail(wallet.id));

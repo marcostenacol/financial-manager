@@ -11,8 +11,8 @@ export class RecurrenceRepository implements RecurrenceRepositoryInterface {
     });
   }
 
-  async update(id: string, data: Prisma.RecurrenceUncheckedUpdateInput): Promise<Recurrence> {
-    return prisma.recurrence.update({
+  async update(id: string, data: Prisma.RecurrenceUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<Recurrence> {
+    return (tx ?? prisma).recurrence.update({
       where: { id },
       data,
     });
