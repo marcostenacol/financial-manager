@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
+import { useScope } from '../../contexts/useScope';
 import { getAvatarUrl } from '../lib/getAvatarUrl';
 import { motion } from 'framer-motion';
 
 export const Sidebar = () => {
   const { signOut, user } = useAuth();
+  const { scope, setScope } = useScope();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -15,7 +17,8 @@ export const Sidebar = () => {
     { icon: Wallet, label: 'Carteiras', path: '/wallets' },
     { icon: History, label: 'Transações', path: '/transactions' },
     { icon: Tag, label: 'Categorias', path: '/categories' },
-    { icon: Target, label: 'Metas', path: '/savings-goals' },
+    ...(scope === 'personal' ? [{ icon: Target, label: 'Metas', path: '/savings-goals' }] : []),
+    ...(scope === 'business' ? [{ icon: Briefcase, label: 'Centros de Custo', path: '/cost-centers' }] : []),
     { icon: RefreshCw, label: 'Recorrências', path: '/recurrences' },
     { icon: UserCircle, label: 'Meu Perfil', path: '/profile' },
   ];
@@ -56,6 +59,27 @@ export const Sidebar = () => {
             <img src="/favicon.svg?v=2" alt="Croesus" className="w-full h-full object-cover" />
           </div>
           <span className="text-app-ink font-bold text-lg tracking-tight">Croesus</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-white/5 rounded-2xl border border-app-border">
+          <button
+            onClick={() => setScope('personal')}
+            className={`flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${
+              scope === 'personal' ? 'bg-app-accent text-app-accent-ink shadow-app-card' : 'text-app-muted hover:text-app-ink'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            Pessoal
+          </button>
+          <button
+            onClick={() => setScope('business')}
+            className={`flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${
+              scope === 'business' ? 'bg-app-accent text-app-accent-ink shadow-app-card' : 'text-app-muted hover:text-app-ink'
+            }`}
+          >
+            <Briefcase className="w-4 h-4" />
+            Empresarial
+          </button>
         </div>
 
         <nav className="space-y-2">

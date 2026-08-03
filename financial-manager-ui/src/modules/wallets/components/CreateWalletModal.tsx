@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../hooks/useWallets';
+import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
@@ -23,6 +24,7 @@ const WALLET_TYPES = [
 export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletModalProps) => {
   const { showToast } = useToast();
   const { createWallet } = useWallets();
+  const { scope } = useScope();
   const [name, setName] = useState('');
   const [type, setType] = useState('checking');
   const [balance, setBalance] = useState(0);
@@ -38,6 +40,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       await createWallet({
         name,
         type,
+        scope,
         balance,
         currency: 'BRL',
       });

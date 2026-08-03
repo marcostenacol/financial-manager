@@ -7,6 +7,7 @@ export interface Category {
   color: string;
   icon: string | null;
   type: 'income' | 'expense' | 'both';
+  scope: 'personal' | 'business' | null;
   userId?: string;
 }
 
@@ -15,6 +16,7 @@ export interface CreateCategoryInput {
   color: string;
   icon?: string;
   type: 'income' | 'expense' | 'both';
+  scope?: 'personal' | 'business';
 }
 
 export interface UpdateCategoryInput {
@@ -22,22 +24,23 @@ export interface UpdateCategoryInput {
   color?: string;
   icon?: string;
   type?: 'income' | 'expense' | 'both';
+  scope?: 'personal' | 'business';
 }
 
-export function useCategories() {
+export function useCategories(scope?: 'personal' | 'business') {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await api.get('/categories');
+      const response = await api.get('/categories', { params: scope ? { scope } : undefined });
       setCategories(response.data.data);
       return response.data.data as Category[];
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [scope]);
 
   const createCategory = useCallback(async (data: CreateCategoryInput) => {
     const response = await api.post('/categories', data);

@@ -33,7 +33,7 @@ describe('WalletsPage', () => {
 
     render(<WalletsPage />);
 
-    expect(api.get).toHaveBeenCalledWith('/wallets');
+    expect(api.get).toHaveBeenCalledWith('/wallets', { params: undefined });
 
     await waitFor(() => expect(screen.getByText('Nubank')).toBeInTheDocument());
     expect(screen.getByText('Poupança')).toBeInTheDocument();

@@ -9,11 +9,13 @@ import { ConfirmDangerModal } from '../../../shared/components/ConfirmDangerModa
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets, type Wallet } from '../hooks/useWallets';
 import { useSavingsGoals } from '../../savings-goals/hooks/useSavingsGoals';
+import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const WalletsPage = () => {
   const { showToast } = useToast();
-  const { wallets, loading, loadWallets, setPrimaryWallet, clearAllWallets } = useWallets();
+  const { scope } = useScope();
+  const { wallets, loading, loadWallets, setPrimaryWallet, clearAllWallets } = useWallets(scope);
   const { clearAllGoals } = useSavingsGoals();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -25,7 +27,7 @@ export const WalletsPage = () => {
      
     loadWallets().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar carteiras'), 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [scope]);
 
   const handleEdit = (wallet: Wallet) => {
     setSelectedWallet(wallet);

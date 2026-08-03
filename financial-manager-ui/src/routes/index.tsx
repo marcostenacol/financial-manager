@@ -9,6 +9,7 @@ import { CategoriesPage } from '../modules/categories/pages/CategoriesPage';
 import { RecurrencesPage } from '../modules/recurrences/pages/RecurrencesPage';
 import { DashboardPage } from '../modules/reports/pages/DashboardPage';
 import { SavingsGoalsPage } from '../modules/savings-goals/pages/SavingsGoalsPage';
+import { CostCentersPage } from '../modules/cost-centers/pages/CostCentersPage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
@@ -89,6 +90,15 @@ export const AppRoutes = () => {
             <SavingsGoalsPage />
           </ProtectedRoute>
         } 
+      />
+
+      <Route
+        path="/cost-centers"
+        element={
+          <ProtectedRoute>
+            <CostCentersPage />
+          </ProtectedRoute>
+        }
       />
 
       <Route path="*" element={<Navigate to="/" />} />

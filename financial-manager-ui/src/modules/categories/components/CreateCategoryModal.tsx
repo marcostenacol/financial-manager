@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Save, Type, Palette, ArrowUpCircle, ArrowDownCircle, Layers } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useCategories } from '../hooks/useCategories';
+import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface CreateCategoryModalProps {
@@ -19,6 +20,7 @@ const PREDEFINED_COLORS = [
 export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCategoryModalProps) => {
   const { showToast } = useToast();
   const { createCategory } = useCategories();
+  const { scope } = useScope();
   const [name, setName] = useState('');
   const [color, setColor] = useState(PREDEFINED_COLORS[0]);
   const [type, setType] = useState<'income' | 'expense' | 'both'>('expense');
@@ -35,6 +37,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
         name,
         color,
         type,
+        scope,
       });
       onSuccess();
       onClose();

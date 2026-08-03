@@ -5,11 +5,13 @@ import { CreateCategoryModal } from '../components/CreateCategoryModal';
 import { UpdateCategoryModal } from '../components/UpdateCategoryModal';
 import { useToast } from '../../../shared/components/useToast';
 import { useCategories, type Category } from '../hooks/useCategories';
+import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const CategoriesPage = () => {
   const { showToast } = useToast();
-  const { categories, loading, loadCategories } = useCategories();
+  const { scope } = useScope();
+  const { categories, loading, loadCategories } = useCategories(scope);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -18,7 +20,7 @@ export const CategoriesPage = () => {
      
     loadCategories().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar categorias'), 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [scope]);
 
   const handleEdit = (category: Category) => {
     setSelectedCategory(category);

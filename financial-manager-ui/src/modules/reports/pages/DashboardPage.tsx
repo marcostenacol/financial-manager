@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity, Target, FileDown, FileSpreadsheet } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity, Target, FileDown, FileSpreadsheet, Briefcase } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useReports, type DashboardOverview, type ExpenseByCategory, type MonthlyEvolution } from '../hooks/useReports';
+import { useReports, type DashboardOverview, type ExpenseByCategory, type MonthlyEvolution, type CashFlowByCostCenter } from '../hooks/useReports';
 import { useSavingsGoals } from '../../savings-goals/hooks/useSavingsGoals';
+import { useScope } from '../../../contexts/useScope';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
@@ -20,11 +21,13 @@ const CHART_COLORS = {
 
 export const DashboardPage = () => {
   const { showToast } = useToast();
-  const { getOverview, getExpensesByCategory, getMonthlyEvolution, exportReport } = useReports();
+  const { getOverview, getExpensesByCategory, getMonthlyEvolution, getCashFlowByCostCenter, exportReport } = useReports();
   const { goals: allGoals, loadGoals } = useSavingsGoals();
+  const { scope } = useScope();
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [expensesByCategory, setExpensesByCategory] = useState<ExpenseByCategory[]>([]);
   const [evolution, setEvolution] = useState<MonthlyEvolution[]>([]);
+  const [cashFlowByCostCenter, setCashFlowByCostCenter] = useState<CashFlowByCostCenter[]>([]);
   const [loading, setLoading] = useState(true);
   const [start_date, setStartDate] = useState<string>('');
   const [end_date, setEndDate] = useState<string>('');
@@ -40,10 +43,10 @@ export const DashboardPage = () => {
       };
 
       const [overviewData, expensesData, evolutionData] = await Promise.all([
-        getOverview(range),
+        getOverview(range, scope),
         getExpensesByCategory(),
         getMonthlyEvolution(),
-        loadGoals(),
+        scope === 'personal' ? loadGoals() : getCashFlowByCostCenter().then(setCashFlowByCostCenter),
       ]);
       setOverview(overviewData);
       setExpensesByCategory(expensesData);
@@ -59,7 +62,7 @@ export const DashboardPage = () => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadDashboardData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [start_date, end_date]);
+  }, [start_date, end_date, scope]);
 
   const handlePresetChange = (preset: string) => {
     setActivePreset(preset);
@@ -389,55 +392,102 @@ export const DashboardPage = () => {
         </motion.div>
       </div>
 
-      {/* Metas de Economia - Resumo */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
-      >
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-xl font-bold text-white flex items-center gap-2">
-            <Target className="w-5 h-5 text-emerald-400" />
-            Progresso das Metas
-          </h3>
-          <Link to="/savings-goals" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
-            Ver todas as metas
-          </Link>
-        </div>
+      {scope === 'personal' ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+        >
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <Target className="w-5 h-5 text-emerald-400" />
+              Progresso das Metas
+            </h3>
+            <Link to="/savings-goals" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+              Ver todas as metas
+            </Link>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {goals.map((goal) => {
-            const progress = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100);
-            return (
-              <div key={goal.id} className="space-y-4">
-                <div className="flex justify-between items-end">
-                  <div>
-                    <p className="text-white font-bold">{goal.name}</p>
-                    <p className="text-slate-500 text-xs">Faltam {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount - goal.currentAmount)}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {goals.map((goal) => {
+              const progress = Math.min(Math.round((goal.currentAmount / goal.targetAmount) * 100), 100);
+              return (
+                <div key={goal.id} className="space-y-4">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <p className="text-white font-bold">{goal.name}</p>
+                      <p className="text-slate-500 text-xs">Faltam {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount - goal.currentAmount)}</p>
+                    </div>
+                    <span className="text-white font-bold text-lg">{progress}%</span>
                   </div>
-                  <span className="text-white font-bold text-lg">{progress}%</span>
+                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: goal.color, boxShadow: `0 0 15px ${goal.color}40` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+
+            {goals.length === 0 && (
+              <div className="col-span-full text-center py-4 text-slate-500">
+                Você ainda não definiu metas de economia.
+              </div>
+            )}
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+        >
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-amber-400" />
+              Fluxo de Caixa por Centro de Custo
+            </h3>
+            <Link to="/cost-centers" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+              Gerenciar centros de custo
+            </Link>
+          </div>
+
+          <div className="space-y-6">
+            {cashFlowByCostCenter.map((item, index) => (
+              <div key={item.cost_center_name} className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-white font-medium">{item.cost_center_name}</span>
+                  <span className="text-slate-400 font-mono">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.total)}
+                    <span className="ml-2 text-slate-500 text-xs">({item.percentage}%)</span>
+                  </span>
                 </div>
                 <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
+                    animate={{ width: `${item.percentage}%` }}
+                    transition={{ delay: 0.3 + index * 0.1, duration: 1 }}
                     className="h-full rounded-full"
-                    style={{ backgroundColor: goal.color, boxShadow: `0 0 15px ${goal.color}40` }}
+                    style={{ backgroundColor: item.color }}
                   />
                 </div>
               </div>
-            );
-          })}
+            ))}
 
-          {goals.length === 0 && (
-            <div className="col-span-full text-center py-4 text-slate-500">
-              Você ainda não definiu metas de economia.
-            </div>
-          )}
-        </div>
-      </motion.div>
+            {cashFlowByCostCenter.length === 0 && (
+              <div className="text-center py-12 text-slate-500">
+                Sem despesas por centro de custo este mês.
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

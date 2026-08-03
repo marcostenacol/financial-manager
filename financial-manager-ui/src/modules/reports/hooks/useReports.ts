@@ -28,10 +28,22 @@ export interface ReportDateRange {
   end_date?: string;
 }
 
+export interface CashFlowByCostCenter {
+  cost_center_name: string;
+  color: string;
+  total: number;
+  percentage: number;
+}
+
 export function useReports() {
-  const getOverview = useCallback(async (range: ReportDateRange) => {
-    const response = await api.get('/reports/overview', { params: range });
+  const getOverview = useCallback(async (range: ReportDateRange, scope?: 'personal' | 'business') => {
+    const response = await api.get('/reports/overview', { params: { ...range, scope } });
     return response.data.data as DashboardOverview;
+  }, []);
+
+  const getCashFlowByCostCenter = useCallback(async () => {
+    const response = await api.get('/reports/cash-flow-by-cost-center');
+    return response.data.data as CashFlowByCostCenter[];
   }, []);
 
   const getExpensesByCategory = useCallback(async () => {
@@ -52,5 +64,5 @@ export function useReports() {
     return response.data as Blob;
   }, []);
 
-  return { getOverview, getExpensesByCategory, getMonthlyEvolution, exportReport };
+  return { getOverview, getExpensesByCategory, getMonthlyEvolution, getCashFlowByCostCenter, exportReport };
 }

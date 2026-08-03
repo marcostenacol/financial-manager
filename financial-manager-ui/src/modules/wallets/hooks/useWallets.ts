@@ -5,6 +5,7 @@ export interface Wallet {
   id: string;
   name: string;
   type: 'checking' | 'savings' | 'credit' | 'investment' | 'cash';
+  scope: 'personal' | 'business';
   balance: number;
   currency: string;
   isPrimary: boolean;
@@ -13,6 +14,7 @@ export interface Wallet {
 export interface CreateWalletInput {
   name: string;
   type: string;
+  scope?: 'personal' | 'business';
   balance: number;
   currency?: string;
 }
@@ -20,24 +22,25 @@ export interface CreateWalletInput {
 export interface UpdateWalletInput {
   name?: string;
   type?: string;
+  scope?: 'personal' | 'business';
   balance?: number;
   currency?: string;
 }
 
-export function useWallets() {
+export function useWallets(scope?: 'personal' | 'business') {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadWallets = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await api.get('/wallets');
+      const response = await api.get('/wallets', { params: scope ? { scope } : undefined });
       setWallets(response.data.data);
       return response.data.data as Wallet[];
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [scope]);
 
   const createWallet = useCallback(async (data: CreateWalletInput) => {
     const response = await api.post('/wallets', { currency: 'BRL', ...data });
