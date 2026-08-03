@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2 } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
 import { useScope } from '../../contexts/useScope';
 import { getAvatarUrl } from '../lib/getAvatarUrl';
+import { useTheme } from '../../hooks/useTheme';
 import { motion } from 'framer-motion';
 
 export const Sidebar = () => {
   const { signOut, user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { scope, setScope } = useScope();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -125,6 +127,14 @@ export const Sidebar = () => {
             <span className="text-app-muted text-xs truncate">{user?.email}</span>
           </div>
         </div>
+
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-3 w-full px-4 py-3 text-app-muted hover:text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
+        >
+          {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          <span className="font-medium">{theme === 'dark' ? 'Tema claro' : 'Tema escuro'}</span>
+        </button>
 
         <button
           onClick={signOut}
