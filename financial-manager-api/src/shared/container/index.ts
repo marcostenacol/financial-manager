@@ -24,6 +24,14 @@ import { NotificationRepositoryInterface } from '@/modules/notifications/reposit
 import { NotificationRepository } from '@/modules/notifications/repositories/NotificationRepository';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { CostCenterRepository } from '@/modules/cost-centers/repositories/CostCenterRepository';
+import { OrganizationRepositoryInterface } from '@/modules/organizations/repositories/contracts/OrganizationRepositoryInterface';
+import { OrganizationRepository } from '@/modules/organizations/repositories/OrganizationRepository';
+import { OrganizationMemberRepositoryInterface } from '@/modules/organizations/repositories/contracts/OrganizationMemberRepositoryInterface';
+import { OrganizationMemberRepository } from '@/modules/organizations/repositories/OrganizationMemberRepository';
+import { InviteRepositoryInterface } from '@/modules/organizations/repositories/contracts/InviteRepositoryInterface';
+import { InviteRepository } from '@/modules/organizations/repositories/InviteRepository';
+import { InviteRedemptionRepositoryInterface } from '@/modules/organizations/repositories/contracts/InviteRedemptionRepositoryInterface';
+import { InviteRedemptionRepository } from '@/modules/organizations/repositories/InviteRedemptionRepository';
 
 container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepository);
 container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', ProfileRepository);
@@ -34,6 +42,10 @@ container.registerSingleton<RecurrenceRepositoryInterface>('RecurrenceRepository
 container.registerSingleton<ReportRepositoryInterface>('ReportRepository', ReportRepository);
 container.registerSingleton<NotificationRepositoryInterface>('NotificationRepository', NotificationRepository);
 container.registerSingleton<CostCenterRepositoryInterface>('CostCenterRepository', CostCenterRepository);
+container.registerSingleton<OrganizationRepositoryInterface>('OrganizationRepository', OrganizationRepository);
+container.registerSingleton<OrganizationMemberRepositoryInterface>('OrganizationMemberRepository', OrganizationMemberRepository);
+container.registerSingleton<InviteRepositoryInterface>('InviteRepository', InviteRepository);
+container.registerSingleton<InviteRedemptionRepositoryInterface>('InviteRedemptionRepository', InviteRedemptionRepository);
 
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
@@ -52,6 +64,7 @@ import { DeleteWalletService } from '@/modules/wallets/services/DeleteWalletServ
 import { DetailWalletService } from '@/modules/wallets/services/DetailWalletService';
 import { SetPrimaryWalletService } from '@/modules/wallets/services/SetPrimaryWalletService';
 import { ClearAllWalletsService } from '@/modules/wallets/services/ClearAllWalletsService';
+import { MoveWalletToOrganizationService } from '@/modules/wallets/services/MoveWalletToOrganizationService';
 import { CreateTransactionService } from '@/modules/transactions/services/CreateTransactionService';
 import { ListTransactionsService } from '@/modules/transactions/services/ListTransactionsService';
 import { ExportTransactionsService } from '@/modules/transactions/services/ExportTransactionsService';
@@ -91,6 +104,15 @@ import { CreateCostCenterService } from '@/modules/cost-centers/services/CreateC
 import { ListCostCentersService } from '@/modules/cost-centers/services/ListCostCentersService';
 import { UpdateCostCenterService } from '@/modules/cost-centers/services/UpdateCostCenterService';
 import { DeleteCostCenterService } from '@/modules/cost-centers/services/DeleteCostCenterService';
+import { CreateOrganizationService } from '@/modules/organizations/services/CreateOrganizationService';
+import { ListMyOrganizationsService } from '@/modules/organizations/services/ListMyOrganizationsService';
+import { ListMembersService } from '@/modules/organizations/services/ListMembersService';
+import { RemoveMemberService } from '@/modules/organizations/services/RemoveMemberService';
+import { CreateInviteService } from '@/modules/organizations/services/CreateInviteService';
+import { ListInvitesService } from '@/modules/organizations/services/ListInvitesService';
+import { RevokeInviteService } from '@/modules/organizations/services/RevokeInviteService';
+import { ListInviteRedemptionsService } from '@/modules/organizations/services/ListInviteRedemptionsService';
+import { RedeemInviteService } from '@/modules/organizations/services/RedeemInviteService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -108,6 +130,7 @@ container.registerSingleton<DeleteWalletService>('DeleteWalletService', DeleteWa
 container.registerSingleton<DetailWalletService>('DetailWalletService', DetailWalletService);
 container.registerSingleton<SetPrimaryWalletService>('SetPrimaryWalletService', SetPrimaryWalletService);
 container.registerSingleton<ClearAllWalletsService>('ClearAllWalletsService', ClearAllWalletsService);
+container.registerSingleton<MoveWalletToOrganizationService>('MoveWalletToOrganizationService', MoveWalletToOrganizationService);
 container.registerSingleton<CreateTransactionService>('CreateTransactionService', CreateTransactionService);
 container.registerSingleton<ListTransactionsService>('ListTransactionsService', ListTransactionsService);
 container.registerSingleton<ExportTransactionsService>('ExportTransactionsService', ExportTransactionsService);
@@ -146,3 +169,12 @@ container.registerSingleton<CreateCostCenterService>('CreateCostCenterService', 
 container.registerSingleton<ListCostCentersService>('ListCostCentersService', ListCostCentersService);
 container.registerSingleton<UpdateCostCenterService>('UpdateCostCenterService', UpdateCostCenterService);
 container.registerSingleton<DeleteCostCenterService>('DeleteCostCenterService', DeleteCostCenterService);
+container.registerSingleton<CreateOrganizationService>('CreateOrganizationService', CreateOrganizationService);
+container.registerSingleton<ListMyOrganizationsService>('ListMyOrganizationsService', ListMyOrganizationsService);
+container.registerSingleton<ListMembersService>('ListMembersService', ListMembersService);
+container.registerSingleton<RemoveMemberService>('RemoveMemberService', RemoveMemberService);
+container.registerSingleton<CreateInviteService>('CreateInviteService', CreateInviteService);
+container.registerSingleton<ListInvitesService>('ListInvitesService', ListInvitesService);
+container.registerSingleton<RevokeInviteService>('RevokeInviteService', RevokeInviteService);
+container.registerSingleton<ListInviteRedemptionsService>('ListInviteRedemptionsService', ListInviteRedemptionsService);
+container.registerSingleton<RedeemInviteService>('RedeemInviteService', RedeemInviteService);

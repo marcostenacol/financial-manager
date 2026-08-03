@@ -20,7 +20,7 @@ export class CostCenterController extends BaseController {
   }
 
   async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const costCenters = await this.listCostCenters.execute(request.user.sub);
+    const costCenters = await this.listCostCenters.execute(request.user.sub, request.organizationIds);
     return this.success(reply, costCenters);
   }
 
@@ -33,13 +33,13 @@ export class CostCenterController extends BaseController {
   async update(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
     const data = UpdateCostCenterDTO.parse(request.body);
-    const costCenter = await this.updateCostCenter.execute(id, data, request.user.sub);
+    const costCenter = await this.updateCostCenter.execute(id, data, request.user.sub, request.organizationIds);
     return this.success(reply, costCenter, 'Centro de custo atualizado com sucesso');
   }
 
   async delete(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
-    await this.deleteCostCenter.execute(id, request.user.sub);
+    await this.deleteCostCenter.execute(id, request.user.sub, request.organizationIds);
     return this.success(reply, null, 'Centro de custo removido com sucesso');
   }
 }

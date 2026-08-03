@@ -13,7 +13,11 @@ export class ListCostCentersService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string): Promise<CostCenter[]> {
+  async execute(userId: string, organizationIds: string[] = []): Promise<CostCenter[]> {
+    if (organizationIds.length > 0) {
+      return this.costCenterRepository.findAllByOwner(userId, organizationIds);
+    }
+
     const cacheKey = CacheKeys.costCenters.list(userId);
 
     const cached = await this.cache.get<CostCenter[]>(cacheKey);

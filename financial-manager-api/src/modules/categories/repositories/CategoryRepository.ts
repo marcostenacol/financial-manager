@@ -31,10 +31,15 @@ export class CategoryRepository implements CategoryRepositoryInterface {
   }
 
   async findAllByUserId(userId: string, scope?: ProfileScope): Promise<Category[]> {
+    return this.findAllByOwner(userId, [], scope);
+  }
+
+  async findAllByOwner(userId: string, organizationIds: string[], scope?: ProfileScope): Promise<Category[]> {
     const ownershipFilter: Prisma.CategoryWhereInput = {
       OR: [
-        { userId },
-        { userId: null }, // Categorias globais do sistema
+        { userId, organizationId: null },
+        { userId: null, organizationId: null }, // Categorias globais do sistema
+        ...(organizationIds.length > 0 ? [{ organizationId: { in: organizationIds } }] : []),
       ],
     };
 

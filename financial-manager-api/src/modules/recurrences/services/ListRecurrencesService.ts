@@ -13,9 +13,13 @@ export class ListRecurrencesService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string): Promise<Recurrence[]> {
+  async execute(userId: string, organizationIds: string[] = []): Promise<Recurrence[]> {
+    if (organizationIds.length > 0) {
+      return this.recurrenceRepository.findByOwner(userId, organizationIds);
+    }
+
     const cacheKey = CacheKeys.recurrences.list(userId);
-    
+
     const cached = await this.cache.get<Recurrence[]>(cacheKey);
     if (cached) {
       return cached;

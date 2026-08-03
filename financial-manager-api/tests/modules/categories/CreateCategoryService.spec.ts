@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CreateCategoryService } from '@/modules/categories/services/CreateCategoryService';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
+import { OrganizationMemberRepositoryInterface } from '@/modules/organizations/repositories/contracts/OrganizationMemberRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { AppError } from '@/shared/errors/AppError';
 
 describe('CreateCategoryService', () => {
   let categoryRepository: CategoryRepositoryInterface;
+  let organizationMemberRepository: OrganizationMemberRepositoryInterface;
   let cacheTrait: CacheTrait;
   let createCategoryService: CreateCategoryService;
 
@@ -15,12 +17,16 @@ describe('CreateCategoryService', () => {
       findByName: vi.fn(),
     } as any;
 
+    organizationMemberRepository = {
+      findByOrganizationAndUser: vi.fn(),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
     } as any;
 
-    createCategoryService = new CreateCategoryService(categoryRepository, cacheTrait);
+    createCategoryService = new CreateCategoryService(categoryRepository, organizationMemberRepository, cacheTrait);
   });
 
   it('should create a new category', async () => {

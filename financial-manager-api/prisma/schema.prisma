@@ -50,7 +50,10 @@ model User {
    savingsGoals    SavingsGoal[]
    notifications   Notification[]
    costCenters     CostCenter[]
- 
+   organizationMemberships OrganizationMember[]
+   invitesCreated  Invite[]
+   inviteRedemptions InviteRedemption[]
+
    @@map("users")
  }
 
@@ -103,6 +106,78 @@ model Profile {
 }
 
 // ─────────────────────────────────────────
+// ORGANIZATIONS (tenant opcional — uso empresarial multi-usuário)
+// ─────────────────────────────────────────
+
+enum OrganizationMemberRole {
+  owner
+  member
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  members      OrganizationMember[]
+  wallets      Wallet[]
+  categories   Category[]
+  costCenters  CostCenter[]
+  savingsGoals SavingsGoal[]
+  invites      Invite[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String                 @id @default(uuid())
+  organizationId String                 @map("organization_id")
+  userId         String                 @map("user_id")
+  role           OrganizationMemberRole @default(member)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model Invite {
+  id             String                 @id @default(uuid())
+  organizationId String                 @map("organization_id")
+  code           String                 @unique
+  role           OrganizationMemberRole @default(member)
+  maxUses        Int?                   @map("max_uses") // null = uso único
+  usesCount      Int                    @default(0) @map("uses_count")
+  expiresAt      DateTime               @map("expires_at")
+  revokedAt      DateTime?              @map("revoked_at")
+  createdBy      String                 @map("created_by")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  organization Organization       @relation(fields: [organizationId], references: [id])
+  creator      User               @relation(fields: [createdBy], references: [id])
+  redemptions  InviteRedemption[]
+
+  @@map("invites")
+}
+
+model InviteRedemption {
+  id       String   @id @default(uuid())
+  inviteId String   @map("invite_id")
+  userId   String   @map("user_id")
+  usedAt   DateTime @default(now()) @map("used_at")
+
+  invite Invite @relation(fields: [inviteId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([inviteId, userId])
+  @@map("invite_redemptions")
+}
+
+// ─────────────────────────────────────────
 // FINANCIAL
 // ─────────────────────────────────────────
 
@@ -112,20 +187,22 @@ enum ProfileScope {
 }
 
 model Wallet {
-  id       String  @id @default(uuid())
-  userId   String  @map("user_id")
-  name     String
-  type     String  // checking, savings, credit, investment, cash
-  scope    ProfileScope @default(personal)
-  balance  Decimal @default(0) @db.Decimal(15, 2)
-  currency String  @default("BRL")
-  isPrimary Boolean @default(false) @map("is_primary")
-  deletedAt DateTime? @map("deleted_at")
+  id             String  @id @default(uuid())
+  userId         String? @map("user_id")
+  organizationId String? @map("organization_id")
+  name           String
+  type           String  // checking, savings, credit, investment, cash
+  scope          ProfileScope @default(personal)
+  balance        Decimal @default(0) @db.Decimal(15, 2)
+  currency       String  @default("BRL")
+  isPrimary      Boolean @default(false) @map("is_primary")
+  deletedAt      DateTime? @map("deleted_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user         User          @relation(fields: [userId], references: [id])
+  user         User?         @relation(fields: [userId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
   transactions Transaction[]
   recurrences  Recurrence[]
 
@@ -133,16 +210,18 @@ model Wallet {
 }
 
 model Category {
-  id     String  @id @default(uuid())
-  userId String? @map("user_id")  // null = categoria do sistema
-  name   String
-  color  String
-  icon   String?
-  type   String  // income, expense, both
-  scope  ProfileScope? // null = global, visível nos dois escopos
+  id             String  @id @default(uuid())
+  userId         String? @map("user_id")  // null = categoria do sistema (se organizationId também null)
+  organizationId String? @map("organization_id")
+  name           String
+  color          String
+  icon           String?
+  type           String  // income, expense, both
+  scope          ProfileScope? // null = global, visível nos dois escopos
 
   createdAt DateTime @default(now()) @map("created_at")
 
+  organization Organization? @relation(fields: [organizationId], references: [id])
   transactions Transaction[]
   recurrences  Recurrence[]
 
@@ -150,14 +229,16 @@ model Category {
 }
 
 model CostCenter {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  name      String
-  color     String   @default("#3b82f6")
+  id             String   @id @default(uuid())
+  userId         String?  @map("user_id")
+  organizationId String?  @map("organization_id")
+  name           String
+  color          String   @default("#3b82f6")
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  user         User          @relation(fields: [userId], references: [id])
+  user         User?         @relation(fields: [userId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
   transactions Transaction[]
 
   @@map("cost_centers")
@@ -209,19 +290,21 @@ model Recurrence {
  }
  
  model SavingsGoal {
-   id           String    @id @default(uuid())
-   userId       String    @map("user_id")
-   name         String
+   id             String    @id @default(uuid())
+   userId         String?   @map("user_id")
+   organizationId String?   @map("organization_id")
+   name           String
    targetAmount Decimal   @map("target_amount") @db.Decimal(15, 2)
    currentAmount Decimal  @default(0) @map("current_amount") @db.Decimal(15, 2)
    deadline     DateTime?
    color        String    @default("#3b82f6")
    icon         String?
- 
+
    createdAt DateTime @default(now()) @map("created_at")
    updatedAt DateTime @updatedAt @map("updated_at")
- 
-   user User @relation(fields: [userId], references: [id])
+
+   user         User?         @relation(fields: [userId], references: [id])
+   organization Organization? @relation(fields: [organizationId], references: [id])
 
    @@map("savings_goals")
  }

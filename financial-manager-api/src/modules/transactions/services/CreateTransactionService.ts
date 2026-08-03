@@ -11,6 +11,8 @@ import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
+import { isOwnedByActor } from '@/shared/authorization/ownership';
+import { resolveOwnerKey } from '@/shared/lib/resolveOwnerKey';
 
 @injectable()
 export class CreateTransactionService {
@@ -30,10 +32,10 @@ export class CreateTransactionService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(data: CreateTransactionDTOType, userId: string): Promise<Transaction> {
+  async execute(data: CreateTransactionDTOType, userId: string, organizationIds: string[] = []): Promise<Transaction> {
     const wallet = await this.walletRepository.findById(data.wallet_id);
 
-    if (!wallet || wallet.userId !== userId) {
+    if (!wallet || !isOwnedByActor(wallet, userId, organizationIds)) {
       throw new AppError('Carteira não encontrada', 404);
     }
 
@@ -87,7 +89,11 @@ export class CreateTransactionService {
     if (isCompleted) {
       // Invalida cache da carteira e lista de carteiras
       await this.cache.del(CacheKeys.wallets.detail(wallet.id));
-      await this.cache.delPattern(CacheKeys.wallets.listPattern(userId));
+      if (wallet.organizationId) {
+        await this.cache.delPattern(CacheKeys.wallets.listAllPattern());
+      } else {
+        await this.cache.delPattern(CacheKeys.wallets.listPattern(resolveOwnerKey(wallet)));
+      }
     }
 
     // Invalida cache de transações

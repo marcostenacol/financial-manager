@@ -2,11 +2,13 @@ import { FastifyInstance } from 'fastify';
 import { container } from 'tsyringe';
 import { RecurrenceController } from './controllers/RecurrenceController';
 import { authMiddleware } from '@/shared/middlewares/AuthMiddleware';
+import { organizationContextMiddleware } from '@/shared/middlewares/OrganizationContextMiddleware';
 
 export async function recurrenceRoutes(fastify: FastifyInstance): Promise<void> {
   const controller = container.resolve(RecurrenceController);
 
   fastify.addHook('preHandler', authMiddleware);
+  fastify.addHook('preHandler', organizationContextMiddleware);
 
   fastify.get('/', (request, reply) => controller.index(request, reply));
   fastify.post('/', (request, reply) => controller.store(request, reply));

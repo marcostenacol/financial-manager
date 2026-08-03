@@ -35,10 +35,14 @@ export class RecurrenceRepository implements RecurrenceRepositoryInterface {
   }
 
   async findByUserId(userId: string): Promise<Recurrence[]> {
+    return this.findByOwner(userId, []);
+  }
+
+  async findByOwner(userId: string, organizationIds: string[]): Promise<Recurrence[]> {
     return prisma.recurrence.findMany({
       where: {
         wallet: {
-          userId,
+          OR: [{ userId }, { organizationId: { in: organizationIds } }],
         },
       },
       include: {

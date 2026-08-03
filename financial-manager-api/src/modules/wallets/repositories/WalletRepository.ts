@@ -18,6 +18,16 @@ export class WalletRepository implements WalletRepositoryInterface {
     });
   }
 
+  async findAllByOwner(user_id: string, organization_ids: string[], scope?: ProfileScope): Promise<Wallet[]> {
+    return prisma.wallet.findMany({
+      where: {
+        OR: [{ userId: user_id }, { organizationId: { in: organization_ids } }],
+        ...(scope && { scope }),
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
   async findById(id: string): Promise<Wallet | null> {
     return prisma.wallet.findUnique({
       where: { id },

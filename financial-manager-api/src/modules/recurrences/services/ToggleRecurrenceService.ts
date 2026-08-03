@@ -4,6 +4,7 @@ import { RecurrenceRepositoryInterface } from '../repositories/contracts/Recurre
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
+import { isOwnedByActor } from '@/shared/authorization/ownership';
 
 @injectable()
 export class ToggleRecurrenceService {
@@ -14,10 +15,10 @@ export class ToggleRecurrenceService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(recurrenceId: string, userId: string): Promise<Recurrence> {
+  async execute(recurrenceId: string, userId: string, organizationIds: string[] = []): Promise<Recurrence> {
     const recurrence = await this.recurrenceRepository.findById(recurrenceId);
 
-    if (!recurrence || recurrence.wallet.userId !== userId) {
+    if (!recurrence || !isOwnedByActor(recurrence.wallet, userId, organizationIds)) {
       throw new AppError('Recorrência não encontrada', 404);
     }
 

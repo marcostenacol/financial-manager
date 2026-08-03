@@ -8,6 +8,7 @@ import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionS
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
+import { resolveOwnerKey } from '@/shared/lib/resolveOwnerKey';
 
 @injectable()
 export class ProcessRecurrenceService {
@@ -89,13 +90,14 @@ export class ProcessRecurrenceService {
     });
 
     if (wallet) {
-      await this.cache.delPattern(CacheKeys.wallets.listPattern(wallet.userId));
+      const ownerKey = resolveOwnerKey(wallet);
+      await this.cache.delPattern(CacheKeys.wallets.listPattern(ownerKey));
       await this.cache.del(CacheKeys.wallets.detail(wallet.id));
-      await this.cache.delPattern(CacheKeys.transactions.listPattern(wallet.userId));
+      await this.cache.delPattern(CacheKeys.transactions.listPattern(ownerKey));
       await this.cache.delPattern(CacheKeys.transactions.byWalletPattern(wallet.id));
-      await this.cache.delPattern(CacheKeys.reports.overviewPattern(wallet.userId));
-      await this.cache.del(CacheKeys.reports.monthlyEvolution(wallet.userId));
-      await this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(wallet.userId));
+      await this.cache.delPattern(CacheKeys.reports.overviewPattern(ownerKey));
+      await this.cache.del(CacheKeys.reports.monthlyEvolution(ownerKey));
+      await this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(ownerKey));
     }
   }
 }

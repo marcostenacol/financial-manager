@@ -6,5 +6,6 @@ export interface CategoryRepositoryInterface {
   delete(id: string): Promise<void>;
   findById(id: string): Promise<Category | null>;
   findAllByUserId(userId: string, scope?: ProfileScope): Promise<Category[]>;
+  findAllByOwner(userId: string, organizationIds: string[], scope?: ProfileScope): Promise<Category[]>;
   findByName(name: string, userId: string | null): Promise<Category | null>;
 }

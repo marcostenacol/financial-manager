@@ -54,9 +54,18 @@ export class TransactionRepository implements TransactionRepositoryInterface {
     filters: Prisma.TransactionWhereInput,
     pagination: { skip: number; take: number },
   ): Promise<PaginatedTransactions> {
+    return this.findByOwner(userId, [], filters, pagination);
+  }
+
+  async findByOwner(
+    userId: string,
+    organizationIds: string[],
+    filters: Prisma.TransactionWhereInput,
+    pagination: { skip: number; take: number },
+  ): Promise<PaginatedTransactions> {
     const where: Prisma.TransactionWhereInput = {
       wallet: {
-        userId,
+        OR: [{ userId }, { organizationId: { in: organizationIds } }],
       },
       ...filters,
     };

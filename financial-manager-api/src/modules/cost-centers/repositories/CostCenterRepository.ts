@@ -27,4 +27,11 @@ export class CostCenterRepository implements CostCenterRepositoryInterface {
       orderBy: { name: 'asc' },
     });
   }
+
+  async findAllByOwner(userId: string, organizationIds: string[]): Promise<CostCenter[]> {
+    return prisma.costCenter.findMany({
+      where: { OR: [{ userId }, { organizationId: { in: organizationIds } }] },
+      orderBy: { name: 'asc' },
+    });
+  }
 }

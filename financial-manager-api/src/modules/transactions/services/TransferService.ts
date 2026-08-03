@@ -7,6 +7,8 @@ import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { prisma } from '@/shared/database/PrismaClient';
+import { AppError } from '@/shared/errors/AppError';
+import { isOwnedByActor } from '@/shared/authorization/ownership';
 
 @injectable()
 export class TransferService {
@@ -20,7 +22,7 @@ export class TransferService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(data: CreateTransferDTOType, userId: string): Promise<void> {
+  async execute(data: CreateTransferDTOType, userId: string, organizationIds: string[] = []): Promise<void> {
     const { source_wallet_id, destination_wallet_id, amount, description, occurred_at, category_id } = data;
 
     // 1. Validar posse das carteiras
@@ -29,16 +31,16 @@ export class TransferService {
       this.walletRepository.findById(destination_wallet_id),
     ]);
 
-    if (!sourceWallet || sourceWallet.userId !== userId) {
-      throw new Error('Carteira de origem não encontrada ou acesso negado');
+    if (!sourceWallet || !isOwnedByActor(sourceWallet, userId, organizationIds)) {
+      throw new AppError('Carteira de origem não encontrada ou acesso negado', 404);
     }
 
-    if (!destinationWallet || destinationWallet.userId !== userId) {
-      throw new Error('Carteira de destino não encontrada ou acesso negado');
+    if (!destinationWallet || !isOwnedByActor(destinationWallet, userId, organizationIds)) {
+      throw new AppError('Carteira de destino não encontrada ou acesso negado', 404);
     }
 
     if (source_wallet_id === destination_wallet_id) {
-      throw new Error('As carteiras de origem e destino devem ser diferentes');
+      throw new AppError('As carteiras de origem e destino devem ser diferentes', 422);
     }
 
     const date = occurred_at ? new Date(occurred_at) : new Date();
@@ -84,11 +86,15 @@ export class TransferService {
     });
 
     // 3. Limpar caches
+    const walletsCachePattern = sourceWallet.organizationId || destinationWallet.organizationId
+      ? CacheKeys.wallets.listAllPattern()
+      : CacheKeys.wallets.listPattern(userId);
+
     await Promise.all([
       this.cache.delPattern(CacheKeys.transactions.listPattern(userId)),
       this.cache.delPattern(CacheKeys.transactions.byWalletPattern(source_wallet_id)),
       this.cache.delPattern(CacheKeys.transactions.byWalletPattern(destination_wallet_id)),
-      this.cache.delPattern(CacheKeys.wallets.listPattern(userId)),
+      this.cache.delPattern(walletsCachePattern),
       this.cache.del(CacheKeys.wallets.detail(source_wallet_id)),
       this.cache.del(CacheKeys.wallets.detail(destination_wallet_id)),
       this.cache.delPattern(CacheKeys.reports.overviewPattern(userId)),

@@ -14,19 +14,22 @@ export class DeleteCategoryService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(id: string, userId: string): Promise<void> {
+  async execute(id: string, userId: string, organizationIds: string[] = []): Promise<void> {
     const category = await this.categoryRepository.findById(id);
 
     if (!category) {
       throw new AppError('Categoria não encontrada', 404);
     }
 
-    if (category.userId && category.userId !== userId) {
-      throw new AppError('Você não tem permissão para deletar esta categoria', 403);
+    if (!category.userId && !category.organizationId) {
+      throw new AppError('Categorias de sistema não podem ser deletadas', 403);
     }
 
-    if (!category.userId) {
-      throw new AppError('Categorias de sistema não podem ser deletadas', 403);
+    const ownedByUser = category.organizationId === null && category.userId === userId;
+    const ownedByOrganization = category.organizationId !== null && organizationIds.includes(category.organizationId);
+
+    if (!ownedByUser && !ownedByOrganization) {
+      throw new AppError('Você não tem permissão para deletar esta categoria', 403);
     }
 
     try {
@@ -38,6 +41,10 @@ export class DeleteCategoryService {
       throw error;
     }
 
-    await this.cache.delPattern(CacheKeys.categories.listPattern(userId));
+    if (category.organizationId) {
+      await this.cache.delPattern(CacheKeys.categories.listAllPattern());
+    } else {
+      await this.cache.delPattern(CacheKeys.categories.listPattern(userId));
+    }
   }
 }

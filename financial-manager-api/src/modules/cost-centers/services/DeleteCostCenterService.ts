@@ -1,6 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { CostCenterRepositoryInterface } from '../repositories/contracts/CostCenterRepositoryInterface';
-import { AppError } from '@/shared/errors/AppError';
+import { assertOwnership } from '@/shared/authorization/ownership';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 
@@ -13,15 +13,17 @@ export class DeleteCostCenterService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(id: string, userId: string): Promise<void> {
+  async execute(id: string, userId: string, organizationIds: string[] = []): Promise<void> {
     const costCenter = await this.costCenterRepository.findById(id);
 
-    if (!costCenter || costCenter.userId !== userId) {
-      throw new AppError('Centro de custo não encontrado', 404);
-    }
+    assertOwnership(costCenter, userId, organizationIds, 'Centro de custo não encontrado');
 
     await this.costCenterRepository.delete(id);
 
-    await this.cache.del(CacheKeys.costCenters.list(userId));
+    if (costCenter!.organizationId) {
+      await this.cache.delPattern(CacheKeys.costCenters.listAllPattern());
+    } else {
+      await this.cache.del(CacheKeys.costCenters.list(userId));
+    }
   }
 }

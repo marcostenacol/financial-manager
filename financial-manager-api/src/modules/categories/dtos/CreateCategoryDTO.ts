@@ -7,6 +7,7 @@ export const CreateCategoryDTO = z.object({
   icon: z.string().optional(),
   type: z.enum(['income', 'expense', 'both']),
   scope: z.nativeEnum(ProfileScope).optional(),
+  organization_id: z.string().uuid('ID da organização inválido').optional(),
 });
 
 export type CreateCategoryDTOType = z.infer<typeof CreateCategoryDTO>;

@@ -13,7 +13,11 @@ export class ListCategoriesService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, scope?: ProfileScope): Promise<Category[]> {
+  async execute(userId: string, scope?: ProfileScope, organizationIds: string[] = []): Promise<Category[]> {
+    if (organizationIds.length > 0) {
+      return this.categoryRepository.findAllByOwner(userId, organizationIds, scope);
+    }
+
     const cacheKey = CacheKeys.categories.list(userId, scope);
 
     const cachedCategories = await this.cache.get<Category[]>(cacheKey);

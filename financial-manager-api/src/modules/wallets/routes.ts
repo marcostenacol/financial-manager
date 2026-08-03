@@ -2,11 +2,13 @@ import { FastifyInstance } from 'fastify';
 import { container } from 'tsyringe';
 import { WalletController } from './controllers/WalletController';
 import { authMiddleware } from '@/shared/middlewares/AuthMiddleware';
+import { organizationContextMiddleware } from '@/shared/middlewares/OrganizationContextMiddleware';
 
 export async function walletRoutes(fastify: FastifyInstance): Promise<void> {
   const controller = container.resolve(WalletController);
 
   fastify.addHook('preHandler', authMiddleware);
+  fastify.addHook('preHandler', organizationContextMiddleware);
 
   fastify.get('/', controller.index.bind(controller));
   fastify.get('/:id', controller.show.bind(controller));
@@ -14,5 +16,6 @@ export async function walletRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.put('/:id', controller.update.bind(controller));
   fastify.delete('/:id', controller.delete.bind(controller));
   fastify.patch('/:id/primary', controller.setPrimary.bind(controller));
+  fastify.patch('/:id/move-to-organization', controller.moveToOrganization.bind(controller));
   fastify.delete('/clear-all', controller.clearAll.bind(controller));
 }

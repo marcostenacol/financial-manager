@@ -23,7 +23,7 @@ export class CategoryController extends BaseController {
   async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
     const { scope } = request.query as { scope?: ProfileScope };
-    const categories = await this.listCategories.execute(userId, scope);
+    const categories = await this.listCategories.execute(userId, scope, request.organizationIds);
     return this.success(reply, categories);
   }
 
@@ -38,14 +38,14 @@ export class CategoryController extends BaseController {
     const { id } = request.params as { id: string };
     const data = UpdateCategoryDTO.parse(request.body);
     const userId = request.user.sub;
-    const category = await this.updateCategory.execute(id, data, userId);
+    const category = await this.updateCategory.execute(id, data, userId, request.organizationIds);
     return this.success(reply, category, 'Categoria atualizada com sucesso');
   }
 
   async delete(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
     const userId = request.user.sub;
-    await this.deleteCategory.execute(id, userId);
+    await this.deleteCategory.execute(id, userId, request.organizationIds);
     return this.success(reply, null, 'Categoria removida com sucesso');
   }
 }

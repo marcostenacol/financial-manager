@@ -7,6 +7,7 @@ import { CategoryRepositoryInterface } from '@/modules/categories/repositories/c
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
+import { isOwnedByActor } from '@/shared/authorization/ownership';
 
 @injectable()
 export class CreateRecurrenceService {
@@ -23,10 +24,10 @@ export class CreateRecurrenceService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(data: CreateRecurrenceDTOType, userId: string): Promise<Recurrence> {
+  async execute(data: CreateRecurrenceDTOType, userId: string, organizationIds: string[] = []): Promise<Recurrence> {
     const wallet = await this.walletRepository.findById(data.wallet_id);
 
-    if (!wallet || wallet.userId !== userId) {
+    if (!wallet || !isOwnedByActor(wallet, userId, organizationIds)) {
       throw new AppError('Carteira não encontrada ou acesso negado', 403);
     }
 

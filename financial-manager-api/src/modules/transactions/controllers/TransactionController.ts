@@ -33,7 +33,7 @@ export class TransactionController extends BaseController {
   async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const filters = ListTransactionsFilterDTO.parse(request.query);
     const userId = request.user.sub;
-    const transactions = await this.listTransactions.execute(userId, filters);
+    const transactions = await this.listTransactions.execute(userId, filters, request.organizationIds);
     return this.success(reply, transactions);
   }
 
@@ -49,14 +49,14 @@ export class TransactionController extends BaseController {
   async show(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
     const userId = request.user.sub;
-    const transaction = await this.detailTransaction.execute(id, userId);
+    const transaction = await this.detailTransaction.execute(id, userId, request.organizationIds);
     return this.success(reply, transaction);
   }
 
   async store(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const data = CreateTransactionDTO.parse(request.body);
     const userId = request.user.sub;
-    const transaction = await this.createTransaction.execute(data, userId);
+    const transaction = await this.createTransaction.execute(data, userId, request.organizationIds);
     return this.success(reply, transaction, 'Transação criada com sucesso', 201);
   }
 
@@ -64,14 +64,14 @@ export class TransactionController extends BaseController {
     const { id } = request.params as { id: string };
     const data = UpdateTransactionDTO.parse(request.body);
     const userId = request.user.sub;
-    const transaction = await this.updateTransaction.execute(id, data, userId);
+    const transaction = await this.updateTransaction.execute(id, data, userId, request.organizationIds);
     return this.success(reply, transaction, 'Transação atualizada com sucesso');
   }
 
   async delete(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
     const userId = request.user.sub;
-    await this.deleteTransaction.execute(id, userId);
+    await this.deleteTransaction.execute(id, userId, request.organizationIds);
     return this.success(reply, null, 'Transação removida com sucesso');
   }
 
@@ -86,7 +86,7 @@ export class TransactionController extends BaseController {
     const userId = request.user.sub;
     const data = CreateTransferDTO.parse(request.body);
 
-    await this.transferService.execute(data, userId);
+    await this.transferService.execute(data, userId, request.organizationIds);
     return this.success(reply, null, 'Transferência realizada com sucesso');
   }
 }

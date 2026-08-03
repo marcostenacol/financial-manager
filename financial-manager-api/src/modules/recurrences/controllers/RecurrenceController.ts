@@ -22,28 +22,28 @@ export class RecurrenceController extends BaseController {
 
   async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const recurrences = await this.listRecurrences.execute(userId);
+    const recurrences = await this.listRecurrences.execute(userId, request.organizationIds);
     return this.success(reply, recurrences);
   }
 
   async store(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const data = CreateRecurrenceDTO.parse(request.body);
     const userId = request.user.sub;
-    const recurrence = await this.createRecurrence.execute(data, userId);
+    const recurrence = await this.createRecurrence.execute(data, userId, request.organizationIds);
     return this.success(reply, recurrence, 'Recorrência configurada com sucesso', 201);
   }
 
   async toggle(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
     const userId = request.user.sub;
-    const recurrence = await this.toggleRecurrence.execute(id, userId);
+    const recurrence = await this.toggleRecurrence.execute(id, userId, request.organizationIds);
     return this.success(reply, recurrence, 'Status da recorrência alterado com sucesso');
   }
 
   async cancel(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const { id } = request.params as { id: string };
     const userId = request.user.sub;
-    const recurrence = await this.cancelRecurrence.execute(id, userId);
+    const recurrence = await this.cancelRecurrence.execute(id, userId, request.organizationIds);
     return this.success(reply, recurrence, 'Recorrência cancelada com sucesso');
   }
 

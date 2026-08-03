@@ -19,14 +19,7 @@ export class ListTransactionsService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, filters: ListTransactionsFilterDTOType): Promise<ListTransactionsResult> {
-    const cacheKey = CacheKeys.transactions.list(userId, filters);
-
-    const cached = await this.cache.get<ListTransactionsResult>(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
+  async execute(userId: string, filters: ListTransactionsFilterDTOType, organizationIds: string[] = []): Promise<ListTransactionsResult> {
     const prismaFilters: Prisma.TransactionWhereInput = {};
 
     if (filters.category_id) prismaFilters.categoryId = filters.category_id;
@@ -41,10 +34,24 @@ export class ListTransactionsService {
       if (filters.end_date) prismaFilters.occurredAt.lte = new Date(filters.end_date);
     }
 
-    const { data, total } = await this.transactionRepository.findByUserId(userId, prismaFilters, {
+    const pagination = {
       skip: (filters.page - 1) * filters.per_page,
       take: filters.per_page,
-    });
+    };
+
+    if (organizationIds.length > 0) {
+      const { data, total } = await this.transactionRepository.findByOwner(userId, organizationIds, prismaFilters, pagination);
+      return { transactions: data, total };
+    }
+
+    const cacheKey = CacheKeys.transactions.list(userId, filters);
+
+    const cached = await this.cache.get<ListTransactionsResult>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const { data, total } = await this.transactionRepository.findByUserId(userId, prismaFilters, pagination);
 
     const result: ListTransactionsResult = { transactions: data, total };
 

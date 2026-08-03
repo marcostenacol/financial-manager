@@ -4,6 +4,8 @@ import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { WalletRepositoryInterface } from '../repositories/contracts/WalletRepositoryInterface';
+import { assertOwnership } from '@/shared/authorization/ownership';
+import { resolveOwnerKey } from '@/shared/lib/resolveOwnerKey';
 
 @injectable()
 export class DeleteWalletService {
@@ -14,12 +16,10 @@ export class DeleteWalletService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(id: string, user_id: string): Promise<void> {
+  async execute(id: string, user_id: string, organization_ids: string[] = []): Promise<void> {
     const wallet = await this.wallet_repository.findById(id);
 
-    if (!wallet || wallet.userId !== user_id) {
-      throw new AppError('Carteira não encontrada', 404);
-    }
+    assertOwnership(wallet, user_id, organization_ids, 'Carteira não encontrada');
 
     try {
       await this.wallet_repository.delete(id);
@@ -31,7 +31,11 @@ export class DeleteWalletService {
     }
 
     // Invalida cache
-    await this.cache.delPattern(CacheKeys.wallets.listPattern(user_id));
+    if (wallet!.organizationId) {
+      await this.cache.delPattern(CacheKeys.wallets.listAllPattern());
+    } else {
+      await this.cache.delPattern(CacheKeys.wallets.listPattern(resolveOwnerKey(wallet!)));
+    }
     await this.cache.del(CacheKeys.wallets.detail(id));
     await this.cache.delPattern(CacheKeys.reports.overviewPattern(user_id));
   }

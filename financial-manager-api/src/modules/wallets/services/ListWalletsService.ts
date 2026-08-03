@@ -13,7 +13,13 @@ export class ListWalletsService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(user_id: string, scope?: ProfileScope): Promise<Wallet[]> {
+  async execute(user_id: string, scope?: ProfileScope, organization_ids: string[] = []): Promise<Wallet[]> {
+    // Membro de organização: dado compartilhado entre usuários, não cacheado
+    // (evitaria invalidar o cache de todo membro sempre que alguém mais mexer na carteira da organização).
+    if (organization_ids.length > 0) {
+      return this.wallet_repository.findAllByOwner(user_id, organization_ids, scope);
+    }
+
     const cache_key = CacheKeys.wallets.list(user_id, scope);
 
     const cached = await this.cache.get<Wallet[]>(cache_key);

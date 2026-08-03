@@ -8,14 +8,17 @@ export const CacheKeys = {
   wallets: {
     list: (userId: string, scope?: string): string => `wallets:user:${userId}:${scope ?? 'all'}`,
     listPattern: (userId: string): string => `wallets:user:${userId}:*`,
+    listAllPattern: (): string => `wallets:user:*`,
     detail: (walletId: string): string => `wallet:detail:${walletId}`,
   },
   categories: {
     list: (userId: string, scope?: string): string => `categories:user:${userId}:${scope ?? 'all'}`,
     listPattern: (userId: string): string => `categories:user:${userId}:*`,
+    listAllPattern: (): string => `categories:user:*`,
   },
   costCenters: {
     list: (userId: string): string => `cost-centers:user:${userId}`,
+    listAllPattern: (): string => `cost-centers:user:*`,
   },
   transactions: {
     list: (userId: string, filters?: unknown): string => `transactions:user:${userId}:${JSON.stringify(filters ?? {})}`,

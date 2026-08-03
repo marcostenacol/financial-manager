@@ -8,6 +8,7 @@ export const CreateWalletDTO = z.object({
   scope: z.nativeEnum(ProfileScope).default(ProfileScope.personal),
   balance: z.number().default(0),
   currency: z.string().default('BRL'),
+  organization_id: z.string().uuid('ID da organização inválido').optional(),
 });
 
 export type CreateWalletDTOType = z.infer<typeof CreateWalletDTO>;

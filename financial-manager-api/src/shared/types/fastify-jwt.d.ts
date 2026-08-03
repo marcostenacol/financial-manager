@@ -1,4 +1,5 @@
 import '@fastify/jwt';
+import 'fastify';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
@@ -9,5 +10,11 @@ declare module '@fastify/jwt' {
       iat: number;
       exp: number;
     };
+  }
+}
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    organizationIds: string[];
   }
 }

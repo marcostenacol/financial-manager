@@ -6,4 +6,5 @@ export interface CostCenterRepositoryInterface {
   delete(id: string): Promise<void>;
   findById(id: string): Promise<CostCenter | null>;
   findAllByUserId(userId: string): Promise<CostCenter[]>;
+  findAllByOwner(userId: string, organizationIds: string[]): Promise<CostCenter[]>;
 }
