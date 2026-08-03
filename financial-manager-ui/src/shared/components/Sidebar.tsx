@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2 } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
 import { useScope } from '../../contexts/useScope';
 import { getAvatarUrl } from '../lib/getAvatarUrl';
@@ -20,6 +20,7 @@ export const Sidebar = () => {
     ...(scope === 'personal' ? [{ icon: Target, label: 'Metas', path: '/savings-goals' }] : []),
     ...(scope === 'business' ? [{ icon: Briefcase, label: 'Centros de Custo', path: '/cost-centers' }] : []),
     { icon: RefreshCw, label: 'Recorrências', path: '/recurrences' },
+    { icon: Building2, label: 'Organizações', path: '/organizations' },
     { icon: UserCircle, label: 'Meu Perfil', path: '/profile' },
   ];
 

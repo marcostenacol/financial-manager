@@ -10,6 +10,7 @@ import { RecurrencesPage } from '../modules/recurrences/pages/RecurrencesPage';
 import { DashboardPage } from '../modules/reports/pages/DashboardPage';
 import { SavingsGoalsPage } from '../modules/savings-goals/pages/SavingsGoalsPage';
 import { CostCentersPage } from '../modules/cost-centers/pages/CostCentersPage';
+import { OrganizationsPage } from '../modules/organizations/pages/OrganizationsPage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
@@ -97,6 +98,15 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <CostCentersPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/organizations"
+        element={
+          <ProtectedRoute>
+            <OrganizationsPage />
           </ProtectedRoute>
         }
       />

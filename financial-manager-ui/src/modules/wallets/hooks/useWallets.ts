@@ -9,6 +9,7 @@ export interface Wallet {
   balance: number;
   currency: string;
   isPrimary: boolean;
+  organizationId?: string | null;
 }
 
 export interface CreateWalletInput {
@@ -65,5 +66,20 @@ export function useWallets(scope?: 'personal' | 'business') {
     await api.delete('/wallets/clear-all');
   }, []);
 
-  return { wallets, loading, loadWallets, createWallet, updateWallet, deleteWallet, setPrimaryWallet, clearAllWallets };
+  const moveWalletToOrganization = useCallback(async (id: string, organizationId: string) => {
+    const response = await api.patch(`/wallets/${id}/move-to-organization`, { organization_id: organizationId });
+    return response.data.data as Wallet;
+  }, []);
+
+  return {
+    wallets,
+    loading,
+    loadWallets,
+    createWallet,
+    updateWallet,
+    deleteWallet,
+    setPrimaryWallet,
+    clearAllWallets,
+    moveWalletToOrganization,
+  };
 }

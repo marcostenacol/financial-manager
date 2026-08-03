@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Wallet as WalletIcon, CreditCard, Banknote, MoreVertical, Star, Trash2 } from 'lucide-react';
+import { Plus, Wallet as WalletIcon, CreditCard, Banknote, Building2, Star, Trash2 } from 'lucide-react';
 import { CreateWalletModal } from '../components/CreateWalletModal';
 import { UpdateWalletModal } from '../components/UpdateWalletModal';
 import { CreateTransferModal } from '../../transactions/components/CreateTransferModal';
@@ -9,25 +9,43 @@ import { ConfirmDangerModal } from '../../../shared/components/ConfirmDangerModa
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets, type Wallet } from '../hooks/useWallets';
 import { useSavingsGoals } from '../../savings-goals/hooks/useSavingsGoals';
+import { useOrganizations } from '../../organizations/hooks/useOrganizations';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const WalletsPage = () => {
   const { showToast } = useToast();
   const { scope } = useScope();
-  const { wallets, loading, loadWallets, setPrimaryWallet, clearAllWallets } = useWallets(scope);
+  const { wallets, loading, loadWallets, setPrimaryWallet, clearAllWallets, moveWalletToOrganization } = useWallets(scope);
   const { clearAllGoals } = useSavingsGoals();
+  const { organizations, loadOrganizations } = useOrganizations();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
+  const [movingWalletId, setMovingWalletId] = useState<string | null>(null);
 
   useEffect(() => {
-     
+
     loadWallets().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar carteiras'), 'error'));
+    loadOrganizations().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
+
+  const handleMoveToOrganization = async (e: React.MouseEvent, walletId: string, organizationId: string) => {
+    e.stopPropagation();
+    if (!organizationId) return;
+
+    try {
+      await moveWalletToOrganization(walletId, organizationId);
+      setMovingWalletId(null);
+      await loadWallets();
+      showToast('Carteira movida para a organização com sucesso', 'success');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao mover carteira'), 'error');
+    }
+  };
 
   const handleEdit = (wallet: Wallet) => {
     setSelectedWallet(wallet);
@@ -152,9 +170,18 @@ export const WalletsPage = () => {
                       >
                         <Star className={`w-5 h-5 ${wallet.isPrimary ? 'text-yellow-300 fill-yellow-300' : 'text-white/70'}`} />
                       </button>
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                        <MoreVertical className="w-5 h-5 text-white/70" />
-                      </button>
+                      {!wallet.organizationId && organizations.length > 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMovingWalletId((prev) => (prev === wallet.id ? null : wallet.id));
+                          }}
+                          title="Mover para organização"
+                          className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                        >
+                          <Building2 className="w-5 h-5 text-white/70" />
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -166,11 +193,42 @@ export const WalletsPage = () => {
                           Principal
                         </span>
                       )}
+                      {wallet.organizationId && (
+                        <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px] normal-case tracking-normal font-bold">
+                          Organização
+                        </span>
+                      )}
                     </p>
                     <h2 className="text-3xl font-bold text-white tracking-tight">
                       {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: wallet.currency }).format(wallet.balance)}
                     </h2>
                   </div>
+
+                  {movingWalletId === wallet.id && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute inset-0 bg-black/70 rounded-3xl flex flex-col items-center justify-center gap-3 p-4 z-10"
+                    >
+                      <p className="text-white text-sm font-medium text-center">Mover "{wallet.name}" para qual organização?</p>
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {organizations.map((organization) => (
+                          <button
+                            key={organization.id}
+                            onClick={(e) => handleMoveToOrganization(e, wallet.id, organization.id)}
+                            className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-xl"
+                          >
+                            {organization.name}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMovingWalletId(null); }}
+                        className="text-white/70 text-xs hover:text-white"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Círculos Decorativos */}
