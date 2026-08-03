@@ -1,29 +1,33 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Sun, Moon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Sun, Moon, Languages } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
 import { useScope } from '../../contexts/useScope';
 import { getAvatarUrl } from '../lib/getAvatarUrl';
 import { useTheme } from '../../hooks/useTheme';
+import { SUPPORTED_LANGUAGES } from '../../i18n';
 import { motion } from 'framer-motion';
 
 export const Sidebar = () => {
   const { signOut, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { scope, setScope } = useScope();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-    { icon: Wallet, label: 'Carteiras', path: '/wallets' },
-    { icon: History, label: 'Transações', path: '/transactions' },
-    { icon: Tag, label: 'Categorias', path: '/categories' },
-    ...(scope === 'personal' ? [{ icon: Target, label: 'Metas', path: '/savings-goals' }] : []),
-    ...(scope === 'business' ? [{ icon: Briefcase, label: 'Centros de Custo', path: '/cost-centers' }] : []),
-    { icon: RefreshCw, label: 'Recorrências', path: '/recurrences' },
-    { icon: Building2, label: 'Organizações', path: '/organizations' },
-    { icon: UserCircle, label: 'Meu Perfil', path: '/profile' },
+    { icon: LayoutDashboard, label: t('nav.dashboard'), path: '/' },
+    { icon: Wallet, label: t('nav.wallets'), path: '/wallets' },
+    { icon: History, label: t('nav.transactions'), path: '/transactions' },
+    { icon: Tag, label: t('nav.categories'), path: '/categories' },
+    ...(scope === 'personal' ? [{ icon: Target, label: t('nav.savingsGoals'), path: '/savings-goals' }] : []),
+    ...(scope === 'business' ? [{ icon: Briefcase, label: t('nav.costCenters'), path: '/cost-centers' }] : []),
+    { icon: RefreshCw, label: t('nav.recurrences'), path: '/recurrences' },
+    { icon: Building2, label: t('nav.organizations'), path: '/organizations' },
+    { icon: UserCircle, label: t('nav.profile'), path: '/profile' },
   ];
 
   return (
@@ -72,7 +76,7 @@ export const Sidebar = () => {
             }`}
           >
             <User className="w-4 h-4" />
-            Pessoal
+            {t('nav.personal')}
           </button>
           <button
             onClick={() => setScope('business')}
@@ -81,7 +85,7 @@ export const Sidebar = () => {
             }`}
           >
             <Briefcase className="w-4 h-4" />
-            Empresarial
+            {t('nav.business')}
           </button>
         </div>
 
@@ -133,15 +137,40 @@ export const Sidebar = () => {
           className="flex items-center gap-3 w-full px-4 py-3 text-app-muted hover:text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
         >
           {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          <span className="font-medium">{theme === 'dark' ? 'Tema claro' : 'Tema escuro'}</span>
+          <span className="font-medium">{theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}</span>
         </button>
+
+        <div className="relative">
+          <button
+            onClick={() => setLangMenuOpen((prev) => !prev)}
+            className="flex items-center gap-3 w-full px-4 py-3 text-app-muted hover:text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
+          >
+            <Languages className="w-5 h-5" />
+            <span className="font-medium uppercase">{i18n.resolvedLanguage}</span>
+          </button>
+          {langMenuOpen && (
+            <div className="absolute bottom-full left-0 mb-1 w-full bg-app-surface border border-app-border rounded-xl shadow-app-card overflow-hidden">
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => { i18n.changeLanguage(lang); setLangMenuOpen(false); }}
+                  className={`flex items-center w-full px-4 py-2 text-sm uppercase font-medium transition-all ${
+                    i18n.resolvedLanguage === lang ? 'text-app-accent' : 'text-app-muted hover:text-app-ink hover:bg-app-surface-2'
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         <button
           onClick={signOut}
           className="flex items-center gap-3 w-full px-4 py-3 text-app-muted hover:text-app-danger hover:bg-app-danger/5 rounded-xl transition-all"
         >
           <LogOut className="w-5 h-5" />
-          <span className="font-medium">Sair</span>
+          <span className="font-medium">{t('nav.signOut')}</span>
         </button>
       </div>
       </aside>

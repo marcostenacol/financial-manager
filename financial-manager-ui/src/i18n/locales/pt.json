@@ -1,0 +1,18 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "wallets": "Carteiras",
+    "transactions": "Transações",
+    "categories": "Categorias",
+    "savingsGoals": "Metas",
+    "costCenters": "Centros de Custo",
+    "recurrences": "Recorrências",
+    "organizations": "Organizações",
+    "profile": "Meu Perfil",
+    "personal": "Pessoal",
+    "business": "Empresarial",
+    "themeLight": "Tema claro",
+    "themeDark": "Tema escuro",
+    "signOut": "Sair"
+  }
+}
