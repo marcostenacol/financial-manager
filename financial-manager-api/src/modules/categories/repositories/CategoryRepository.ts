@@ -1,4 +1,4 @@
-import { Category, Prisma } from '@prisma/client';
+import { Category, Prisma, ProfileScope } from '@prisma/client';
 import { CategoryRepositoryInterface } from './contracts/CategoryRepositoryInterface';
 import { prisma } from '@/shared/database/PrismaClient';
 import { injectable } from 'tsyringe';
@@ -30,13 +30,21 @@ export class CategoryRepository implements CategoryRepositoryInterface {
     });
   }
 
-  async findAllByUserId(userId: string): Promise<Category[]> {
+  async findAllByUserId(userId: string, scope?: ProfileScope): Promise<Category[]> {
+    const ownershipFilter: Prisma.CategoryWhereInput = {
+      OR: [
+        { userId },
+        { userId: null }, // Categorias globais do sistema
+      ],
+    };
+
+    const scopeFilter: Prisma.CategoryWhereInput | undefined = scope
+      ? { OR: [{ scope }, { scope: null }] }
+      : undefined;
+
     return prisma.category.findMany({
       where: {
-        OR: [
-          { userId },
-          { userId: null }, // Categorias globais do sistema
-        ],
+        AND: [ownershipFilter, ...(scopeFilter ? [scopeFilter] : [])],
       },
       orderBy: {
         name: 'asc',

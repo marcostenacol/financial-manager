@@ -22,6 +22,8 @@ import { ReportRepositoryInterface } from '@/modules/reports/repositories/contra
 import { ReportRepository } from '@/modules/reports/repositories/ReportRepository';
 import { NotificationRepositoryInterface } from '@/modules/notifications/repositories/contracts/NotificationRepositoryInterface';
 import { NotificationRepository } from '@/modules/notifications/repositories/NotificationRepository';
+import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
+import { CostCenterRepository } from '@/modules/cost-centers/repositories/CostCenterRepository';
 
 container.registerSingleton<AuthRepositoryInterface>('AuthRepository', AuthRepository);
 container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', ProfileRepository);
@@ -31,6 +33,7 @@ container.registerSingleton<CategoryRepositoryInterface>('CategoryRepository', C
 container.registerSingleton<RecurrenceRepositoryInterface>('RecurrenceRepository', RecurrenceRepository);
 container.registerSingleton<ReportRepositoryInterface>('ReportRepository', ReportRepository);
 container.registerSingleton<NotificationRepositoryInterface>('NotificationRepository', NotificationRepository);
+container.registerSingleton<CostCenterRepositoryInterface>('CostCenterRepository', CostCenterRepository);
 
 // Services
 import { RegisterService } from '@/modules/auth/services/RegisterService';
@@ -77,12 +80,17 @@ import { SavingsGoalRepositoryInterface } from '@/modules/savings-goals/reposito
 import { GetDashboardOverviewService } from '@/modules/reports/services/GetDashboardOverviewService';
 import { GetExpensesByCategoryService } from '@/modules/reports/services/GetExpensesByCategoryService';
 import { GetMonthlyEvolutionService } from '@/modules/reports/services/GetMonthlyEvolutionService';
+import { GetCashFlowByCostCenterService } from '@/modules/reports/services/GetCashFlowByCostCenterService';
 import { ExportReportService } from '@/modules/reports/services/ExportReportService';
 import { CreateNotificationService } from '@/modules/notifications/services/CreateNotificationService';
 import { ListNotificationsService } from '@/modules/notifications/services/ListNotificationsService';
 import { MarkNotificationAsReadService } from '@/modules/notifications/services/MarkNotificationAsReadService';
 import { MarkAllNotificationsAsReadService } from '@/modules/notifications/services/MarkAllNotificationsAsReadService';
 import { DeleteNotificationService } from '@/modules/notifications/services/DeleteNotificationService';
+import { CreateCostCenterService } from '@/modules/cost-centers/services/CreateCostCenterService';
+import { ListCostCentersService } from '@/modules/cost-centers/services/ListCostCentersService';
+import { UpdateCostCenterService } from '@/modules/cost-centers/services/UpdateCostCenterService';
+import { DeleteCostCenterService } from '@/modules/cost-centers/services/DeleteCostCenterService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -127,9 +135,14 @@ container.registerSingleton<ClearAllSavingsGoalsService>('ClearAllSavingsGoalsSe
 container.registerSingleton<GetDashboardOverviewService>('GetDashboardOverviewService', GetDashboardOverviewService);
 container.registerSingleton<GetExpensesByCategoryService>('GetExpensesByCategoryService', GetExpensesByCategoryService);
 container.registerSingleton<GetMonthlyEvolutionService>('GetMonthlyEvolutionService', GetMonthlyEvolutionService);
+container.registerSingleton<GetCashFlowByCostCenterService>('GetCashFlowByCostCenterService', GetCashFlowByCostCenterService);
 container.registerSingleton<ExportReportService>('ExportReportService', ExportReportService);
 container.registerSingleton<CreateNotificationService>('CreateNotificationService', CreateNotificationService);
 container.registerSingleton<ListNotificationsService>('ListNotificationsService', ListNotificationsService);
 container.registerSingleton<MarkNotificationAsReadService>('MarkNotificationAsReadService', MarkNotificationAsReadService);
 container.registerSingleton<MarkAllNotificationsAsReadService>('MarkAllNotificationsAsReadService', MarkAllNotificationsAsReadService);
 container.registerSingleton<DeleteNotificationService>('DeleteNotificationService', DeleteNotificationService);
+container.registerSingleton<CreateCostCenterService>('CreateCostCenterService', CreateCostCenterService);
+container.registerSingleton<ListCostCentersService>('ListCostCentersService', ListCostCentersService);
+container.registerSingleton<UpdateCostCenterService>('UpdateCostCenterService', UpdateCostCenterService);
+container.registerSingleton<DeleteCostCenterService>('DeleteCostCenterService', DeleteCostCenterService);

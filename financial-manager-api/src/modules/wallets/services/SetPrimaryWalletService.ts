@@ -21,12 +21,12 @@ export class SetPrimaryWalletService {
       throw new AppError('Carteira não encontrada', 404);
     }
 
-    const previous_primary_wallets = await this.wallet_repository.findAllByUserId(user_id);
+    const previous_primary_wallets = await this.wallet_repository.findAllByUserId(user_id, wallet.scope);
     const previous_primary = previous_primary_wallets.find((w) => w.isPrimary);
 
-    const updated_wallet = await this.wallet_repository.setPrimary(id, user_id);
+    const updated_wallet = await this.wallet_repository.setPrimary(id, user_id, wallet.scope);
 
-    await this.cache.del(CacheKeys.wallets.list(user_id));
+    await this.cache.delPattern(CacheKeys.wallets.listPattern(user_id));
     await this.cache.del(CacheKeys.wallets.detail(id));
 
     if (previous_primary && previous_primary.id !== id) {

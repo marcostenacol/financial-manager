@@ -55,7 +55,7 @@ describe('GetDashboardOverviewService', () => {
     const result = await getDashboardOverviewService.execute(userId);
 
     expect(result).toEqual(dbData);
-    expect(cacheTrait.set).toHaveBeenCalledWith(`reports:overview:${userId}::`, dbData, 300);
+    expect(cacheTrait.set).toHaveBeenCalledWith(`reports:overview:${userId}:::all`, dbData, 300);
   });
 
   it('should forward the date range to the repository and use a range-specific cache key', async () => {
@@ -74,9 +74,9 @@ describe('GetDashboardOverviewService', () => {
 
     await getDashboardOverviewService.execute(userId, range);
 
-    expect(reportRepository.getDashboardOverview).toHaveBeenCalledWith(userId, range);
+    expect(reportRepository.getDashboardOverview).toHaveBeenCalledWith(userId, range, undefined);
     expect(cacheTrait.set).toHaveBeenCalledWith(
-      `reports:overview:${userId}:${range.start_date}:${range.end_date}`,
+      `reports:overview:${userId}:${range.start_date}:${range.end_date}:all`,
       dbData,
       300,
     );

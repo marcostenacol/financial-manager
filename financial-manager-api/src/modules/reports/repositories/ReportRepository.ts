@@ -1,5 +1,12 @@
 import { prisma } from '@/shared/database/PrismaClient';
-import { DashboardOverviewData, DashboardOverviewRange, ExpenseByCategoryData, MonthlyEvolutionData, ReportRepositoryInterface } from './contracts/ReportRepositoryInterface';
+import {
+  DashboardOverviewData,
+  DashboardOverviewRange,
+  ExpenseByCategoryData,
+  MonthlyEvolutionData,
+  CashFlowByCostCenterData,
+  ReportRepositoryInterface,
+} from './contracts/ReportRepositoryInterface';
 import { injectable } from 'tsyringe';
 
 interface DashboardPeriod {
@@ -38,14 +45,16 @@ export class ReportRepository implements ReportRepositoryInterface {
     };
   }
 
-  async getDashboardOverview(userId: string, range?: DashboardOverviewRange): Promise<DashboardOverviewData> {
+  async getDashboardOverview(userId: string, range?: DashboardOverviewRange, scope?: string): Promise<DashboardOverviewData> {
     const { periodStart, periodEnd, previousStart, previousEnd } = this.resolvePeriod(range);
+    const scopeFilter = scope ? 'AND w.scope = $6' : '';
 
     const results = await prisma.$queryRawUnsafe<any[]>(`
       WITH wallet_stats AS (
         SELECT COALESCE(SUM(balance), 0) as total_balance
-        FROM wallets
-        WHERE user_id = $1
+        FROM wallets w
+        WHERE w.user_id = $1
+          ${scope ? 'AND w.scope = $6' : ''}
       ),
       period_stats AS (
         SELECT
@@ -57,6 +66,7 @@ export class ReportRepository implements ReportRepositoryInterface {
           AND t.status = 'completed'
           AND t.occurred_at >= $2
           AND t.occurred_at < $3
+          ${scopeFilter}
       ),
       previous_period_stats AS (
         SELECT
@@ -68,6 +78,7 @@ export class ReportRepository implements ReportRepositoryInterface {
           AND t.status = 'completed'
           AND t.occurred_at >= $4
           AND t.occurred_at < $5
+          ${scopeFilter}
       )
       SELECT
         w.total_balance,
@@ -76,7 +87,7 @@ export class ReportRepository implements ReportRepositoryInterface {
         pp.income as last_month_income,
         pp.expense as last_month_expense
       FROM wallet_stats w, period_stats p, previous_period_stats pp
-    `, userId, periodStart, periodEnd, previousStart, previousEnd);
+    `, ...(scope ? [userId, periodStart, periodEnd, previousStart, previousEnd, scope] : [userId, periodStart, periodEnd, previousStart, previousEnd]));
 
     const data = results[0];
 
@@ -167,6 +178,49 @@ export class ReportRepository implements ReportRepositoryInterface {
        income: Number(row.income),
        expense: Number(row.expense),
        balance: Number(row.balance),
+     }));
+   }
+
+   async getCashFlowByCostCenter(userId: string, month: number, year: number): Promise<CashFlowByCostCenterData[]> {
+     const startDate = new Date(year, month - 1, 1);
+     const endDate = new Date(year, month, 0);
+
+     const results = await prisma.$queryRawUnsafe<any[]>(`
+       WITH cost_center_totals AS (
+         SELECT
+           cc.name as cost_center_name,
+           cc.color,
+           SUM(t.amount) as total
+         FROM transactions t
+         JOIN cost_centers cc ON t.cost_center_id = cc.id
+         JOIN wallets w ON t.wallet_id = w.id
+         WHERE w.user_id = $1
+           AND t.type = 'expense'
+           AND t.status = 'completed'
+           AND t.occurred_at >= $2
+           AND t.occurred_at <= $3
+         GROUP BY cc.name, cc.color
+       ),
+       total_sum AS (
+         SELECT SUM(total) as grand_total FROM cost_center_totals
+       )
+       SELECT
+         cct.cost_center_name,
+         cct.color,
+         cct.total,
+         CASE WHEN ts.grand_total > 0
+           THEN ROUND((cct.total / ts.grand_total) * 100, 2)
+           ELSE 0
+         END as percentage
+       FROM cost_center_totals cct, total_sum ts
+       ORDER BY cct.total DESC
+     `, userId, startDate, endDate);
+
+     return results.map(row => ({
+       cost_center_name: row.cost_center_name,
+       color: row.color,
+       total: Number(row.total),
+       percentage: Number(row.percentage),
      }));
    }
  }

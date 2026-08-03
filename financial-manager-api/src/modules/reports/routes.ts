@@ -12,4 +12,5 @@ export async function reportRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.get('/overview', (request, reply) => controller.overview(request, reply));
   fastify.get('/expenses-by-category', (request, reply) => controller.expensesByCategory(request, reply));
   fastify.get('/evolution', (request, reply) => controller.evolution(request, reply));
+  fastify.get('/cash-flow-by-cost-center', (request, reply) => controller.cashFlowByCostCenter(request, reply));
 }

@@ -49,6 +49,7 @@ model User {
    wallets         Wallet[]
    savingsGoals    SavingsGoal[]
    notifications   Notification[]
+   costCenters     CostCenter[]
  
    @@map("users")
  }
@@ -105,11 +106,17 @@ model Profile {
 // FINANCIAL
 // ─────────────────────────────────────────
 
+enum ProfileScope {
+  personal
+  business
+}
+
 model Wallet {
   id       String  @id @default(uuid())
   userId   String  @map("user_id")
   name     String
   type     String  // checking, savings, credit, investment, cash
+  scope    ProfileScope @default(personal)
   balance  Decimal @default(0) @db.Decimal(15, 2)
   currency String  @default("BRL")
   isPrimary Boolean @default(false) @map("is_primary")
@@ -132,6 +139,7 @@ model Category {
   color  String
   icon   String?
   type   String  // income, expense, both
+  scope  ProfileScope? // null = global, visível nos dois escopos
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -141,11 +149,26 @@ model Category {
   @@map("categories")
 }
 
+model CostCenter {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  color     String   @default("#3b82f6")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+
+  @@map("cost_centers")
+}
+
 model Transaction {
   id           String   @id @default(uuid())
   walletId     String   @map("wallet_id")
   categoryId   String   @map("category_id")
   recurrenceId String?  @map("recurrence_id")
+  costCenterId String?  @map("cost_center_id")
   type         String   // income, expense, transfer
   amount       Decimal  @db.Decimal(15, 2)
   description  String?
@@ -158,6 +181,7 @@ model Transaction {
   wallet     Wallet      @relation(fields: [walletId], references: [id])
   category   Category    @relation(fields: [categoryId], references: [id])
   recurrence Recurrence? @relation(fields: [recurrenceId], references: [id])
+  costCenter CostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
 
   @@map("transactions")
 }

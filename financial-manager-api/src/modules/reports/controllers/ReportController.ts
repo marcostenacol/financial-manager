@@ -4,6 +4,7 @@ import { BaseController } from '@/base/http/BaseController';
 import { GetDashboardOverviewService } from '../services/GetDashboardOverviewService';
 import { GetExpensesByCategoryService } from '../services/GetExpensesByCategoryService';
 import { GetMonthlyEvolutionService } from '../services/GetMonthlyEvolutionService';
+import { GetCashFlowByCostCenterService } from '../services/GetCashFlowByCostCenterService';
 import { ExportReportService } from '../services/ExportReportService';
 
 @injectable()
@@ -12,6 +13,7 @@ export class ReportController extends BaseController {
     @inject('GetDashboardOverviewService') private getOverview: GetDashboardOverviewService,
     @inject('GetExpensesByCategoryService') private getExpenses: GetExpensesByCategoryService,
     @inject('GetMonthlyEvolutionService') private getEvolution: GetMonthlyEvolutionService,
+    @inject('GetCashFlowByCostCenterService') private getCashFlowByCostCenter: GetCashFlowByCostCenterService,
     @inject('ExportReportService') private exportReport: ExportReportService,
   ) {
     super();
@@ -39,8 +41,20 @@ export class ReportController extends BaseController {
 
   async overview(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { start_date, end_date } = request.query as { start_date?: string; end_date?: string };
-    const data = await this.getOverview.execute(userId, { start_date, end_date });
+    const { start_date, end_date, scope } = request.query as { start_date?: string; end_date?: string; scope?: string };
+    const data = await this.getOverview.execute(userId, { start_date, end_date }, scope);
+    return this.success(reply, data);
+  }
+
+  async cashFlowByCostCenter(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = request.user.sub;
+    const { month, year } = request.query as { month: string; year: string };
+
+    const now = new Date();
+    const targetMonth = month ? Number(month) : now.getMonth() + 1;
+    const targetYear = year ? Number(year) : now.getFullYear();
+
+    const data = await this.getCashFlowByCostCenter.execute(userId, targetMonth, targetYear);
     return this.success(reply, data);
   }
 

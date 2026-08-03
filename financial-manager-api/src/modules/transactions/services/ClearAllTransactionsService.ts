@@ -42,7 +42,7 @@ export class ClearAllTransactionsService {
     await this.cache.del(CacheKeys.reports.monthlyEvolution(userId));
     await this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(userId));
     if (resetBalances) {
-      await this.cache.del(CacheKeys.wallets.list(userId));
+      await this.cache.delPattern(CacheKeys.wallets.listPattern(userId));
     }
   }
 }

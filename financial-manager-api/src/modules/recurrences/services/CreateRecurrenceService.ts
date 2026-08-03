@@ -3,6 +3,7 @@ import { Recurrence } from '@prisma/client';
 import { RecurrenceRepositoryInterface } from '../repositories/contracts/RecurrenceRepositoryInterface';
 import { CreateRecurrenceDTOType } from '../dtos/CreateRecurrenceDTO';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
@@ -16,6 +17,9 @@ export class CreateRecurrenceService {
     @inject('WalletRepository')
     private walletRepository: WalletRepositoryInterface,
 
+    @inject('CategoryRepository')
+    private categoryRepository: CategoryRepositoryInterface,
+
     private cache: CacheTrait,
   ) {}
 
@@ -24,6 +28,16 @@ export class CreateRecurrenceService {
 
     if (!wallet || wallet.userId !== userId) {
       throw new AppError('Carteira não encontrada ou acesso negado', 403);
+    }
+
+    const category = await this.categoryRepository.findById(data.category_id);
+
+    if (!category) {
+      throw new AppError('Categoria não encontrada', 404);
+    }
+
+    if (category.scope && category.scope !== wallet.scope) {
+      throw new AppError('Esta categoria não é compatível com o escopo da carteira', 422);
     }
 
     const recurrence = await this.recurrenceRepository.create({

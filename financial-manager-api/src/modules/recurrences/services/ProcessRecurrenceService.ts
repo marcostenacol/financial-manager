@@ -89,7 +89,7 @@ export class ProcessRecurrenceService {
     });
 
     if (wallet) {
-      await this.cache.del(CacheKeys.wallets.list(wallet.userId));
+      await this.cache.delPattern(CacheKeys.wallets.listPattern(wallet.userId));
       await this.cache.del(CacheKeys.wallets.detail(wallet.id));
       await this.cache.delPattern(CacheKeys.transactions.listPattern(wallet.userId));
       await this.cache.delPattern(CacheKeys.transactions.byWalletPattern(wallet.id));

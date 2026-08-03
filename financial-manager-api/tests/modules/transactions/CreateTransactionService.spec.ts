@@ -10,6 +10,8 @@ vi.mock('@/shared/database/PrismaClient', () => ({
 import { CreateTransactionService } from '@/modules/transactions/services/CreateTransactionService';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
+import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
@@ -18,6 +20,8 @@ import { Prisma } from '@prisma/client';
 describe('CreateTransactionService', () => {
   let transactionRepository: TransactionRepositoryInterface;
   let walletRepository: WalletRepositoryInterface;
+  let categoryRepository: CategoryRepositoryInterface;
+  let costCenterRepository: CostCenterRepositoryInterface;
   let cacheTrait: CacheTrait;
   let createTransactionService: CreateTransactionService;
 
@@ -31,12 +35,26 @@ describe('CreateTransactionService', () => {
       update: vi.fn(),
     } as any;
 
+    categoryRepository = {
+      findById: vi.fn().mockResolvedValue({ id: 'category-1', scope: null }),
+    } as any;
+
+    costCenterRepository = {
+      findById: vi.fn(),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
     } as any;
 
-    createTransactionService = new CreateTransactionService(transactionRepository, walletRepository, cacheTrait);
+    createTransactionService = new CreateTransactionService(
+      transactionRepository,
+      walletRepository,
+      categoryRepository,
+      costCenterRepository,
+      cacheTrait,
+    );
   });
 
   it('should create a transaction and update wallet balance for income', async () => {
@@ -51,7 +69,7 @@ describe('CreateTransactionService', () => {
       occurred_at: '2024-05-01',
     };
 
-    const wallet = { id: walletId, userId, balance: 500 };
+    const wallet = { id: walletId, userId, balance: 500, scope: 'personal' };
     vi.spyOn(walletRepository, 'findById').mockResolvedValue(wallet as any);
     vi.spyOn(transactionRepository, 'create').mockResolvedValue({ id: 'tx-1', ...data, amount: 1000 } as any);
 
@@ -78,7 +96,7 @@ describe('CreateTransactionService', () => {
       occurred_at: '2024-05-01',
     };
 
-    const wallet = { id: walletId, userId, balance: 500 };
+    const wallet = { id: walletId, userId, balance: 500, scope: 'personal' };
     vi.spyOn(walletRepository, 'findById').mockResolvedValue(wallet as any);
     vi.spyOn(transactionRepository, 'create').mockResolvedValue({ id: 'tx-2', ...data, amount: 200 } as any);
 
@@ -104,12 +122,56 @@ describe('CreateTransactionService', () => {
       occurred_at: '2024-05-01',
     };
 
-    const wallet = { id: walletId, userId, balance: 500 };
+    const wallet = { id: walletId, userId, balance: 500, scope: 'personal' };
     vi.spyOn(walletRepository, 'findById').mockResolvedValue(wallet as any);
     vi.spyOn(transactionRepository, 'create').mockResolvedValue({ id: 'tx-3', ...data, amount: 100 } as any);
 
     await createTransactionService.execute(data as any, userId);
 
     expect(walletRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('should reject a category whose scope is incompatible with the wallet scope', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const data = {
+      description: 'Fornecedor',
+      amount: 300,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.COMPLETED,
+      wallet_id: walletId,
+      category_id: 'category-1',
+      occurred_at: '2024-05-01',
+    };
+
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 500, scope: 'personal' } as any);
+    vi.spyOn(categoryRepository, 'findById').mockResolvedValue({ id: 'category-1', scope: 'business' } as any);
+
+    await expect(createTransactionService.execute(data as any, userId)).rejects.toThrow(
+      'Esta categoria não é compatível com o escopo da carteira',
+    );
+    expect(transactionRepository.create).not.toHaveBeenCalled();
+  });
+
+  it('should reject a cost center on a personal wallet', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const data = {
+      description: 'Fornecedor',
+      amount: 300,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.COMPLETED,
+      wallet_id: walletId,
+      category_id: 'category-1',
+      cost_center_id: 'cc-1',
+      occurred_at: '2024-05-01',
+    };
+
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 500, scope: 'personal' } as any);
+
+    await expect(createTransactionService.execute(data as any, userId)).rejects.toThrow(
+      'Centro de custo só pode ser usado em carteiras empresariais',
+    );
+    expect(transactionRepository.create).not.toHaveBeenCalled();
   });
 });

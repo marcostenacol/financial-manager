@@ -88,7 +88,7 @@ export class TransferService {
       this.cache.delPattern(CacheKeys.transactions.listPattern(userId)),
       this.cache.delPattern(CacheKeys.transactions.byWalletPattern(source_wallet_id)),
       this.cache.delPattern(CacheKeys.transactions.byWalletPattern(destination_wallet_id)),
-      this.cache.del(CacheKeys.wallets.list(userId)),
+      this.cache.delPattern(CacheKeys.wallets.listPattern(userId)),
       this.cache.del(CacheKeys.wallets.detail(source_wallet_id)),
       this.cache.del(CacheKeys.wallets.detail(destination_wallet_id)),
       this.cache.delPattern(CacheKeys.reports.overviewPattern(userId)),

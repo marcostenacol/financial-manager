@@ -25,8 +25,16 @@ export interface DashboardOverviewRange {
   end_date?: string;
 }
 
+export interface CashFlowByCostCenterData {
+  cost_center_name: string;
+  color: string;
+  total: number;
+  percentage: number;
+}
+
 export interface ReportRepositoryInterface {
-  getDashboardOverview(userId: string, range?: DashboardOverviewRange): Promise<DashboardOverviewData>;
+  getDashboardOverview(userId: string, range?: DashboardOverviewRange, scope?: string): Promise<DashboardOverviewData>;
   getExpensesByCategory(userId: string, month: number, year: number): Promise<ExpenseByCategoryData[]>;
   getMonthlyEvolution(userId: string): Promise<MonthlyEvolutionData[]>;
+  getCashFlowByCostCenter(userId: string, month: number, year: number): Promise<CashFlowByCostCenterData[]>;
 }

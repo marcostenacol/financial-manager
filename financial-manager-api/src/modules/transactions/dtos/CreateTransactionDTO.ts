@@ -10,6 +10,7 @@ export const CreateTransactionDTO = z.object({
   description: z.string().optional(),
   status: z.nativeEnum(TransactionStatusEnum).default(TransactionStatusEnum.COMPLETED),
   occurred_at: z.string().datetime().or(z.date()).default(() => new Date()),
+  cost_center_id: z.string().uuid('ID do centro de custo inválido').optional(),
 });
 
 export type CreateTransactionDTOType = z.infer<typeof CreateTransactionDTO>;

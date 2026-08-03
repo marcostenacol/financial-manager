@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import { Wallet, Prisma } from '@prisma/client';
+import { Wallet, Prisma, ProfileScope } from '@prisma/client';
 import { prisma } from '@/shared/database/PrismaClient';
 import { WalletRepositoryInterface } from './contracts/WalletRepositoryInterface';
 
@@ -11,9 +11,9 @@ export class WalletRepository implements WalletRepositoryInterface {
     });
   }
 
-  async findAllByUserId(user_id: string): Promise<Wallet[]> {
+  async findAllByUserId(user_id: string, scope?: ProfileScope): Promise<Wallet[]> {
     return prisma.wallet.findMany({
-      where: { userId: user_id },
+      where: { userId: user_id, ...(scope && { scope }) },
       orderBy: { name: 'asc' },
     });
   }
@@ -43,10 +43,10 @@ export class WalletRepository implements WalletRepositoryInterface {
     });
   }
 
-  async setPrimary(id: string, user_id: string): Promise<Wallet> {
+  async setPrimary(id: string, user_id: string, scope: ProfileScope): Promise<Wallet> {
     const [, wallet] = await prisma.$transaction([
       prisma.wallet.updateMany({
-        where: { userId: user_id, isPrimary: true },
+        where: { userId: user_id, scope, isPrimary: true },
         data: { isPrimary: false },
       }),
       prisma.wallet.update({

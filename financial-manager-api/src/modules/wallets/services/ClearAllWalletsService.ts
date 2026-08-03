@@ -37,7 +37,7 @@ export class ClearAllWalletsService {
       await this.cache.delPattern(CacheKeys.transactions.byWalletPattern(wallet.id));
     }
 
-    await this.cache.del(CacheKeys.wallets.list(userId));
+    await this.cache.delPattern(CacheKeys.wallets.listPattern(userId));
     await this.cache.del(CacheKeys.recurrences.list(userId));
     await this.cache.delPattern(CacheKeys.transactions.listPattern(userId));
     await this.cache.delPattern(CacheKeys.reports.overviewPattern(userId));

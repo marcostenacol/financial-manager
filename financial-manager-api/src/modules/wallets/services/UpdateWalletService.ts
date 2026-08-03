@@ -27,6 +27,7 @@ export class UpdateWalletService {
     const update_payload: Prisma.WalletUncheckedUpdateInput = {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.type !== undefined && { type: data.type }),
+      ...(data.scope !== undefined && { scope: data.scope }),
       ...(data.currency !== undefined && { currency: data.currency }),
       ...(data.balance !== undefined && { balance: new Prisma.Decimal(data.balance) }),
     };
@@ -34,7 +35,7 @@ export class UpdateWalletService {
     const updated_wallet = await this.wallet_repository.update(id, update_payload);
 
     // Invalida cache
-    await this.cache.del(CacheKeys.wallets.list(user_id));
+    await this.cache.delPattern(CacheKeys.wallets.listPattern(user_id));
     await this.cache.del(CacheKeys.wallets.detail(id));
     await this.cache.delPattern(CacheKeys.reports.overviewPattern(user_id));
 

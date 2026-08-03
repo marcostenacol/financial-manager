@@ -11,6 +11,8 @@ import { Prisma } from '@prisma/client';
 import { UpdateTransactionService } from '@/modules/transactions/services/UpdateTransactionService';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
+import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
@@ -19,6 +21,8 @@ import { AppError } from '@/shared/errors/AppError';
 describe('UpdateTransactionService', () => {
   let transactionRepository: TransactionRepositoryInterface;
   let walletRepository: WalletRepositoryInterface;
+  let categoryRepository: CategoryRepositoryInterface;
+  let costCenterRepository: CostCenterRepositoryInterface;
   let cacheTrait: CacheTrait;
   let updateTransactionService: UpdateTransactionService;
 
@@ -33,12 +37,26 @@ describe('UpdateTransactionService', () => {
       update: vi.fn(),
     } as any;
 
+    categoryRepository = {
+      findById: vi.fn().mockResolvedValue({ id: 'category-1', scope: null }),
+    } as any;
+
+    costCenterRepository = {
+      findById: vi.fn(),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
     } as any;
 
-    updateTransactionService = new UpdateTransactionService(transactionRepository, walletRepository, cacheTrait);
+    updateTransactionService = new UpdateTransactionService(
+      transactionRepository,
+      walletRepository,
+      categoryRepository,
+      costCenterRepository,
+      cacheTrait,
+    );
   });
 
   it('should apply only the net delta when changing the amount of a completed expense', async () => {

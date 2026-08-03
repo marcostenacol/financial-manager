@@ -31,7 +31,7 @@ export class UpdateCategoryService {
 
     const updatedCategory = await this.categoryRepository.update(id, data);
 
-    await this.cache.del(CacheKeys.categories.list(userId));
+    await this.cache.delPattern(CacheKeys.categories.listPattern(userId));
 
     return updatedCategory;
   }

@@ -17,6 +17,7 @@ describe('CreateCategoryService', () => {
 
     cacheTrait = {
       del: vi.fn(),
+      delPattern: vi.fn(),
     } as any;
 
     createCategoryService = new CreateCategoryService(categoryRepository, cacheTrait);
@@ -37,7 +38,7 @@ describe('CreateCategoryService', () => {
 
     expect(result).toHaveProperty('id');
     expect(result.name).toBe('Lazer');
-    expect(cacheTrait.del).toHaveBeenCalledWith(`categories:user:${userId}`);
+    expect(cacheTrait.delPattern).toHaveBeenCalledWith(`categories:user:${userId}:*`);
   });
 
   it('should throw error if category name already exists for user', async () => {

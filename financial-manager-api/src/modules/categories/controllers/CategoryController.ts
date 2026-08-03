@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { injectable, inject } from 'tsyringe';
+import { ProfileScope } from '@prisma/client';
 import { BaseController } from '@/base/http/BaseController';
 import { CreateCategoryService } from '../services/CreateCategoryService';
 import { ListCategoriesService } from '../services/ListCategoriesService';
@@ -21,7 +22,8 @@ export class CategoryController extends BaseController {
 
   async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const categories = await this.listCategories.execute(userId);
+    const { scope } = request.query as { scope?: ProfileScope };
+    const categories = await this.listCategories.execute(userId, scope);
     return this.success(reply, categories);
   }
 

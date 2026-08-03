@@ -1,8 +1,10 @@
 import { inject, injectable } from 'tsyringe';
-import { Prisma, Transaction } from '@prisma/client';
+import { Prisma, Transaction, ProfileScope } from '@prisma/client';
 import { prisma } from '@/shared/database/PrismaClient';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
+import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { CreateTransactionDTOType } from '../dtos/CreateTransactionDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
@@ -19,6 +21,12 @@ export class CreateTransactionService {
     @inject('WalletRepository')
     private walletRepository: WalletRepositoryInterface,
 
+    @inject('CategoryRepository')
+    private categoryRepository: CategoryRepositoryInterface,
+
+    @inject('CostCenterRepository')
+    private costCenterRepository: CostCenterRepositoryInterface,
+
     private cache: CacheTrait,
   ) {}
 
@@ -27,6 +35,28 @@ export class CreateTransactionService {
 
     if (!wallet || wallet.userId !== userId) {
       throw new AppError('Carteira não encontrada', 404);
+    }
+
+    const category = await this.categoryRepository.findById(data.category_id);
+
+    if (!category) {
+      throw new AppError('Categoria não encontrada', 404);
+    }
+
+    if (category.scope && category.scope !== wallet.scope) {
+      throw new AppError('Esta categoria não é compatível com o escopo da carteira', 422);
+    }
+
+    if (data.cost_center_id && wallet.scope !== ProfileScope.business) {
+      throw new AppError('Centro de custo só pode ser usado em carteiras empresariais', 422);
+    }
+
+    if (data.cost_center_id) {
+      const costCenter = await this.costCenterRepository.findById(data.cost_center_id);
+
+      if (!costCenter || costCenter.userId !== userId) {
+        throw new AppError('Centro de custo não encontrado', 404);
+      }
     }
 
     const amount = new Prisma.Decimal(data.amount);
@@ -42,6 +72,7 @@ export class CreateTransactionService {
         description: data.description,
         status: data.status,
         occurredAt: new Date(data.occurred_at),
+        costCenterId: data.cost_center_id,
       }, tx);
 
       if (isCompleted) {
@@ -56,7 +87,7 @@ export class CreateTransactionService {
     if (isCompleted) {
       // Invalida cache da carteira e lista de carteiras
       await this.cache.del(CacheKeys.wallets.detail(wallet.id));
-      await this.cache.del(CacheKeys.wallets.list(userId));
+      await this.cache.delPattern(CacheKeys.wallets.listPattern(userId));
     }
 
     // Invalida cache de transações
@@ -65,6 +96,7 @@ export class CreateTransactionService {
     await this.cache.delPattern(CacheKeys.reports.overviewPattern(userId));
     await this.cache.del(CacheKeys.reports.monthlyEvolution(userId));
     await this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(userId));
+    await this.cache.delPattern(CacheKeys.reports.cashFlowByCostCenterPattern(userId));
 
     return transaction;
   }

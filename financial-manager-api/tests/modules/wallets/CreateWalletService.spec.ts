@@ -39,6 +39,6 @@ describe('CreateWalletService', () => {
 
     expect(result).toHaveProperty('id');
     expect(result.name).toBe(walletData.name);
-    expect(cacheTrait.del).toHaveBeenCalledWith(`wallets:user:${userId}`);
+    expect(cacheTrait.delPattern).toHaveBeenCalledWith(`wallets:user:${userId}:*`);
   });
 });

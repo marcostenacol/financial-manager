@@ -38,6 +38,6 @@ export class DeleteCategoryService {
       throw error;
     }
 
-    await this.cache.del(CacheKeys.categories.list(userId));
+    await this.cache.delPattern(CacheKeys.categories.listPattern(userId));
   }
 }

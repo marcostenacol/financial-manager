@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { Wallet } from '@prisma/client';
+import { Wallet, ProfileScope } from '@prisma/client';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { WalletRepositoryInterface } from '../repositories/contracts/WalletRepositoryInterface';
@@ -13,13 +13,13 @@ export class ListWalletsService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(user_id: string): Promise<Wallet[]> {
-    const cache_key = CacheKeys.wallets.list(user_id);
+  async execute(user_id: string, scope?: ProfileScope): Promise<Wallet[]> {
+    const cache_key = CacheKeys.wallets.list(user_id, scope);
 
     const cached = await this.cache.get<Wallet[]>(cache_key);
     if (cached) return cached;
 
-    const wallets = await this.wallet_repository.findAllByUserId(user_id);
+    const wallets = await this.wallet_repository.findAllByUserId(user_id, scope);
 
     await this.cache.set(cache_key, wallets, 300);
 

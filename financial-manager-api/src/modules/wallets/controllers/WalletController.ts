@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { injectable, inject } from 'tsyringe';
+import { ProfileScope } from '@prisma/client';
 import { BaseController } from '@/base/http/BaseController';
 import { CreateWalletService } from '../services/CreateWalletService';
 import { ListWalletsService } from '../services/ListWalletsService';
@@ -26,7 +27,8 @@ export class WalletController extends BaseController {
   }
 
   async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const wallets = await this.list_wallets.execute(request.user.sub);
+    const { scope } = request.query as { scope?: ProfileScope };
+    const wallets = await this.list_wallets.execute(request.user.sub, scope);
     return this.success(reply, wallets);
   }
 

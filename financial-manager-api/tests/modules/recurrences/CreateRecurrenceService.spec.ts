@@ -2,11 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CreateRecurrenceService } from '@/modules/recurrences/services/CreateRecurrenceService';
 import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositories/contracts/RecurrenceRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 
 describe('CreateRecurrenceService', () => {
   let recurrenceRepository: RecurrenceRepositoryInterface;
   let walletRepository: WalletRepositoryInterface;
+  let categoryRepository: CategoryRepositoryInterface;
   let cacheTrait: CacheTrait;
   let createRecurrenceService: CreateRecurrenceService;
 
@@ -19,11 +21,15 @@ describe('CreateRecurrenceService', () => {
       findById: vi.fn(),
     } as any;
 
+    categoryRepository = {
+      findById: vi.fn().mockResolvedValue({ id: 'cat-1', scope: null }),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
     } as any;
 
-    createRecurrenceService = new CreateRecurrenceService(recurrenceRepository, walletRepository, cacheTrait);
+    createRecurrenceService = new CreateRecurrenceService(recurrenceRepository, walletRepository, categoryRepository, cacheTrait);
   });
 
   it('should create a new recurrence and clear cache', async () => {

@@ -27,7 +27,7 @@ export class CreateCategoryService {
       userId,
     });
 
-    await this.cache.del(CacheKeys.categories.list(userId));
+    await this.cache.delPattern(CacheKeys.categories.listPattern(userId));
 
     return category;
   }

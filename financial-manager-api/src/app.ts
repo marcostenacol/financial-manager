@@ -89,6 +89,7 @@ import { recurrenceRoutes } from '@/modules/recurrences/routes';
 import { reportRoutes } from '@/modules/reports/routes';
 import { savingsGoalRoutes } from '@/modules/savings-goals/routes';
 import { notificationRoutes } from '@/modules/notifications/routes';
+import { costCenterRoutes } from '@/modules/cost-centers/routes';
 
 app.register(authRoutes, { prefix: '/api/v1/auth' });
 app.register(profileRoutes, { prefix: '/api/v1/profile' });
@@ -99,6 +100,7 @@ app.register(recurrenceRoutes, { prefix: '/api/v1/recurrences' });
 app.register(reportRoutes, { prefix: '/api/v1/reports' });
 app.register(savingsGoalRoutes, { prefix: '/api/v1/savings-goals' });
 app.register(notificationRoutes, { prefix: '/api/v1/notifications' });
+app.register(costCenterRoutes, { prefix: '/api/v1/cost-centers' });
 
 // Health Check
 app.get('/health', async () => {

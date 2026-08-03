@@ -21,12 +21,13 @@ export class CreateWalletService {
       userId: data.user_id,
       name: data.name,
       type: data.type,
+      scope: data.scope,
       balance: new Prisma.Decimal(data.balance ?? 0),
       currency: data.currency,
     });
 
     // Invalida cache de listagem
-    await this.cache.del(CacheKeys.wallets.list(data.user_id));
+    await this.cache.delPattern(CacheKeys.wallets.listPattern(data.user_id));
     await this.cache.delPattern(CacheKeys.reports.overviewPattern(data.user_id));
 
     return wallet;

@@ -18,13 +18,14 @@ describe('SetPrimaryWalletService', () => {
 
     cacheTrait = {
       del: vi.fn(),
+      delPattern: vi.fn(),
     } as any;
 
     setPrimaryWalletService = new SetPrimaryWalletService(walletRepository, cacheTrait);
   });
 
   it('should set wallet as primary and invalidate caches', async () => {
-    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-2', userId: 'user-id' } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-2', userId: 'user-id', scope: 'personal' } as any);
     vi.spyOn(walletRepository, 'findAllByUserId').mockResolvedValue([
       { id: 'wallet-1', userId: 'user-id', isPrimary: true },
       { id: 'wallet-2', userId: 'user-id', isPrimary: false },
@@ -34,8 +35,8 @@ describe('SetPrimaryWalletService', () => {
     const result = await setPrimaryWalletService.execute('wallet-2', 'user-id');
 
     expect(result.isPrimary).toBe(true);
-    expect(walletRepository.setPrimary).toHaveBeenCalledWith('wallet-2', 'user-id');
-    expect(cacheTrait.del).toHaveBeenCalledWith('wallets:user:user-id');
+    expect(walletRepository.setPrimary).toHaveBeenCalledWith('wallet-2', 'user-id', 'personal');
+    expect(cacheTrait.delPattern).toHaveBeenCalledWith('wallets:user:user-id:*');
     expect(cacheTrait.del).toHaveBeenCalledWith('wallet:detail:wallet-2');
     expect(cacheTrait.del).toHaveBeenCalledWith('wallet:detail:wallet-1');
   });
