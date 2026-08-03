@@ -13,7 +13,7 @@ import {
   Download,
   Trash2
 } from 'lucide-react';
-import { CreateTransactionModal } from '../components/CreateTransactionModal';
+import { CreateTransactionModal, type DuplicateTransactionData } from '../components/CreateTransactionModal';
 import { UpdateTransactionModal } from '../components/UpdateTransactionModal';
 import { AdvancedFiltersModal } from '../components/AdvancedFiltersModal';
 import { TransactionDetailModal } from '../components/TransactionDetailModal';
@@ -36,6 +36,7 @@ export const TransactionsPage = () => {
   const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState({});
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [duplicateData, setDuplicateData] = useState<DuplicateTransactionData | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
 
@@ -94,6 +95,20 @@ export const TransactionsPage = () => {
   const handleEdit = () => {
     setIsDetailModalOpen(false);
     setIsUpdateModalOpen(true);
+  };
+
+  const handleDuplicate = () => {
+    if (!selectedTransaction || selectedTransaction.type === 'transfer') return;
+
+    setDuplicateData({
+      description: selectedTransaction.description,
+      amount: selectedTransaction.amount,
+      type: selectedTransaction.type,
+      walletId: selectedTransaction.walletId,
+      categoryId: selectedTransaction.categoryId,
+    });
+    setIsDetailModalOpen(false);
+    setIsModalOpen(true);
   };
 
   const handleDelete = async () => {
@@ -176,7 +191,10 @@ export const TransactionsPage = () => {
           </button>
 
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setDuplicateData(null);
+              setIsModalOpen(true);
+            }}
             className="bg-app-accent hover:bg-app-accent/90 text-app-accent-ink p-3 rounded-2xl transition-all active:scale-95 shadow-lg shadow-blue-600/20"
           >
             <Plus className="w-6 h-6" />
@@ -313,10 +331,14 @@ export const TransactionsPage = () => {
         )}
       </div>
 
-      <CreateTransactionModal 
+      <CreateTransactionModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setDuplicateData(null);
+        }}
         onSuccess={fetchTransactions}
+        initialData={duplicateData}
       />
 
       <UpdateTransactionModal 
@@ -341,6 +363,7 @@ export const TransactionsPage = () => {
         onClose={() => setIsDetailModalOpen(false)}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onDuplicate={handleDuplicate}
         deleting={isDeleting}
         transaction={selectedTransaction}
       />

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { X, Pencil, Trash2, ArrowUpCircle, ArrowDownCircle, Calendar, Tag, Wallet as WalletIcon } from 'lucide-react';
+import { X, Pencil, Trash2, Copy, ArrowUpCircle, ArrowDownCircle, Calendar, Tag, Wallet as WalletIcon } from 'lucide-react';
 
 interface Transaction {
   id: string;
@@ -17,11 +17,12 @@ interface TransactionDetailModalProps {
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onDuplicate: () => void;
   deleting?: boolean;
   transaction: Transaction | null;
 }
 
-export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, deleting, transaction }: TransactionDetailModalProps) => {
+export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDuplicate, deleting, transaction }: TransactionDetailModalProps) => {
   if (!isOpen || !transaction) return null;
 
   const isIncome = transaction.type === 'income';
@@ -50,6 +51,13 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, dele
               title="Editar Transação"
             >
               <Pencil className="w-5 h-5" />
+            </button>
+            <button
+              onClick={onDuplicate}
+              className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400 hover:text-white"
+              title="Duplicar Transação"
+            >
+              <Copy className="w-5 h-5" />
             </button>
             <button
               onClick={onDelete}

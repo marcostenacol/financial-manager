@@ -18,13 +18,22 @@ interface Category {
   name: string;
 }
 
+export interface DuplicateTransactionData {
+  description: string;
+  amount: number;
+  type: 'income' | 'expense';
+  walletId: string;
+  categoryId?: string;
+}
+
 interface CreateTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialData?: DuplicateTransactionData | null;
 }
 
-export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTransactionModalProps) => {
+export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData }: CreateTransactionModalProps) => {
   const { showToast } = useToast();
   const { createTransaction } = useTransactions();
   const { loadWallets } = useWallets();
@@ -35,7 +44,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [occurredAt, setOccurredAt] = useState(new Date().toISOString().split('T')[0]);
-  
+
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,6 +57,16 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       ]);
       setWallets(walletsData);
       setCategories(categoriesData);
+
+      if (initialData) {
+        setType(initialData.type);
+        setDescription(initialData.description);
+        setAmount(initialData.amount);
+        setWalletId(initialData.walletId);
+        setCategoryId(initialData.categoryId ?? '');
+        setOccurredAt(new Date().toISOString().split('T')[0]);
+        return;
+      }
 
       if (walletsData.length > 0) {
         const primaryWallet = walletsData.find((wallet) => wallet.isPrimary);
@@ -67,7 +86,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
       loadData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +133,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess }: CreateTra
         className="relative w-full max-w-xl bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-white/5 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">Nova Transação</h2>
+          <h2 className="text-xl font-bold text-white">{initialData ? 'Duplicar Transação' : 'Nova Transação'}</h2>
           <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400">
             <X className="w-5 h-5" />
           </button>
