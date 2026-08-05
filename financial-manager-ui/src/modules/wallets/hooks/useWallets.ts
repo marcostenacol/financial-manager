@@ -18,6 +18,7 @@ export interface CreateWalletInput {
   scope?: 'personal' | 'business';
   balance: number;
   currency?: string;
+  organization_id?: string;
 }
 
 export interface UpdateWalletInput {
@@ -62,8 +63,8 @@ export function useWallets(scope?: 'personal' | 'business') {
     return response.data.data as Wallet;
   }, []);
 
-  const clearAllWallets = useCallback(async () => {
-    await api.delete('/wallets/clear-all');
+  const clearAllWallets = useCallback(async (organizationId?: string) => {
+    await api.delete('/wallets/clear-all', { params: organizationId ? { organization_id: organizationId } : undefined });
   }, []);
 
   const moveWalletToOrganization = useCallback(async (id: string, organizationId: string) => {

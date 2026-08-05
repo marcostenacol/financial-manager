@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Plus, Ban, Copy } from 'lucide-react';
+import { Trash2, Plus, Ban, Copy, Crown } from 'lucide-react';
 import { useOrganizations, type Organization, type Member, type Invite } from '../hooks/useOrganizations';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface OrganizationDetailPanelProps {
   organization: Organization;
+  onOwnershipTransferred?: () => void;
 }
 
-export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPanelProps) => {
+export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }: OrganizationDetailPanelProps) => {
   const { showToast } = useToast();
-  const { loadMembers, removeMember, loadInvites, createInvite, revokeInvite } = useOrganizations();
+  const { loadMembers, removeMember, transferOwnership, loadInvites, createInvite, revokeInvite, deleteInvite } = useOrganizations();
   const [members, setMembers] = useState<Member[]>([]);
   const [invites, setInvites] = useState<Invite[]>([]);
   const [expiresInDays, setExpiresInDays] = useState(7);
@@ -49,6 +50,18 @@ export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPane
     }
   };
 
+  const handleTransferOwnership = async (member: Member) => {
+    if (!window.confirm(`Transferir a titularidade da organização para ${member.user.email}? Você passará a ser um membro comum.`)) return;
+    try {
+      await transferOwnership(organization.id, member.userId);
+      await load();
+      onOwnershipTransferred?.();
+      showToast('Titularidade transferida com sucesso', 'success');
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao transferir titularidade'), 'error');
+    }
+  };
+
   const handleCreateInvite = async () => {
     setCreatingInvite(true);
     try {
@@ -75,6 +88,16 @@ export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPane
     }
   };
 
+  const handleDeleteInvite = async (inviteId: string) => {
+    if (!window.confirm('Excluir este convite definitivamente? O histórico de quem já usou também será apagado.')) return;
+    try {
+      await deleteInvite(organization.id, inviteId);
+      await load();
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao excluir convite'), 'error');
+    }
+  };
+
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     showToast('Código copiado', 'success');
@@ -88,23 +111,32 @@ export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPane
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-8">
+    <div className="bg-app-surface-2 border border-app-border rounded-3xl p-6 space-y-8">
       <div>
-        <h3 className="text-white font-bold mb-4">Membros</h3>
+        <h3 className="text-app-ink font-bold mb-4">Membros</h3>
         <div className="space-y-2">
           {members.map((member) => (
-            <div key={member.id} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-3">
+            <div key={member.id} className="flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-3">
               <div>
-                <p className="text-white text-sm font-medium">{member.user.email}</p>
-                <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500">{member.role === 'owner' ? 'Dono' : 'Membro'}</span>
+                <p className="text-app-ink text-sm font-medium">{member.user.email}</p>
+                <span className="text-[10px] uppercase tracking-widest font-bold text-app-muted">{member.role === 'owner' ? 'Dono' : 'Membro'}</span>
               </div>
-              {isOwner && (
-                <button
-                  onClick={() => handleRemoveMember(member.userId)}
-                  className="p-2 text-slate-500 hover:text-red-400 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              {isOwner && member.role !== 'owner' && (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleTransferOwnership(member)}
+                    title="Transferir titularidade para este membro"
+                    className="p-2 text-app-muted hover:text-amber-400 transition-colors"
+                  >
+                    <Crown className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleRemoveMember(member.userId)}
+                    className="p-2 text-app-muted hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               )}
             </div>
           ))}
@@ -113,16 +145,16 @@ export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPane
 
       {isOwner && (
         <div>
-          <h3 className="text-white font-bold mb-4">Convites</h3>
+          <h3 className="text-app-ink font-bold mb-4">Convites</h3>
 
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4 space-y-3">
+          <div className="bg-app-surface-2 border border-app-border rounded-2xl p-4 mb-4 space-y-3">
             <div className="flex flex-wrap gap-3 items-end">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Validade</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted">Validade</label>
                 <select
                   value={expiresInDays}
                   onChange={(e) => setExpiresInDays(Number(e.target.value))}
-                  className="bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-white text-sm"
+                  className="bg-app-surface-2 border border-app-border rounded-xl px-3 py-2 text-app-ink text-sm"
                 >
                   <option value={7}>7 dias</option>
                   <option value={15}>15 dias</option>
@@ -130,11 +162,11 @@ export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPane
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Uso</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted">Uso</label>
                 <select
                   value={maxUses}
                   onChange={(e) => setMaxUses(e.target.value as 'single' | 'multi')}
-                  className="bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-white text-sm"
+                  className="bg-app-surface-2 border border-app-border rounded-xl px-3 py-2 text-app-ink text-sm"
                 >
                   <option value="single">Único uso</option>
                   <option value="multi">Múltiplo uso</option>
@@ -142,20 +174,20 @@ export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPane
               </div>
               {maxUses === 'multi' && (
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Máx. de usos</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted">Máx. de usos</label>
                   <input
                     type="number"
                     min={2}
                     value={multiUses}
                     onChange={(e) => setMultiUses(Number(e.target.value))}
-                    className="w-20 bg-slate-800 border border-white/10 rounded-xl px-3 py-2 text-white text-sm"
+                    className="w-20 bg-app-surface-2 border border-app-border rounded-xl px-3 py-2 text-app-ink text-sm"
                   />
                 </div>
               )}
               <button
                 onClick={handleCreateInvite}
                 disabled={creatingInvite}
-                className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-50"
+                className="bg-app-accent hover:opacity-90 text-app-ink font-bold px-4 py-2 rounded-xl flex items-center gap-2 disabled:opacity-50"
               >
                 <Plus className="w-4 h-4" />
                 Gerar convite
@@ -165,15 +197,15 @@ export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPane
 
           <div className="space-y-2">
             {invites.map((invite) => (
-              <div key={invite.id} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl p-3">
+              <div key={invite.id} className="flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-mono font-bold">{invite.code}</span>
-                    <button onClick={() => handleCopyCode(invite.code)} className="text-slate-500 hover:text-white">
+                    <span className="text-app-ink font-mono font-bold">{invite.code}</span>
+                    <button onClick={() => handleCopyCode(invite.code)} className="text-app-muted hover:text-app-ink">
                       <Copy className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">
+                  <p className="text-[10px] text-app-muted mt-1">
                     {invite.usesCount}/{invite.maxUses ?? 1} usos · expira em {new Date(invite.expiresAt).toLocaleDateString('pt-BR')}
                     {' · '}
                     <span className={isInviteActive(invite) ? 'text-emerald-400' : 'text-red-400'}>
@@ -181,20 +213,29 @@ export const OrganizationDetailPanel = ({ organization }: OrganizationDetailPane
                     </span>
                   </p>
                 </div>
-                {isInviteActive(invite) && (
+                <div className="flex items-center gap-1">
+                  {isInviteActive(invite) && (
+                    <button
+                      onClick={() => handleRevokeInvite(invite.id)}
+                      className="p-2 text-app-muted hover:text-amber-400 transition-colors"
+                      title="Revogar convite"
+                    >
+                      <Ban className="w-4 h-4" />
+                    </button>
+                  )}
                   <button
-                    onClick={() => handleRevokeInvite(invite.id)}
-                    className="p-2 text-slate-500 hover:text-red-400 transition-colors"
-                    title="Revogar convite"
+                    onClick={() => handleDeleteInvite(invite.id)}
+                    className="p-2 text-app-muted hover:text-red-400 transition-colors"
+                    title="Excluir convite"
                   >
-                    <Ban className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
-                )}
+                </div>
               </div>
             ))}
 
             {invites.length === 0 && (
-              <p className="text-slate-500 text-sm text-center py-4">Nenhum convite criado ainda.</p>
+              <p className="text-app-muted text-sm text-center py-4">Nenhum convite criado ainda.</p>
             )}
           </div>
         </div>

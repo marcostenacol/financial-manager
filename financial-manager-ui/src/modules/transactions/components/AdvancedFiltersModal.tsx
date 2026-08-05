@@ -4,6 +4,7 @@ import { X, Filter, Calendar, Tag, Wallet as WalletIcon, CheckCircle } from 'luc
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 interface Category {
@@ -33,8 +34,9 @@ interface AdvancedFiltersModalProps {
 
 export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters }: AdvancedFiltersModalProps) => {
   const { showToast } = useToast();
-  const { loadWallets } = useWallets();
-  const { loadCategories } = useCategories();
+  const { scope } = useScope();
+  const { loadWallets } = useWallets(scope);
+  const { loadCategories } = useCategories(scope);
   const [categories, setCategories] = useState<Category[]>([]);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [filters, setFilters] = useState<Filters>(currentFilters);
@@ -97,56 +99,56 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-[#0f172a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-md bg-[#0f172a] border border-app-border rounded-3xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+            <div className="p-6 border-b border-app-border flex items-center justify-between bg-white/[0.02]">
               <div className="flex items-center gap-2">
-                <Filter className="w-5 h-5 text-blue-400" />
-                <h2 className="text-xl font-bold text-white">Filtros Avançados</h2>
+                <Filter className="w-5 h-5 text-app-accent" />
+                <h2 className="text-xl font-bold text-app-ink">Filtros Avançados</h2>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors">
-                <X className="w-5 h-5 text-slate-400" />
+              <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors">
+                <X className="w-5 h-5 text-app-muted" />
               </button>
             </div>
 
             <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
               {/* Carteira */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-xs font-bold text-app-muted uppercase tracking-widest flex items-center gap-2">
                   <WalletIcon className="w-3.5 h-3.5" /> Carteira
                 </label>
                 <select 
                   value={filters.wallet_id || ''}
                   onChange={(e) => setFilters({ ...filters, wallet_id: e.target.value || undefined })}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none"
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl p-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 appearance-none"
                 >
-                  <option value="" className="bg-slate-900">Todas as carteiras</option>
+                  <option value="" className="bg-app-surface">Todas as carteiras</option>
                   {wallets.map(w => (
-                    <option key={w.id} value={w.id} className="bg-slate-900">{w.name}</option>
+                    <option key={w.id} value={w.id} className="bg-app-surface">{w.name}</option>
                   ))}
                 </select>
               </div>
 
               {/* Categoria */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-xs font-bold text-app-muted uppercase tracking-widest flex items-center gap-2">
                   <Tag className="w-3.5 h-3.5" /> Categoria
                 </label>
                 <select 
                   value={filters.category_id || ''}
                   onChange={(e) => setFilters({ ...filters, category_id: e.target.value || undefined })}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none"
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl p-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 appearance-none"
                 >
-                  <option value="" className="bg-slate-900">Todas as categorias</option>
+                  <option value="" className="bg-app-surface">Todas as categorias</option>
                   {categories.map(c => (
-                    <option key={c.id} value={c.id} className="bg-slate-900">{c.name}</option>
+                    <option key={c.id} value={c.id} className="bg-app-surface">{c.name}</option>
                   ))}
                 </select>
               </div>
 
               {/* Status */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-xs font-bold text-app-muted uppercase tracking-widest flex items-center gap-2">
                   <CheckCircle className="w-3.5 h-3.5" /> Status
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -156,8 +158,8 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
                       onClick={() => setFilters({ ...filters, status: filters.status === status ? undefined : status })}
                       className={`p-3 rounded-xl border text-sm font-medium transition-all ${
                         filters.status === status 
-                          ? 'bg-blue-600/20 border-blue-500 text-white' 
-                          : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                          ? 'bg-app-accent/20 border-app-accent text-app-ink' 
+                          : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                       }`}
                     >
                       {status === 'pending' ? 'Pendente' : 'Efetivado'}
@@ -168,42 +170,42 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
 
               {/* Período */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <label className="text-xs font-bold text-app-muted uppercase tracking-widest flex items-center gap-2">
                   <Calendar className="w-3.5 h-3.5" /> Período
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <span className="text-[10px] text-slate-600 font-bold uppercase ml-1">De</span>
+                    <span className="text-[10px] text-app-muted font-bold uppercase ml-1">De</span>
                     <input 
                       type="date"
                       value={filters.start_date || ''}
                       onChange={(e) => setFilters({ ...filters, start_date: e.target.value || undefined })}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm [color-scheme:dark]"
+                      className="w-full bg-app-surface-2 border border-app-border rounded-2xl p-3 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 text-sm [color-scheme:dark]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[10px] text-slate-600 font-bold uppercase ml-1">Até</span>
+                    <span className="text-[10px] text-app-muted font-bold uppercase ml-1">Até</span>
                     <input 
                       type="date"
                       value={filters.end_date || ''}
                       onChange={(e) => setFilters({ ...filters, end_date: e.target.value || undefined })}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm [color-scheme:dark]"
+                      className="w-full bg-app-surface-2 border border-app-border rounded-2xl p-3 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 text-sm [color-scheme:dark]"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 bg-white/[0.02] border-t border-white/5 flex gap-3">
+            <div className="p-6 bg-white/[0.02] border-t border-app-border flex gap-3">
               <button
                 onClick={handleClear}
-                className="flex-1 py-4 px-6 rounded-2xl border border-white/10 text-slate-400 font-bold hover:bg-white/5 transition-all"
+                className="flex-1 py-4 px-6 rounded-2xl border border-app-border text-app-muted font-bold hover:bg-app-surface-2 transition-all"
               >
                 Limpar
               </button>
               <button
                 onClick={handleApply}
-                className="flex-[2] py-4 px-6 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-500 shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]"
+                className="flex-[2] py-4 px-6 rounded-2xl bg-app-accent text-app-ink font-bold hover:opacity-90 shadow-lg shadow-app-card transition-all active:scale-[0.98]"
               >
                 Aplicar Filtros
               </button>

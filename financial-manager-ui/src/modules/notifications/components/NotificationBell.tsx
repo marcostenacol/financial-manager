@@ -72,7 +72,7 @@ export const NotificationBell = () => {
       case 'success': return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
       case 'warning': return <AlertTriangle className="w-4 h-4 text-amber-400" />;
       case 'error': return <AlertCircle className="w-4 h-4 text-red-400" />;
-      default: return <Info className="w-4 h-4 text-blue-400" />;
+      default: return <Info className="w-4 h-4 text-app-accent" />;
     }
   };
 
@@ -92,12 +92,12 @@ export const NotificationBell = () => {
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className={`relative p-2.5 rounded-xl transition-all ${
-          isOpen ? 'bg-blue-600 text-white' : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+          isOpen ? 'bg-app-accent text-app-ink' : 'bg-app-surface-2 text-app-muted hover:bg-app-surface-2 hover:text-app-ink'
         }`}
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-slate-900">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-app-ink text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-app-surface">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -109,15 +109,15 @@ export const NotificationBell = () => {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute right-0 mt-3 w-80 bg-[#1e293b] border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-[60]"
+            className="absolute right-0 mt-3 w-80 bg-[#1e293b] border border-app-border rounded-3xl shadow-2xl overflow-hidden z-[60]"
           >
-            <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-              <h3 className="text-sm font-bold text-white">Notificações</h3>
+            <div className="p-4 border-b border-app-border flex items-center justify-between bg-white/[0.02]">
+              <h3 className="text-sm font-bold text-app-ink">Notificações</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllAsRead}
                   disabled={isMarkingAll}
-                  className="text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase tracking-widest flex items-center gap-1 disabled:opacity-50"
+                  className="text-[10px] font-bold text-app-accent hover:opacity-80 uppercase tracking-widest flex items-center gap-1 disabled:opacity-50"
                 >
                   <CheckCheck className="w-3 h-3" />
                   Ler tudo
@@ -127,32 +127,32 @@ export const NotificationBell = () => {
 
             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
               {notifications.length > 0 ? (
-                <div className="divide-y divide-white/5">
+                <div className="divide-y divide-app-border">
                   {notifications.map((notification) => (
                     <div 
                       key={notification.id}
                       className={`p-4 transition-colors relative group ${
-                        !notification.readAt ? 'bg-blue-600/5' : 'hover:bg-white/[0.02]'
+                        !notification.readAt ? 'bg-app-accent/5' : 'hover:bg-white/[0.02]'
                       }`}
                     >
                       <div className="flex gap-3">
                         <div className={`mt-1 p-2 rounded-lg shrink-0 ${
                           notification.type === 'success' ? 'bg-emerald-500/10' :
                           notification.type === 'warning' ? 'bg-amber-500/10' :
-                          notification.type === 'error' ? 'bg-red-500/10' : 'bg-blue-500/10'
+                          notification.type === 'error' ? 'bg-red-500/10' : 'bg-app-accent-soft'
                         }`}>
                           {getTypeIcon(notification.type)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
-                            <h4 className={`text-sm font-bold truncate ${!notification.readAt ? 'text-white' : 'text-slate-300'}`}>
+                            <h4 className={`text-sm font-bold truncate ${!notification.readAt ? 'text-app-ink' : 'text-app-ink/80'}`}>
                               {notification.title}
                             </h4>
-                            <span className="text-[10px] text-slate-500 whitespace-nowrap ml-2">
+                            <span className="text-[10px] text-app-muted whitespace-nowrap ml-2">
                               {formatTime(notification.createdAt)}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-app-muted mt-1 line-clamp-2 leading-relaxed">
                             {notification.message}
                           </p>
                           
@@ -160,7 +160,7 @@ export const NotificationBell = () => {
                             <button
                               onClick={() => handleMarkAsRead(notification.id)}
                               disabled={pendingIds.has(notification.id)}
-                              className="mt-2 text-[10px] font-bold text-blue-400 hover:text-blue-300 uppercase tracking-widest flex items-center gap-1 disabled:opacity-50"
+                              className="mt-2 text-[10px] font-bold text-app-accent hover:opacity-80 uppercase tracking-widest flex items-center gap-1 disabled:opacity-50"
                             >
                               <Check className="w-3 h-3" />
                               Marcar como lida
@@ -173,16 +173,16 @@ export const NotificationBell = () => {
                 </div>
               ) : (
                 <div className="p-12 flex flex-col items-center justify-center text-center">
-                  <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-3">
-                    <Bell className="w-6 h-6 text-slate-600" />
+                  <div className="w-12 h-12 bg-app-surface-2 rounded-full flex items-center justify-center mb-3">
+                    <Bell className="w-6 h-6 text-app-muted" />
                   </div>
-                  <p className="text-slate-500 text-sm">Tudo em dia por aqui!</p>
+                  <p className="text-app-muted text-sm">Tudo em dia por aqui!</p>
                 </div>
               )}
             </div>
 
-            <div className="p-3 bg-white/[0.02] border-t border-white/5 text-center">
-               <button className="text-[10px] font-bold text-slate-500 hover:text-white uppercase tracking-widest transition-colors">
+            <div className="p-3 bg-white/[0.02] border-t border-app-border text-center">
+               <button className="text-[10px] font-bold text-app-muted hover:text-app-ink uppercase tracking-widest transition-colors">
                  Ver histórico completo
                </button>
             </div>

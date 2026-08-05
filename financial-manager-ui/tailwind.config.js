@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['var(--font-display)'],
+      },
       colors: {
         'app-bg': 'var(--bg)',
         'app-surface': 'var(--surface)',

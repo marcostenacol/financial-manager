@@ -71,6 +71,11 @@ export function useOrganizations() {
     await api.delete(`/organizations/${organizationId}/members/${userId}`);
   }, []);
 
+  const transferOwnership = useCallback(async (organizationId: string, userId: string) => {
+    const response = await api.patch(`/organizations/${organizationId}/transfer-ownership`, { user_id: userId });
+    return response.data.data as Member;
+  }, []);
+
   const loadInvites = useCallback(async (organizationId: string) => {
     const response = await api.get(`/organizations/${organizationId}/invites`);
     return response.data.data as Invite[];
@@ -86,6 +91,14 @@ export function useOrganizations() {
     return response.data.data as Invite;
   }, []);
 
+  const deleteInvite = useCallback(async (organizationId: string, inviteId: string) => {
+    await api.delete(`/organizations/${organizationId}/invites/${inviteId}`);
+  }, []);
+
+  const deleteOrganization = useCallback(async (organizationId: string) => {
+    await api.delete(`/organizations/${organizationId}`);
+  }, []);
+
   const loadInviteRedemptions = useCallback(async (organizationId: string, inviteId: string) => {
     const response = await api.get(`/organizations/${organizationId}/invites/${inviteId}/redemptions`);
     return response.data.data as InviteRedemption[];
@@ -99,9 +112,12 @@ export function useOrganizations() {
     redeemInvite,
     loadMembers,
     removeMember,
+    transferOwnership,
     loadInvites,
     createInvite,
     revokeInvite,
+    deleteInvite,
+    deleteOrganization,
     loadInviteRedemptions,
   };
 }

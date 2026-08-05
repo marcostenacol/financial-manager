@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../hooks/useWallets';
+import { useOrganizations } from '../../organizations/hooks/useOrganizations';
 import { useScope } from '../../../contexts/useScope';
+import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
@@ -14,9 +16,9 @@ interface CreateWalletModalProps {
 }
 
 const WALLET_TYPES = [
-  { id: 'checking', label: 'Conta Corrente', icon: WalletIcon, color: 'text-blue-400' },
+  { id: 'checking', label: 'Conta Corrente', icon: WalletIcon, color: 'text-app-accent' },
   { id: 'savings', label: 'Poupança', icon: Banknote, color: 'text-emerald-400' },
-  { id: 'credit', label: 'Cartão de Crédito', icon: CreditCard, color: 'text-purple-400' },
+  { id: 'credit', label: 'Cartão de Crédito', icon: CreditCard, color: 'text-app-accent' },
   { id: 'investment', label: 'Investimento', icon: Landmark, color: 'text-amber-400' },
   { id: 'cash', label: 'Dinheiro em Espécie', icon: Coins, color: 'text-orange-400' },
 ];
@@ -24,11 +26,26 @@ const WALLET_TYPES = [
 export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletModalProps) => {
   const { showToast } = useToast();
   const { createWallet } = useWallets();
+  const { organizations, loadOrganizations } = useOrganizations();
   const { scope } = useScope();
+  const { activeOrganizationId } = useActiveOrganization();
   const [name, setName] = useState('');
   const [type, setType] = useState('checking');
   const [balance, setBalance] = useState(0);
+  const [organizationId, setOrganizationId] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadOrganizations().catch(() => {});
+      // Só pré-seleciona a organização ativa quando o formulário está no escopo empresarial —
+      // senão o valor fica "preso" no estado e é enviado no submit mesmo com o seletor de
+      // organização escondido (escopo pessoal), criando uma carteira empresarial por engano.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOrganizationId(scope === 'business' ? (activeOrganizationId ?? '') : '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, scope]);
 
   if (!isOpen) return null;
 
@@ -43,6 +60,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
         scope,
         balance,
         currency: 'BRL',
+        organization_id: scope === 'business' && organizationId ? organizationId : undefined,
       });
       onSuccess();
       onClose();
@@ -50,6 +68,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       setName('');
       setType('checking');
       setBalance(0);
+      setOrganizationId('');
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao criar carteira'), 'error');
     } finally {
@@ -71,30 +90,30 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-lg bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
-        <div className="p-6 border-b border-white/5 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">Nova Carteira</h2>
-          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400">
+        <div className="p-6 border-b border-app-border flex justify-between items-center">
+          <h2 className="text-xl font-bold text-app-ink">Nova Carteira</h2>
+          <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-400 ml-1">Nome da Carteira</label>
+            <label className="text-sm font-medium text-app-muted ml-1">Nome da Carteira</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: Nubank Principal"
-              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+              className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-400 ml-1">Tipo de Conta</label>
+            <label className="text-sm font-medium text-app-muted ml-1">Tipo de Conta</label>
             <div className="grid grid-cols-2 gap-3">
               {WALLET_TYPES.map((wType) => (
                 <button
@@ -103,8 +122,8 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
                   onClick={() => setType(wType.id)}
                   className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
                     type === wType.id 
-                      ? 'bg-blue-600/20 border-blue-600 text-white' 
-                      : 'bg-white/5 border-white/10 text-slate-500 hover:bg-white/10'
+                      ? 'bg-app-accent/20 border-app-accent text-app-ink' 
+                      : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                   }`}
                 >
                   <wType.icon className={`w-5 h-5 ${type === wType.id ? wType.color : ''}`} />
@@ -114,15 +133,31 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
             </div>
           </div>
 
+          {scope === 'business' && organizations.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-app-muted ml-1">Organização</label>
+              <select
+                value={organizationId}
+                onChange={(e) => setOrganizationId(e.target.value)}
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
+              >
+                <option value="" className="bg-app-surface">Só minha (não compartilhada)</option>
+                {organizations.map((organization) => (
+                  <option key={organization.id} value={organization.id} className="bg-app-surface">{organization.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-400 ml-1">Saldo Inicial</label>
+            <label className="text-sm font-medium text-app-muted ml-1">Saldo Inicial</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-lg">R$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted font-bold text-lg">R$</span>
               <CurrencyInput
                 required
                 value={balance}
                 onChange={setBalance}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-xl font-mono"
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all text-xl ledger-figure"
               />
             </div>
           </div>
@@ -130,10 +165,10 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
+            className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-4 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
           >
             {loading ? (
-              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-app-accent/40 border-t-white rounded-full animate-spin" />
             ) : (
               <>
                 <Save className="w-5 h-5" />

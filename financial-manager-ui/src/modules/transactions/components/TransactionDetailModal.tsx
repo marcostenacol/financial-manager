@@ -40,21 +40,21 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDu
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-lg bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
-        <div className="p-6 border-b border-white/5 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">Detalhes da Transação</h2>
+        <div className="p-6 border-b border-app-border flex justify-between items-center">
+          <h2 className="text-xl font-bold text-app-ink">Detalhes da Transação</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={onEdit}
-              className="p-2 hover:bg-blue-500/10 rounded-xl transition-colors text-blue-400"
+              className="p-2 hover:bg-app-accent-soft rounded-xl transition-colors text-app-accent"
               title="Editar Transação"
             >
               <Pencil className="w-5 h-5" />
             </button>
             <button
               onClick={onDuplicate}
-              className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400 hover:text-white"
+              className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted hover:text-app-ink"
               title="Duplicar Transação"
             >
               <Copy className="w-5 h-5" />
@@ -67,7 +67,7 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDu
             >
               <Trash2 className="w-5 h-5" />
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400">
+            <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -83,32 +83,32 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDu
               )}
             </div>
             <div>
-              <p className="text-slate-400 text-sm">{transaction.description}</p>
-              <p className={`text-2xl font-bold font-mono ${isIncome ? 'text-emerald-400' : 'text-red-400'}`}>
+              <p className="text-app-muted text-sm">{transaction.description}</p>
+              <p className={`ledger-figure text-3xl ${isIncome ? 'text-app-success' : 'text-app-danger'}`}>
                 {isIncome ? '+' : '-'} {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(transaction.amount))}
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4">
-            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
-              <Calendar className="w-5 h-5 text-slate-500" />
-              <span className="text-white">
+            <div className="flex items-center gap-3 bg-app-surface-2 border border-app-border rounded-2xl p-4">
+              <Calendar className="w-5 h-5 text-app-muted" />
+              <span className="text-app-ink">
                 {new Date(transaction.occurredAt).toLocaleDateString('pt-BR')}
               </span>
             </div>
 
             {transaction.wallet && (
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
-                <WalletIcon className="w-5 h-5 text-slate-500" />
-                <span className="text-white">{transaction.wallet.name}</span>
+              <div className="flex items-center gap-3 bg-app-surface-2 border border-app-border rounded-2xl p-4">
+                <WalletIcon className="w-5 h-5 text-app-muted" />
+                <span className="text-app-ink">{transaction.wallet.name}</span>
               </div>
             )}
 
             {transaction.category && (
-              <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
-                <Tag className="w-5 h-5 text-slate-500" />
-                <span className="text-white">{transaction.category.name}</span>
+              <div className="flex items-center gap-3 bg-app-surface-2 border border-app-border rounded-2xl p-4">
+                <Tag className="w-5 h-5 text-app-muted" />
+                <span className="text-app-ink">{transaction.category.name}</span>
               </div>
             )}
           </div>

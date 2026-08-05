@@ -18,7 +18,7 @@ import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-white">Carregando...</div>;
+  if (loading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center text-app-ink">Carregando...</div>;
   if (!user) return <Navigate to="/login" />;
 
   return <DefaultLayout>{children}</DefaultLayout>;

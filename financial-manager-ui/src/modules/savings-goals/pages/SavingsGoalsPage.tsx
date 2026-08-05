@@ -68,20 +68,20 @@ export const SavingsGoalsPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">Metas de Economia</h1>
-          <p className="text-slate-400">Poupe dinheiro para seus grandes objetivos</p>
+          <h1 className="ledger-title text-4xl text-app-ink">Metas de Economia</h1>
+          <p className="text-app-muted">Poupe dinheiro para seus grandes objetivos</p>
         </div>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+            className="bg-app-accent hover:opacity-90 text-app-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-5 h-5" />
             Nova Meta
           </button>
           <button
             onClick={() => setIsClearAllModalOpen(true)}
-            className="bg-white/5 hover:bg-red-500/10 text-white hover:text-red-400 p-3 rounded-2xl border border-white/10 transition-all active:scale-95"
+            className="bg-app-surface-2 hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95"
             title="Limpar todas as metas"
           >
             <Trash2 className="w-5 h-5" />
@@ -92,7 +92,7 @@ export const SavingsGoalsPage = () => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-64 bg-white/5 border border-white/10 rounded-3xl animate-pulse" />
+            <div key={i} className="h-64 bg-app-surface-2 border border-app-border rounded-3xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -105,7 +105,7 @@ export const SavingsGoalsPage = () => {
                   key={goal.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl hover:bg-white/[0.07] transition-all group"
+                  className="bg-app-surface-2 backdrop-blur-xl border border-app-border p-6 rounded-3xl hover:bg-white/[0.07] transition-all group"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div 
@@ -117,36 +117,36 @@ export const SavingsGoalsPage = () => {
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={() => handleEdit(goal)}
-                        className="p-2 text-slate-500 hover:text-white transition-colors"
+                        className="p-2 text-app-muted hover:text-app-ink transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(goal.id)}
                         disabled={pendingIds.has(goal.id)}
-                        className="p-2 text-slate-500 hover:text-red-400 transition-colors disabled:opacity-50"
+                        className="p-2 text-app-muted hover:text-red-400 transition-colors disabled:opacity-50"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
 
-                  <h3 className="text-white font-bold text-xl mb-1">{goal.name}</h3>
-                  <div className="flex items-center gap-2 text-slate-400 text-sm mb-6">
+                  <h3 className="text-app-ink font-bold text-xl mb-1">{goal.name}</h3>
+                  <div className="flex items-center gap-2 text-app-muted text-sm mb-6">
                     <TrendingUp className="w-4 h-4" />
                     <span>{progress}% concluído</span>
                   </div>
 
                   <div className="space-y-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-500">Progresso</span>
-                      <span className="text-white font-bold">
+                      <span className="text-app-muted">Progresso</span>
+                      <span className="text-app-ink font-bold">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.currentAmount)}
-                        <span className="text-slate-500 font-normal"> / {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount)}</span>
+                        <span className="text-app-muted font-normal"> / {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount)}</span>
                       </span>
                     </div>
 
-                    <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-3 bg-app-surface-2 rounded-full overflow-hidden">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
@@ -156,7 +156,7 @@ export const SavingsGoalsPage = () => {
                     </div>
 
                     {goal.deadline && (
-                      <div className="flex items-center gap-2 text-xs text-slate-500 pt-2">
+                      <div className="flex items-center gap-2 text-xs text-app-muted pt-2">
                         <Calendar className="w-3.5 h-3.5" />
                         <span>Meta para: {new Date(goal.deadline).toLocaleDateString('pt-BR')}</span>
                       </div>
@@ -169,11 +169,11 @@ export const SavingsGoalsPage = () => {
 
           {goals.length === 0 && !loading && (
             <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
-              <div className="p-4 bg-white/5 rounded-full mb-4">
-                <Target className="w-12 h-12 text-slate-600" />
+              <div className="p-4 bg-app-surface-2 rounded-full mb-4">
+                <Target className="w-12 h-12 text-app-muted" />
               </div>
-              <h3 className="text-white font-bold text-lg">Nenhuma meta definida</h3>
-              <p className="text-slate-500 mt-1">Defina objetivos financeiros para te ajudar a poupar.</p>
+              <h3 className="text-app-ink font-bold text-lg">Nenhuma meta definida</h3>
+              <p className="text-app-muted mt-1">Defina objetivos financeiros para te ajudar a poupar.</p>
             </div>
           )}
         </div>

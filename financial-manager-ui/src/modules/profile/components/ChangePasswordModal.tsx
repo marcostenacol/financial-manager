@@ -62,56 +62,56 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative w-full max-w-md bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          className="relative w-full max-w-md bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
-          <div className="p-6 border-b border-white/5 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Trocar Senha</h2>
-            <button onClick={handleClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400">
+          <div className="p-6 border-b border-app-border flex justify-between items-center">
+            <h2 className="text-xl font-bold text-app-ink">Trocar Senha</h2>
+            <button onClick={handleClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400 ml-1">Senha Atual</label>
+              <label className="text-sm font-medium text-app-muted ml-1">Senha Atual</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
                   type="password"
                   required
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400 ml-1">Nova Senha</label>
+              <label className="text-sm font-medium text-app-muted ml-1">Nova Senha</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
                   type="password"
                   required
                   minLength={6}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400 ml-1">Confirmar Nova Senha</label>
+              <label className="text-sm font-medium text-app-muted ml-1">Confirmar Nova Senha</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
                   type="password"
                   required
                   minLength={6}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
                 />
               </div>
             </div>
@@ -119,10 +119,10 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
+              className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-4 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
             >
               {loading ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-app-accent/40 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <Save className="w-5 h-5" />

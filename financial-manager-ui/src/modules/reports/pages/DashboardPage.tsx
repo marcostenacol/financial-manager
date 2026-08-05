@@ -5,7 +5,10 @@ import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChar
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useReports, type DashboardOverview, type ExpenseByCategory, type MonthlyEvolution, type CashFlowByCostCenter } from '../hooks/useReports';
 import { useSavingsGoals } from '../../savings-goals/hooks/useSavingsGoals';
+import { useOrganizations } from '../../organizations/hooks/useOrganizations';
+import { OrganizationFilterSelect } from '../../organizations/components/OrganizationFilterSelect';
 import { useScope } from '../../../contexts/useScope';
+import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
@@ -23,7 +26,10 @@ export const DashboardPage = () => {
   const { showToast } = useToast();
   const { getOverview, getExpensesByCategory, getMonthlyEvolution, getCashFlowByCostCenter, exportReport } = useReports();
   const { goals: allGoals, loadGoals } = useSavingsGoals();
+  const { organizations, loadOrganizations } = useOrganizations();
   const { scope } = useScope();
+  const { activeOrganizationId } = useActiveOrganization();
+  const organizationId = scope === 'business' ? (activeOrganizationId ?? undefined) : undefined;
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [expensesByCategory, setExpensesByCategory] = useState<ExpenseByCategory[]>([]);
   const [evolution, setEvolution] = useState<MonthlyEvolution[]>([]);
@@ -43,10 +49,10 @@ export const DashboardPage = () => {
       };
 
       const [overviewData, expensesData, evolutionData] = await Promise.all([
-        getOverview(range, scope),
-        getExpensesByCategory(),
-        getMonthlyEvolution(),
-        scope === 'personal' ? loadGoals() : getCashFlowByCostCenter().then(setCashFlowByCostCenter),
+        getOverview(range, scope, organizationId),
+        getExpensesByCategory(organizationId),
+        getMonthlyEvolution(organizationId),
+        scope === 'personal' ? loadGoals() : getCashFlowByCostCenter(organizationId).then(setCashFlowByCostCenter),
       ]);
       setOverview(overviewData);
       setExpensesByCategory(expensesData);
@@ -61,8 +67,9 @@ export const DashboardPage = () => {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadDashboardData();
+    loadOrganizations().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [start_date, end_date, scope]);
+  }, [start_date, end_date, scope, activeOrganizationId]);
 
   const handlePresetChange = (preset: string) => {
     setActivePreset(preset);
@@ -127,9 +134,11 @@ export const DashboardPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-app-ink">Dashboard</h1>
+          <h1 className="ledger-title text-4xl text-app-ink">Dashboard</h1>
           <p className="text-app-muted">Bem-vindo de volta! Aqui está o resumo das suas finanças.</p>
         </div>
+
+        {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
 
         <div className="flex flex-wrap bg-app-surface p-1 rounded-2xl border border-app-border">
           {[
@@ -143,7 +152,7 @@ export const DashboardPage = () => {
               onClick={() => handlePresetChange(preset.id)}
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
                 active_preset === preset.id
-                  ? 'bg-app-accent text-app-accent-ink shadow-lg shadow-blue-600/20'
+                  ? 'bg-app-accent text-app-accent-ink shadow-lg shadow-app-card'
                   : 'text-app-muted hover:text-app-ink'
               }`}
             >
@@ -177,21 +186,21 @@ export const DashboardPage = () => {
           className="flex flex-wrap gap-4 mb-8 p-4 bg-app-surface border border-app-border rounded-2xl items-end"
         >
           <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500 ml-1">Início</label>
+            <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted ml-1">Início</label>
             <input 
               type="date" 
               value={start_date}
               onChange={(e) => setStartDate(e.target.value)}
-              className="bg-slate-800 border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              className="bg-app-surface-2 border border-app-border rounded-xl px-4 py-2 text-app-ink text-sm focus:outline-none focus:ring-2 focus:ring-app-accent/50"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-widest font-bold text-slate-500 ml-1">Fim</label>
+            <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted ml-1">Fim</label>
             <input 
               type="date" 
               value={end_date}
               onChange={(e) => setEndDate(e.target.value)}
-              className="bg-slate-800 border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              className="bg-app-surface-2 border border-app-border rounded-xl px-4 py-2 text-app-ink text-sm focus:outline-none focus:ring-2 focus:ring-app-accent/50"
             />
           </div>
         </motion.div>
@@ -202,16 +211,16 @@ export const DashboardPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl shadow-app-card relative overflow-hidden group"
+          className="bg-gradient-to-br from-app-accent to-app-accent p-6 rounded-3xl shadow-app-card relative overflow-hidden group"
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
             <Wallet className="w-24 h-24" />
           </div>
-          <p className="text-blue-100 font-medium mb-1">Saldo Total</p>
-          <h2 className="text-3xl font-bold text-white">
+          <p className="text-app-accent-ink font-medium mb-1">Saldo Total</p>
+          <h2 className="ledger-figure text-4xl text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.total_balance || 0)}
           </h2>
-          <div className="mt-4 flex items-center gap-2 text-blue-100/80 text-sm">
+          <div className="mt-4 flex items-center gap-2 text-app-accent-ink/80 text-sm">
             <Activity className="w-4 h-4" />
             <span>Atualizado agora</span>
           </div>
@@ -229,16 +238,16 @@ export const DashboardPage = () => {
               <TrendingUp className="w-6 h-6" />
             </div>
             {overview && (
-              <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-lg ${
-                calculateChange(overview.monthly_income, overview.last_month_income) >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+              <span className={`ledger-stamp ${
+                calculateChange(overview.monthly_income, overview.last_month_income) >= 0 ? 'text-app-success' : 'text-app-danger'
               }`}>
                 {calculateChange(overview.monthly_income, overview.last_month_income) >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                 {Math.abs(calculateChange(overview.monthly_income, overview.last_month_income)).toFixed(1)}%
               </span>
             )}
           </div>
-          <p className="text-slate-400 font-medium mb-1">Receitas do Mês</p>
-          <h2 className="text-2xl font-bold text-white">
+          <p className="text-app-muted font-medium mb-1">Receitas do Mês</p>
+          <h2 className="ledger-figure text-3xl text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.monthly_income || 0)}
           </h2>
         </motion.div>
@@ -255,16 +264,16 @@ export const DashboardPage = () => {
               <TrendingDown className="w-6 h-6" />
             </div>
             {overview && (
-              <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-lg ${
-                calculateChange(overview.monthly_expense, overview.last_month_expense) <= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
+              <span className={`ledger-stamp ${
+                calculateChange(overview.monthly_expense, overview.last_month_expense) <= 0 ? 'text-app-success' : 'text-app-danger'
               }`}>
                 {calculateChange(overview.monthly_expense, overview.last_month_expense) >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                 {Math.abs(calculateChange(overview.monthly_expense, overview.last_month_expense)).toFixed(1)}%
               </span>
             )}
           </div>
-          <p className="text-slate-400 font-medium mb-1">Despesas do Mês</p>
-          <h2 className="text-2xl font-bold text-white">
+          <p className="text-app-muted font-medium mb-1">Despesas do Mês</p>
+          <h2 className="ledger-figure text-3xl text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.monthly_expense || 0)}
           </h2>
         </motion.div>
@@ -276,11 +285,11 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="ledger-rules bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <PieChart className="w-5 h-5 text-purple-400" />
+            <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
+              <PieChart className="w-5 h-5 text-app-accent" />
               Gastos por Categoria
             </h3>
           </div>
@@ -289,13 +298,13 @@ export const DashboardPage = () => {
             {expensesByCategory.map((item, index) => (
               <div key={item.category_name} className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white font-medium">{item.category_name}</span>
-                  <span className="text-slate-400 font-mono">
+                  <span className="text-app-ink font-medium">{item.category_name}</span>
+                  <span className="ledger-figure text-app-muted">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.total)}
-                    <span className="ml-2 text-slate-500 text-xs">({item.percentage}%)</span>
+                    <span className="ml-2 text-app-muted text-xs">({item.percentage}%)</span>
                   </span>
                 </div>
-                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-app-surface-2 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${item.percentage}%` }}
@@ -308,7 +317,7 @@ export const DashboardPage = () => {
             ))}
             
             {expensesByCategory.length === 0 && (
-              <div className="text-center py-12 text-slate-500">
+              <div className="text-center py-12 text-app-muted">
                 Sem despesas registradas este mês.
               </div>
             )}
@@ -320,11 +329,11 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="ledger-rules bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-400" />
+            <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-app-accent" />
               Evolução Mensal
             </h3>
           </div>
@@ -397,14 +406,14 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="ledger-rules mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
               <Target className="w-5 h-5 text-emerald-400" />
               Progresso das Metas
             </h3>
-            <Link to="/savings-goals" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+            <Link to="/savings-goals" className="text-app-accent hover:opacity-80 text-sm font-medium transition-colors">
               Ver todas as metas
             </Link>
           </div>
@@ -416,12 +425,12 @@ export const DashboardPage = () => {
                 <div key={goal.id} className="space-y-4">
                   <div className="flex justify-between items-end">
                     <div>
-                      <p className="text-white font-bold">{goal.name}</p>
-                      <p className="text-slate-500 text-xs">Faltam {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount - goal.currentAmount)}</p>
+                      <p className="text-app-ink font-bold">{goal.name}</p>
+                      <p className="text-app-muted text-xs">Faltam {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount - goal.currentAmount)}</p>
                     </div>
-                    <span className="text-white font-bold text-lg">{progress}%</span>
+                    <span className="text-app-ink font-bold text-lg">{progress}%</span>
                   </div>
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-app-surface-2 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
@@ -435,7 +444,7 @@ export const DashboardPage = () => {
             })}
 
             {goals.length === 0 && (
-              <div className="col-span-full text-center py-4 text-slate-500">
+              <div className="col-span-full text-center py-4 text-app-muted">
                 Você ainda não definiu metas de economia.
               </div>
             )}
@@ -446,14 +455,14 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="ledger-rules mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-amber-400" />
               Fluxo de Caixa por Centro de Custo
             </h3>
-            <Link to="/cost-centers" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+            <Link to="/cost-centers" className="text-app-accent hover:opacity-80 text-sm font-medium transition-colors">
               Gerenciar centros de custo
             </Link>
           </div>
@@ -462,13 +471,13 @@ export const DashboardPage = () => {
             {cashFlowByCostCenter.map((item, index) => (
               <div key={item.cost_center_name} className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white font-medium">{item.cost_center_name}</span>
-                  <span className="text-slate-400 font-mono">
+                  <span className="text-app-ink font-medium">{item.cost_center_name}</span>
+                  <span className="ledger-figure text-app-muted">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.total)}
-                    <span className="ml-2 text-slate-500 text-xs">({item.percentage}%)</span>
+                    <span className="ml-2 text-app-muted text-xs">({item.percentage}%)</span>
                   </span>
                 </div>
-                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-app-surface-2 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${item.percentage}%` }}
@@ -481,7 +490,7 @@ export const DashboardPage = () => {
             ))}
 
             {cashFlowByCostCenter.length === 0 && (
-              <div className="text-center py-12 text-slate-500">
+              <div className="text-center py-12 text-app-muted">
                 Sem despesas por centro de custo este mês.
               </div>
             )}

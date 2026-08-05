@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Briefcase, Trash2 } from 'lucide-react';
 import { useCostCenters } from '../hooks/useCostCenters';
+import { useOrganizations } from '../../organizations/hooks/useOrganizations';
+import { OrganizationFilterSelect } from '../../organizations/components/OrganizationFilterSelect';
+import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
@@ -13,15 +16,20 @@ const PREDEFINED_COLORS = [
 export const CostCentersPage = () => {
   const { showToast } = useToast();
   const { costCenters, loading, loadCostCenters, createCostCenter, deleteCostCenter } = useCostCenters();
+  const { organizations, loadOrganizations } = useOrganizations();
+  const { activeOrganizationId } = useActiveOrganization();
+  const visibleCostCenters = costCenters.filter((costCenter) => costCenter.organizationId === activeOrganizationId);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [name, setName] = useState('');
   const [color, setColor] = useState(PREDEFINED_COLORS[0]);
+  const [organizationId, setOrganizationId] = useState(activeOrganizationId ?? '');
   const [submitting, setSubmitting] = useState(false);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
 
     loadCostCenters().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar centros de custo'), 'error'));
+    loadOrganizations().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -29,7 +37,7 @@ export const CostCentersPage = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await createCostCenter({ name, color });
+      await createCostCenter({ name, color, organization_id: organizationId || undefined });
       await loadCostCenters();
       setName('');
       setColor(PREDEFINED_COLORS[0]);
@@ -63,16 +71,19 @@ export const CostCentersPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-app-ink">Centros de Custo</h1>
+          <h1 className="ledger-title text-4xl text-app-ink">Centros de Custo</h1>
           <p className="text-app-muted">Organize o fluxo de caixa empresarial por área</p>
         </div>
-        <button
-          onClick={() => setIsFormOpen((v) => !v)}
-          className="bg-app-accent hover:opacity-90 text-app-accent-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
-        >
-          <Plus className="w-5 h-5" />
-          Novo Centro de Custo
-        </button>
+        <div className="flex flex-wrap items-center gap-4">
+          <OrganizationFilterSelect organizations={organizations} />
+          <button
+            onClick={() => setIsFormOpen((v) => !v)}
+            className="bg-app-accent hover:opacity-90 text-app-accent-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
+          >
+            <Plus className="w-5 h-5" />
+            Novo Centro de Custo
+          </button>
+        </div>
       </div>
 
       {isFormOpen && (
@@ -83,8 +94,20 @@ export const CostCentersPage = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Marketing, Operações..."
-            className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50"
           />
+          {organizations.length > 0 && (
+            <select
+              value={organizationId}
+              onChange={(e) => setOrganizationId(e.target.value)}
+              className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 appearance-none"
+            >
+              <option value="" className="bg-app-surface">Só meu (não compartilhado)</option>
+              {organizations.map((organization) => (
+                <option key={organization.id} value={organization.id} className="bg-app-surface">{organization.name}</option>
+              ))}
+            </select>
+          )}
           <div className="flex flex-wrap gap-3">
             {PREDEFINED_COLORS.map((c) => (
               <button
@@ -99,7 +122,7 @@ export const CostCentersPage = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-2xl disabled:opacity-50"
+            className="bg-app-accent hover:opacity-90 text-app-ink font-bold px-6 py-3 rounded-2xl disabled:opacity-50"
           >
             {submitting ? 'Salvando...' : 'Salvar'}
           </button>
@@ -110,18 +133,18 @@ export const CostCentersPage = () => {
         {loading ? (
           <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-white/5 rounded-2xl animate-pulse" />
+              <div key={i} className="h-20 bg-app-surface-2 rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : (
           <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <AnimatePresence>
-              {costCenters.map((costCenter) => (
+              {visibleCostCenters.map((costCenter) => (
                 <motion.div
                   key={costCenter.id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="group relative bg-white/5 border border-white/10 p-5 rounded-2xl hover:bg-white/[0.08] transition-all"
+                  className="group relative bg-app-surface-2 border border-app-border p-5 rounded-2xl hover:bg-white/[0.08] transition-all"
                 >
                   <div className="flex items-center gap-4">
                     <div
@@ -136,7 +159,7 @@ export const CostCentersPage = () => {
                     <button
                       onClick={() => handleDelete(costCenter.id)}
                       disabled={pendingIds.has(costCenter.id)}
-                      className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-slate-500 hover:text-red-400 disabled:opacity-50"
+                      className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-app-muted hover:text-red-400 disabled:opacity-50"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -145,10 +168,10 @@ export const CostCentersPage = () => {
               ))}
             </AnimatePresence>
 
-            {costCenters.length === 0 && !loading && (
+            {visibleCostCenters.length === 0 && !loading && (
               <div className="col-span-full py-20 flex flex-col items-center justify-center text-center">
-                <div className="p-4 bg-white/5 rounded-full mb-4">
-                  <Briefcase className="w-12 h-12 text-slate-600" />
+                <div className="p-4 bg-app-surface-2 rounded-full mb-4">
+                  <Briefcase className="w-12 h-12 text-app-muted" />
                 </div>
                 <h3 className="text-app-ink font-bold text-lg">Nenhum centro de custo</h3>
                 <p className="text-app-muted mt-1">Crie centros de custo para organizar o fluxo empresarial.</p>

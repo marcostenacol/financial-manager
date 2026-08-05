@@ -1,90 +1,71 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Save, RefreshCw, Calendar, Wallet as WalletIcon, Tag, Clock, FileText } from 'lucide-react';
-import { useWallets } from '../../wallets/hooks/useWallets';
+import { X, Save, RefreshCw, Clock, Tag, FileText, Calendar } from 'lucide-react';
 import { useCategories } from '../../categories/hooks/useCategories';
-import { useRecurrences } from '../hooks/useRecurrences';
+import { useRecurrences, type Recurrence } from '../hooks/useRecurrences';
 import { useScope } from '../../../contexts/useScope';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
-interface CreateRecurrenceModalProps {
+interface UpdateRecurrenceModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  recurrence: Recurrence | null;
 }
 
-export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecurrenceModalProps) => {
+export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }: UpdateRecurrenceModalProps) => {
   const { showToast } = useToast();
   const { scope } = useScope();
-  const { wallets, loadWallets } = useWallets(scope);
   const { categories, loadCategories } = useCategories(scope);
-  const { createRecurrence, runRecurrenceNow } = useRecurrences();
+  const { updateRecurrence } = useRecurrences();
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(0);
   const [type, setType] = useState<'income' | 'expense'>('expense');
-  const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('monthly');
-  const [startsAt, setStartsAt] = useState(new Date().toISOString().split('T')[0]);
-
+  const [endsAt, setEndsAt] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const loadData = async () => {
-    try {
-      const [loadedWallets, loadedCategories] = await Promise.all([loadWallets(), loadCategories()]);
-
-      if (loadedWallets.length > 0) setWalletId(loadedWallets[0].id);
-      if (loadedCategories.length > 0) setCategoryId(loadedCategories[0].id);
-    } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao carregar dados'), 'error');
-    }
-  };
-
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && recurrence) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      loadData();
+      setDescription(recurrence.description);
+      setAmount(Number(recurrence.amount));
+      setType(recurrence.type);
+      setPeriod(recurrence.period);
+      setEndsAt(recurrence.endsAt ? recurrence.endsAt.split('T')[0] : '');
+      loadCategories().catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, recurrence]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!recurrence) return;
     setLoading(true);
 
     try {
-      const recurrence = await createRecurrence({
+      await updateRecurrence(recurrence.id, {
         description,
         amount,
         type,
-        wallet_id: walletId,
-        category_id: categoryId,
+        ...(categoryId && { category_id: categoryId }),
         period,
-        starts_at: new Date(startsAt).toISOString(),
+        ends_at: endsAt ? new Date(endsAt).toISOString() : null,
       });
 
       onSuccess();
       onClose();
-
-      if (window.confirm('Recorrência criada! Deseja lançar a ocorrência deste ciclo agora, em vez de esperar o próximo processamento automático?')) {
-        try {
-          await runRecurrenceNow(recurrence.id);
-          showToast('Ocorrência lançada com sucesso', 'success');
-          onSuccess();
-        } catch (err) {
-          showToast(getErrorMessage(err, 'Erro ao lançar a ocorrência'), 'error');
-        }
-      }
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao criar recorrência'), 'error');
+      showToast(getErrorMessage(err, 'Erro ao atualizar recorrência'), 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !recurrence) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -95,7 +76,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
         onClick={onClose}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
-      
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -104,7 +85,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
         <div className="p-6 border-b border-app-border flex justify-between items-center bg-app-surface sticky top-0 z-10">
           <h2 className="text-xl font-bold text-app-ink flex items-center gap-2">
             <RefreshCw className="w-5 h-5 text-app-accent" />
-            Nova Recorrência
+            Editar Recorrência
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
@@ -112,7 +93,6 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          {/* Tipo de Recorrência */}
           <div className="flex p-1 bg-app-surface-2 border border-app-border rounded-2xl">
             <button
               type="button"
@@ -146,7 +126,6 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Ex: Assinatura Netflix..."
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
                 />
               </div>
@@ -185,55 +164,33 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Data de Início</label>
-              <div className="relative">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
-                <input
-                  type="date"
-                  required
-                  value={startsAt}
-                  onChange={(e) => setStartsAt(e.target.value)}
-                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Carteira</label>
-              <div className="relative">
-                <WalletIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
-                <select
-                  required
-                  value={walletId}
-                  onChange={(e) => setWalletId(e.target.value)}
-                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
-                >
-                  <option value="" disabled className="bg-app-surface">Selecionar Carteira</option>
-                  {wallets.map(w => (
-                    <option key={w.id} value={w.id} className="bg-app-surface">{w.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
               <label className="text-sm font-medium text-app-muted ml-1">Categoria</label>
               <div className="relative">
                 <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <select
-                  required
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
-                  <option value="" disabled className="bg-app-surface">Selecionar Categoria</option>
+                  <option value="" className="bg-app-surface">Manter categoria atual</option>
                   {categories.map(c => (
                     <option key={c.id} value={c.id} className="bg-app-surface">{c.name}</option>
                   ))}
                 </select>
               </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-app-muted ml-1">Data de término (opcional)</label>
+            <div className="relative">
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
+              <input
+                type="date"
+                value={endsAt}
+                onChange={(e) => setEndsAt(e.target.value)}
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
+              />
             </div>
           </div>
 
@@ -247,7 +204,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Salvar Recorrência
+                Salvar Alterações
               </>
             )}
           </button>

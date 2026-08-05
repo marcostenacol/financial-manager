@@ -99,10 +99,10 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative w-full max-w-lg bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
-          <div className="p-6 border-b border-white/5 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Editar Carteira</h2>
+          <div className="p-6 border-b border-app-border flex justify-between items-center">
+            <h2 className="text-xl font-bold text-app-ink">Editar Carteira</h2>
             <div className="flex items-center gap-2">
               <button 
                 onClick={handleDelete}
@@ -111,7 +111,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
               >
                 <Trash2 className="w-5 h-5" />
               </button>
-              <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400">
+              <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -119,19 +119,19 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
 
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400 ml-1">Nome da Carteira</label>
+              <label className="text-sm font-medium text-app-muted ml-1">Nome da Carteira</label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ex: Nubank, Carteira Pessoal..."
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400 ml-1">Tipo de Conta</label>
+              <label className="text-sm font-medium text-app-muted ml-1">Tipo de Conta</label>
               <div className="grid grid-cols-2 gap-3">
                 {WALLET_TYPES.map((wType) => (
                   <button
@@ -140,8 +140,8 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
                     onClick={() => setType(wType.id as 'checking' | 'savings' | 'credit' | 'investment' | 'cash')}
                     className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${
                       type === wType.id 
-                        ? 'bg-blue-600/10 border-blue-600 text-white shadow-lg shadow-blue-600/5' 
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-app-accent/10 border-app-accent text-app-ink shadow-lg shadow-app-card' 
+                        : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                     }`}
                   >
                     {wType.icon}
@@ -152,23 +152,23 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400 ml-1">Saldo Atual (R$)</label>
+              <label className="text-sm font-medium text-app-muted ml-1">Saldo Atual (R$)</label>
               <CurrencyInput
                 required
                 allowNegative
                 value={balance}
                 onChange={setBalance}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-2xl font-bold"
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all text-2xl font-bold"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading || deleting}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
+              className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-4 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
             >
               {loading ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-app-accent/40 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <Save className="w-5 h-5" />

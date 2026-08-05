@@ -98,52 +98,52 @@ export const ProfilePage = () => {
         className="max-w-3xl mx-auto"
       >
         <div className="flex items-center gap-4 mb-8">
-          <div className="p-3 bg-blue-500/20 rounded-2xl border border-blue-500/30">
-            <UserCircle className="w-8 h-8 text-blue-400" />
+          <div className="p-3 bg-app-accent/20 rounded-2xl border border-app-accent/30">
+            <UserCircle className="w-8 h-8 text-app-accent" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-white">Meu Perfil</h1>
-            <p className="text-slate-400">Gerencie suas informações pessoais</p>
+            <h1 className="ledger-title text-4xl text-app-ink">Meu Perfil</h1>
+            <p className="text-app-muted">Gerencie suas informações pessoais</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+          <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-3xl p-8 shadow-2xl">
             {/* Avatar Section */}
             <div className="flex flex-col items-center mb-10">
               <div className="relative group">
-                <div className="w-32 h-32 rounded-full border-2 border-white/10 overflow-hidden bg-slate-900 flex items-center justify-center relative">
+                <div className="w-32 h-32 rounded-full border-2 border-app-border overflow-hidden bg-app-surface flex items-center justify-center relative">
                   {avatar ? (
                     <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <User className="w-12 h-12 text-slate-700" />
+                    <User className="w-12 h-12 text-app-muted" />
                   )}
                   
                   <label className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                    <Camera className="w-6 h-6 text-white mb-1" />
-                    <span className="text-[10px] text-white font-bold uppercase tracking-wider">Alterar</span>
+                    <Camera className="w-6 h-6 text-app-ink mb-1" />
+                    <span className="text-[10px] text-app-ink font-bold uppercase tracking-wider">Alterar</span>
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
                   </label>
                 </div>
                 
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border-4 border-[#0f172a] shadow-lg">
-                  <Camera className="w-3.5 h-3.5 text-white" />
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-app-accent rounded-full flex items-center justify-center border-4 border-[#0f172a] shadow-lg">
+                  <Camera className="w-3.5 h-3.5 text-app-ink" />
                 </div>
               </div>
-              <p className="text-xs text-slate-500 mt-4 uppercase tracking-widest font-bold">Foto do Perfil</p>
+              <p className="text-xs text-app-muted mt-4 uppercase tracking-widest font-bold">Foto do Perfil</p>
             </div>
 
             <div className="space-y-6">
               {/* Nome */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400 ml-1">Nome Completo</label>
+                <label className="text-sm font-medium text-app-muted ml-1">Nome Completo</label>
                 <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 focus:border-app-accent/50 transition-all"
                     placeholder="Seu nome"
                     required
                   />
@@ -152,12 +152,12 @@ export const ProfilePage = () => {
 
               {/* Bio */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400 ml-1">Biografia</label>
+                <label className="text-sm font-medium text-app-muted ml-1">Biografia</label>
                 <div className="relative group">
                   <textarea
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all resize-none h-24"
+                    className="w-full bg-app-surface border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 focus:border-app-accent/50 transition-all resize-none h-24"
                     placeholder="Conte um pouco sobre você..."
                   />
                 </div>
@@ -165,29 +165,29 @@ export const ProfilePage = () => {
 
               {/* E-mail (Read Only) */}
               <div className="space-y-2 opacity-60">
-                <label className="text-sm font-medium text-slate-400 ml-1">E-mail (Não alterável)</label>
+                <label className="text-sm font-medium text-app-muted ml-1">E-mail (Não alterável)</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                   <input
                     type="email"
                     value={user?.email || ''}
                     disabled
-                    className="w-full bg-slate-900/50 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-slate-400 cursor-not-allowed"
+                    className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-muted cursor-not-allowed"
                   />
                 </div>
               </div>
 
               {/* Tipo de Perfil */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400 ml-1">Tipo de Conta</label>
+                <label className="text-sm font-medium text-app-muted ml-1">Tipo de Conta</label>
                 <div className="grid grid-cols-2 gap-4">
                   <button
                     type="button"
                     onClick={() => setType('personal')}
                     className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${
                       type === 'personal' 
-                        ? 'bg-blue-500/20 border-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.2)]' 
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-app-accent/20 border-app-accent text-app-ink shadow-[0_0_20px_rgba(59,130,246,0.2)]' 
+                        : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                     }`}
                   >
                     <User className="w-6 h-6" />
@@ -198,8 +198,8 @@ export const ProfilePage = () => {
                     onClick={() => setType('business')}
                     className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${
                       type === 'business' 
-                        ? 'bg-purple-500/20 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
+                        ? 'bg-app-accent/20 border-app-accent text-app-ink shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
+                        : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                     }`}
                   >
                     <Shield className="w-6 h-6" />
@@ -211,7 +211,7 @@ export const ProfilePage = () => {
               <button
                 type="button"
                 onClick={() => setIsChangePasswordOpen(true)}
-                className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl border border-white/10 text-slate-300 hover:bg-white/5 transition-all font-medium"
+                className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl border border-app-border text-app-ink/80 hover:bg-app-surface-2 transition-all font-medium"
               >
                 <KeyRound className="w-5 h-5" />
                 Trocar Senha
@@ -231,10 +231,10 @@ export const ProfilePage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full mt-8 bg-gradient-to-r from-app-accent to-app-accent hover:from-app-accent hover:to-app-accent text-app-ink font-bold py-4 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
             >
               {loading ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-app-accent/40 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <Save className="w-5 h-5" />
@@ -248,7 +248,7 @@ export const ProfilePage = () => {
         <div className="mt-8 flex justify-center">
           <button
             onClick={signOut}
-            className="text-slate-500 hover:text-red-400 font-medium transition-colors p-2"
+            className="text-app-muted hover:text-red-400 font-medium transition-colors p-2"
           >
             Sair da conta
           </button>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useRegister } from '../hooks/useRegister';
 
@@ -38,39 +38,39 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-[10%] -right-[10%] h-[40%] w-[40%] rounded-full bg-indigo-500/10 blur-[120px]" />
-        <div className="absolute -bottom-[10%] -left-[10%] h-[40%] w-[40%] rounded-full bg-purple-500/10 blur-[120px]" />
-      </div>
-
-      <div className="relative w-full max-w-md space-y-8 rounded-2xl border border-neutral-800 bg-neutral-900/50 p-8 shadow-2xl backdrop-blur-xl">
-        <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500 ring-1 ring-indigo-500/20">
-            <UserPlus size={24} />
+    <div className="flex min-h-screen items-center justify-center bg-app-bg px-4 py-10">
+      <div className="grid w-full max-w-3xl overflow-hidden rounded-2xl border border-app-border shadow-app-card md:grid-cols-[1fr_1.15fr]">
+        <div className="hidden flex-col justify-between border-r border-app-border bg-app-surface-2 p-9 md:flex">
+          <div className="font-display text-2xl text-app-ink">
+            Croesus<span className="text-app-accent">.</span>
           </div>
-          <h2 className="mt-6 text-3xl font-bold tracking-tight text-white">Criar nova conta</h2>
-          <p className="mt-2 text-sm text-neutral-400">
-            Junte-se a nós e organize sua vida financeira
-          </p>
+          <div className="space-y-3 border-t border-app-border pt-5 font-mono text-xs text-app-muted">
+            <p className="text-app-ink">Um livro-caixa simples pra sua vida financeira.</p>
+            <p>Carteiras, transações e metas — tudo num só lugar.</p>
+          </div>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <div className="flex flex-col justify-center gap-6 bg-app-surface p-8 sm:p-10">
+          <div>
+            <h1 className="font-display text-2xl font-medium text-app-ink">Criar nova conta</h1>
+            <p className="mt-1 text-sm text-app-muted">Junte-se a nós e organize sua vida financeira</p>
+          </div>
+
           {error && (
-            <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-500 ring-1 ring-red-500/20">
+            <div className="rounded-md bg-app-danger/10 p-3 text-sm text-app-danger ring-1 ring-app-danger/20">
               {error}
             </div>
           )}
 
-          <div className="space-y-4">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="group relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500 group-focus-within:text-indigo-500 transition-colors">
-                <User size={18} />
+              <div className="absolute inset-y-0 left-0 flex items-center text-app-muted transition-colors group-focus-within:text-app-accent">
+                <User size={17} />
               </div>
               <input
                 type="text"
                 required
-                className="block w-full rounded-lg border border-neutral-800 bg-neutral-900/50 py-3 pl-10 pr-3 text-white placeholder-neutral-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
                 placeholder="Seu nome completo"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -78,13 +78,13 @@ export const RegisterPage = () => {
             </div>
 
             <div className="group relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500 group-focus-within:text-indigo-500 transition-colors">
-                <Mail size={18} />
+              <div className="absolute inset-y-0 left-0 flex items-center text-app-muted transition-colors group-focus-within:text-app-accent">
+                <Mail size={17} />
               </div>
               <input
                 type="email"
                 required
-                className="block w-full rounded-lg border border-neutral-800 bg-neutral-900/50 py-3 pl-10 pr-3 text-white placeholder-neutral-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
                 placeholder="Seu e-mail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -92,13 +92,13 @@ export const RegisterPage = () => {
             </div>
 
             <div className="group relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500 group-focus-within:text-indigo-500 transition-colors">
-                <Lock size={18} />
+              <div className="absolute inset-y-0 left-0 flex items-center text-app-muted transition-colors group-focus-within:text-app-accent">
+                <Lock size={17} />
               </div>
               <input
                 type="password"
                 required
-                className="block w-full rounded-lg border border-neutral-800 bg-neutral-900/50 py-3 pl-10 pr-3 text-white placeholder-neutral-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
                 placeholder="Crie uma senha"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -106,42 +106,35 @@ export const RegisterPage = () => {
             </div>
 
             <div className="group relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500 group-focus-within:text-indigo-500 transition-colors">
-                <Lock size={18} />
+              <div className="absolute inset-y-0 left-0 flex items-center text-app-muted transition-colors group-focus-within:text-app-accent">
+                <Lock size={17} />
               </div>
               <input
                 type="password"
                 required
-                className="block w-full rounded-lg border border-neutral-800 bg-neutral-900/50 py-3 pl-10 pr-3 text-white placeholder-neutral-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
                 placeholder="Confirme sua senha"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="group relative flex w-full justify-center rounded-lg bg-indigo-600 py-3 text-sm font-semibold text-white transition-all hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <Loader2 className="animate-spin" size={20} />
-            ) : (
-              <>
-                Cadastrar
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </>
-            )}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="flex w-full items-center justify-center rounded-sm bg-app-accent py-3 text-sm font-bold uppercase tracking-wide text-app-accent-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Cadastrar'}
+            </button>
+          </form>
 
-        <p className="mt-6 text-center text-sm text-neutral-400">
-          Já tem uma conta?{' '}
-          <Link to="/login" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
-            Faça login
-          </Link>
-        </p>
+          <p className="text-center text-sm text-app-muted">
+            Já tem uma conta?{' '}
+            <Link to="/login" className="font-medium text-app-accent hover:opacity-80 transition-opacity">
+              Faça login
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

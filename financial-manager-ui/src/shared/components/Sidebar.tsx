@@ -62,34 +62,42 @@ export const Sidebar = () => {
 
         <div className="p-6 overflow-y-auto min-h-0 flex-1">
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-blue-500/20 shrink-0">
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-app-card shrink-0">
             <img src="/favicon.svg?v=2" alt="Croesus" className="w-full h-full object-cover" />
           </div>
-          <span className="text-app-ink font-bold text-lg tracking-tight">Croesus</span>
+          <div className="flex flex-col min-w-0">
+            <span className="ledger-title text-app-ink text-xl leading-none">Croesus</span>
+            <span className="text-[9px] uppercase tracking-[0.22em] text-app-muted mt-1">Livro-caixa</span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-white/5 rounded-2xl border border-app-border">
+        <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-app-surface-2 rounded-2xl border border-app-border">
           <button
             onClick={() => setScope('personal')}
-            className={`flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${
+            className={`flex items-center justify-center gap-1 px-1 py-2 rounded-xl text-[11px] font-bold uppercase transition-all ${
               scope === 'personal' ? 'bg-app-accent text-app-accent-ink shadow-app-card' : 'text-app-muted hover:text-app-ink'
             }`}
           >
-            <User className="w-4 h-4" />
-            {t('nav.personal')}
+            <User className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{t('nav.personal')}</span>
           </button>
           <button
             onClick={() => setScope('business')}
-            className={`flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold uppercase tracking-wide transition-all ${
+            className={`flex items-center justify-center gap-1 px-1 py-2 rounded-xl text-[11px] font-bold uppercase transition-all ${
               scope === 'business' ? 'bg-app-accent text-app-accent-ink shadow-app-card' : 'text-app-muted hover:text-app-ink'
             }`}
           >
-            <Briefcase className="w-4 h-4" />
-            {t('nav.business')}
+            <Briefcase className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{t('nav.business')}</span>
           </button>
         </div>
 
-        <nav className="space-y-2">
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-app-muted">Lançamentos</span>
+          <span className="flex-1 h-px bg-app-border" />
+        </div>
+
+        <nav className="space-y-1">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -108,7 +116,7 @@ export const Sidebar = () => {
                 {isActive && (
                   <motion.div
                     layoutId="active-pill"
-                    className="ml-auto w-1.5 h-1.5 bg-white rounded-full shrink-0"
+                    className="ml-auto w-1.5 h-1.5 bg-app-ink rounded-full shrink-0"
                   />
                 )}
               </Link>

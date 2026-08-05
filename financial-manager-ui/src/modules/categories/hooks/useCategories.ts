@@ -8,7 +8,8 @@ export interface Category {
   icon: string | null;
   type: 'income' | 'expense' | 'both';
   scope: 'personal' | 'business' | null;
-  userId?: string;
+  userId?: string | null;
+  organizationId?: string | null;
 }
 
 export interface CreateCategoryInput {
@@ -17,6 +18,7 @@ export interface CreateCategoryInput {
   icon?: string;
   type: 'income' | 'expense' | 'both';
   scope?: 'personal' | 'business';
+  organization_id?: string;
 }
 
 export interface UpdateCategoryInput {

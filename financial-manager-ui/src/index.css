@@ -3,20 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0f172a;
-  --surface: rgba(255, 255, 255, 0.05);
-  --surface-2: rgba(255, 255, 255, 0.1);
-  --ink: 255 255 255;
-  --muted: 148 163 184;
-  --border: rgba(255, 255, 255, 0.1);
-  --accent: 79 179 172;
-  --accent-ink: #0a1615;
-  --accent-soft: rgba(79, 179, 172, 0.15);
-  --success: 74 222 128;
-  --danger: 242 139 116;
+  /* Ledger: fundo verde-tinta quase preto, superfícies levemente mais claras, latão fosco
+     como único acento — evita o roxo/indigo genérico de SaaS e reflete o produto (livro-caixa). */
+  --bg: #12140f;
+  --surface: #191c15;
+  --surface-2: #212418;
+  --ink: 238 232 217;
+  --muted: 141 146 128;
+  --border: rgba(238, 232, 217, 0.1);
+  --accent: 201 162 74;
+  --accent-ink: #14170c;
+  --accent-soft: rgba(201, 162, 74, 0.15);
+  --success: 143 191 138;
+  --danger: 201 122 107;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -10px rgba(0, 0, 0, 0.55);
 
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-display: Georgia, "Iowan Old Style", "Times New Roman", serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -29,18 +32,86 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #eef0f1;
-  --surface: #fff;
-  --surface-2: #f7f8f8;
-  --ink: 20 24 26;
-  --muted: 102 112 119;
-  --border: rgba(20, 24, 26, 0.06);
-  --accent: 15 92 92;
+  --bg: #ece6d8;
+  --surface: #f7f2e6;
+  --surface-2: #efe8d7;
+  --ink: 43 40 32;
+  --muted: 124 117 99;
+  --border: rgba(43, 40, 32, 0.1);
+  --accent: 138 100 42;
   --accent-ink: #fff;
-  --accent-soft: #e4efee;
-  --success: 26 122 76;
-  --danger: 179 64 46;
+  --accent-soft: #e7dcc0;
+  --success: 59 92 59;
+  --danger: 122 59 46;
   --shadow: 0 1px 2px rgba(16, 24, 26, 0.04), 0 8px 24px -8px rgba(16, 24, 26, 0.1);
+}
+
+@layer components {
+  /* Identidade "Ledger": papel pautado, tinta e latão. Devices reutilizáveis —
+     preferir estas classes a estilos inline pontuais em cada página. */
+
+  /* Papel pautado: linhas horizontais finas atrás de listas/painéis.
+     A cor deriva de --ink com opacidade baixa, então funciona nos dois temas. */
+  .ledger-rules {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      rgb(var(--ink) / 0.06) 31px,
+      rgb(var(--ink) / 0.06) 32px
+    );
+  }
+
+  /* Cifras monetárias: serifada + numerais tabulares (colunas alinhadas,
+     como num livro-caixa). Usar em todo valor em dinheiro. */
+  .ledger-figure {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    letter-spacing: -0.01em;
+  }
+
+  /* Título de página / cabeçalho de seção na face serifada. */
+  .ledger-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  /* Rótulo "carimbado a tinta": caixa alta, tracking aberto, moldura fina. */
+  .ledger-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.075rem 0.4rem;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    font-size: 0.625rem;
+    line-height: 1.4;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    opacity: 0.9;
+  }
+
+  /* Item de lançamento: filete inferior + tinta alternada nas linhas pares. */
+  .ledger-item {
+    border-bottom: 1px solid rgb(var(--ink) / 0.08);
+  }
+
+  .ledger-item:nth-child(even) {
+    background-color: rgb(var(--ink) / 0.02);
+  }
+
+  .ledger-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Lombada de livro encadernado: filete duplo em latão na borda esquerda.
+     Usar somente no container principal de conteúdo. */
+  .ledger-spine {
+    border-left: 3px double rgb(var(--accent) / 0.55);
+  }
 }
 
 body {

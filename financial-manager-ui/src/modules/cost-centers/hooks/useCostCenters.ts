@@ -5,11 +5,13 @@ export interface CostCenter {
   id: string;
   name: string;
   color: string;
+  organizationId?: string | null;
 }
 
 export interface CreateCostCenterInput {
   name: string;
   color?: string;
+  organization_id?: string;
 }
 
 export interface UpdateCostCenterInput {

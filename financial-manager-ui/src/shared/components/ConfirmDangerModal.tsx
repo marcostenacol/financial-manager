@@ -64,20 +64,20 @@ export const ConfirmDangerModal = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative w-full max-w-lg bg-slate-900 border border-red-500/20 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          className="relative w-full max-w-lg bg-app-surface border border-red-500/20 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
-          <div className="p-6 border-b border-white/5 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <div className="p-6 border-b border-app-border flex justify-between items-center">
+            <h2 className="text-xl font-bold text-app-ink flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-400" />
               {title}
             </h2>
-            <button onClick={handleClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-400">
+            <button onClick={handleClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="p-8 space-y-6">
-            <p className="text-slate-300 text-sm leading-relaxed">{warning}</p>
+            <p className="text-app-ink/80 text-sm leading-relaxed">{warning}</p>
 
             <div className="space-y-3">
               {actions.map((action, index) => (
@@ -91,13 +91,13 @@ export const ConfirmDangerModal = ({
                   <p className="font-bold text-red-400">
                     {runningIndex === index ? 'Executando...' : action.label}
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">{action.description}</p>
+                  <p className="text-xs text-app-muted mt-1">{action.description}</p>
                 </button>
               ))}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-400 ml-1">
+              <label className="text-sm font-medium text-app-muted ml-1">
                 Digite <span className="font-mono text-red-400">{confirmWord}</span> para habilitar
               </label>
               <input
@@ -105,7 +105,7 @@ export const ConfirmDangerModal = ({
                 value={typedWord}
                 onChange={(e) => setTypedWord(e.target.value)}
                 placeholder={confirmWord}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-mono"
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-mono"
               />
             </div>
           </div>
