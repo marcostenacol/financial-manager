@@ -14,6 +14,7 @@ import { CreateTransactionDTO } from '../dtos/CreateTransactionDTO';
 import { UpdateTransactionDTO } from '../dtos/UpdateTransactionDTO';
 import { ListTransactionsFilterDTO } from '../dtos/ListTransactionsFilterDTO';
 import { ClearAllTransactionsDTO } from '../dtos/ClearAllTransactionsDTO';
+import { AppError } from '@/shared/errors/AppError';
 
 @injectable()
 export class TransactionController extends BaseController {
@@ -77,8 +78,13 @@ export class TransactionController extends BaseController {
 
   async clearAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { reset_balances } = ClearAllTransactionsDTO.parse(request.body ?? {});
-    await this.clearAllTransactions.execute(userId, reset_balances);
+    const { reset_balances, organization_id } = ClearAllTransactionsDTO.parse(request.body ?? {});
+
+    if (organization_id && !request.organizationIds.includes(organization_id)) {
+      throw new AppError('Você não faz parte desta organização', 403);
+    }
+
+    await this.clearAllTransactions.execute(userId, reset_balances, organization_id);
     return this.success(reply, null, 'Transações removidas com sucesso');
   }
 

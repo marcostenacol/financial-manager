@@ -30,9 +30,13 @@ export class MoveWalletToOrganizationService {
       throw new AppError('Você não faz parte desta organização', 403);
     }
 
+    // scope precisa virar 'business' junto com a mudança de dono — senão a carteira continua
+    // 'personal' mesmo pertencendo à organização, e some silenciosamente da visão pessoal (junto
+    // com as transações lançadas nela) sem nunca aparecer corretamente na visão empresarial.
     const updated_wallet = await this.wallet_repository.update(id, {
       userId: null,
       organizationId: organization_id,
+      scope: 'business',
     });
 
     await this.cache.delPattern(CacheKeys.wallets.listPattern(user_id));

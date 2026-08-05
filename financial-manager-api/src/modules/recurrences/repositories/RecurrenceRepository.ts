@@ -95,4 +95,10 @@ export class RecurrenceRepository implements RecurrenceRepositoryInterface {
       where: { wallet: { userId } },
     });
   }
+
+  async deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).recurrence.deleteMany({
+      where: { wallet: { organizationId } },
+    });
+  }
 }

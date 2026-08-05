@@ -13,6 +13,7 @@ import { MoveWalletToOrganizationService } from '../services/MoveWalletToOrganiz
 import { CreateWalletDTO } from '../dtos/CreateWalletDTO';
 import { UpdateWalletDTO } from '../dtos/UpdateWalletDTO';
 import { MoveWalletToOrganizationDTO } from '../dtos/MoveWalletToOrganizationDTO';
+import { AppError } from '@/shared/errors/AppError';
 
 @injectable()
 export class WalletController extends BaseController {
@@ -82,7 +83,13 @@ export class WalletController extends BaseController {
   }
 
   async clearAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    await this.clear_all_wallets.execute(request.user.sub);
+    const { organization_id } = request.query as { organization_id?: string };
+
+    if (organization_id && !request.organizationIds.includes(organization_id)) {
+      throw new AppError('Você não faz parte desta organização', 403);
+    }
+
+    await this.clear_all_wallets.execute(request.user.sub, organization_id);
     return this.success(reply, null, 'Carteiras removidas com sucesso');
   }
 }

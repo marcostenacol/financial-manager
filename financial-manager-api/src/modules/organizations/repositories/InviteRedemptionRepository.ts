@@ -12,6 +12,14 @@ export class InviteRedemptionRepository implements InviteRedemptionRepositoryInt
     return (tx ?? prisma).inviteRedemption.create({ data });
   }
 
+  async deleteAllByInviteId(inviteId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).inviteRedemption.deleteMany({ where: { inviteId } });
+  }
+
+  async deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).inviteRedemption.deleteMany({ where: { invite: { organizationId } } });
+  }
+
   async findAllByInviteId(inviteId: string): Promise<InviteRedemptionWithUser[]> {
     return prisma.inviteRedemption.findMany({
       where: { inviteId },

@@ -6,7 +6,11 @@ import { ListRecurrencesService } from '../services/ListRecurrencesService';
 import { ToggleRecurrenceService } from '../services/ToggleRecurrenceService';
 import { CancelRecurrenceService } from '../services/CancelRecurrenceService';
 import { ClearAllRecurrencesService } from '../services/ClearAllRecurrencesService';
+import { UpdateRecurrenceService } from '../services/UpdateRecurrenceService';
+import { RunRecurrenceNowService } from '../services/RunRecurrenceNowService';
 import { CreateRecurrenceDTO } from '../dtos/CreateRecurrenceDTO';
+import { UpdateRecurrenceDTO } from '../dtos/UpdateRecurrenceDTO';
+import { AppError } from '@/shared/errors/AppError';
 
 @injectable()
 export class RecurrenceController extends BaseController {
@@ -16,6 +20,8 @@ export class RecurrenceController extends BaseController {
     @inject('ToggleRecurrenceService') private toggleRecurrence: ToggleRecurrenceService,
     @inject('CancelRecurrenceService') private cancelRecurrence: CancelRecurrenceService,
     @inject('ClearAllRecurrencesService') private clearAllRecurrences: ClearAllRecurrencesService,
+    @inject('UpdateRecurrenceService') private updateRecurrence: UpdateRecurrenceService,
+    @inject('RunRecurrenceNowService') private runRecurrenceNow: RunRecurrenceNowService,
   ) {
     super();
   }
@@ -47,9 +53,30 @@ export class RecurrenceController extends BaseController {
     return this.success(reply, recurrence, 'Recorrência cancelada com sucesso');
   }
 
+  async update(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { id } = request.params as { id: string };
+    const data = UpdateRecurrenceDTO.parse(request.body);
+    const userId = request.user.sub;
+    const recurrence = await this.updateRecurrence.execute(id, data, userId, request.organizationIds);
+    return this.success(reply, recurrence, 'Recorrência atualizada com sucesso');
+  }
+
+  async runNow(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const { id } = request.params as { id: string };
+    const userId = request.user.sub;
+    const recurrence = await this.runRecurrenceNow.execute(id, userId, request.organizationIds);
+    return this.success(reply, recurrence, 'Recorrência executada com sucesso');
+  }
+
   async clearAll(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    await this.clearAllRecurrences.execute(userId);
+    const { organization_id } = request.query as { organization_id?: string };
+
+    if (organization_id && !request.organizationIds.includes(organization_id)) {
+      throw new AppError('Você não faz parte desta organização', 403);
+    }
+
+    await this.clearAllRecurrences.execute(userId, organization_id);
     return this.success(reply, null, 'Recorrências removidas com sucesso');
   }
 }

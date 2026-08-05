@@ -22,6 +22,13 @@ export interface TransactionRepositoryInterface {
     filters: Prisma.TransactionWhereInput,
     pagination: { skip: number; take: number },
   ): Promise<PaginatedTransactions>;
+  findByOrganizationId(
+    organizationId: string,
+    filters: Prisma.TransactionWhereInput,
+    pagination: { skip: number; take: number },
+  ): Promise<PaginatedTransactions>;
   deleteAllByUserId(userId: string, tx?: Prisma.TransactionClient): Promise<void>;
   nullifyRecurrenceForUser(userId: string, tx?: Prisma.TransactionClient): Promise<void>;
+  deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void>;
+  nullifyRecurrenceForOrganization(organizationId: string, tx?: Prisma.TransactionClient): Promise<void>;
 }

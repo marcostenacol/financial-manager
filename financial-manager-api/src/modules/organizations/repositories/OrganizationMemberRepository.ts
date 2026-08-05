@@ -12,8 +12,16 @@ export class OrganizationMemberRepository implements OrganizationMemberRepositor
     return (tx ?? prisma).organizationMember.create({ data });
   }
 
+  async update(id: string, data: Prisma.OrganizationMemberUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<OrganizationMember> {
+    return (tx ?? prisma).organizationMember.update({ where: { id }, data });
+  }
+
   async delete(id: string): Promise<void> {
     await prisma.organizationMember.delete({ where: { id } });
+  }
+
+  async deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).organizationMember.deleteMany({ where: { organizationId } });
   }
 
   async findByOrganizationAndUser(organizationId: string, userId: string): Promise<OrganizationMember | null> {

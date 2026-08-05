@@ -14,4 +14,5 @@ export interface RecurrenceRepositoryInterface {
   findAllActive(): Promise<Recurrence[]>;
   findActiveByUserId(userId: string): Promise<Recurrence[]>;
   deleteAllByUserId(userId: string, tx?: Prisma.TransactionClient): Promise<void>;
+  deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void>;
 }

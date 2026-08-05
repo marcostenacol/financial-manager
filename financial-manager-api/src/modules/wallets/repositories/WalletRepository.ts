@@ -53,6 +53,19 @@ export class WalletRepository implements WalletRepositoryInterface {
     });
   }
 
+  async findAllByOrganizationId(organization_id: string): Promise<Wallet[]> {
+    return prisma.wallet.findMany({
+      where: { organizationId: organization_id },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async deleteAllByOrganizationId(organization_id: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).wallet.deleteMany({
+      where: { organizationId: organization_id },
+    });
+  }
+
   async setPrimary(id: string, user_id: string, scope: ProfileScope): Promise<Wallet> {
     const [, wallet] = await prisma.$transaction([
       prisma.wallet.updateMany({

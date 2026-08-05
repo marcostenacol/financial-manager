@@ -89,6 +89,35 @@ export class TransactionRepository implements TransactionRepositoryInterface {
     return { data, total };
   }
 
+  async findByOrganizationId(
+    organizationId: string,
+    filters: Prisma.TransactionWhereInput,
+    pagination: { skip: number; take: number },
+  ): Promise<PaginatedTransactions> {
+    const where: Prisma.TransactionWhereInput = {
+      wallet: { organizationId },
+      ...filters,
+    };
+
+    const [data, total] = await Promise.all([
+      prisma.transaction.findMany({
+        where,
+        include: {
+          category: true,
+          wallet: true,
+        },
+        orderBy: {
+          occurredAt: 'desc',
+        },
+        skip: pagination.skip,
+        take: pagination.take,
+      }),
+      prisma.transaction.count({ where }),
+    ]);
+
+    return { data, total };
+  }
+
   async deleteAllByUserId(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
     await (tx ?? prisma).transaction.deleteMany({
       where: { wallet: { userId } },
@@ -98,6 +127,19 @@ export class TransactionRepository implements TransactionRepositoryInterface {
   async nullifyRecurrenceForUser(userId: string, tx?: Prisma.TransactionClient): Promise<void> {
     await (tx ?? prisma).transaction.updateMany({
       where: { wallet: { userId }, recurrenceId: { not: null } },
+      data: { recurrenceId: null },
+    });
+  }
+
+  async deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).transaction.deleteMany({
+      where: { wallet: { organizationId } },
+    });
+  }
+
+  async nullifyRecurrenceForOrganization(organizationId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).transaction.updateMany({
+      where: { wallet: { organizationId }, recurrenceId: { not: null } },
       data: { recurrenceId: null },
     });
   }

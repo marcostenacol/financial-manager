@@ -36,6 +36,11 @@ export class ProcessRecurrenceService {
     }
   }
 
+  /** Processa uma única recorrência agora, ignorando `shouldProcess` — usado pelo disparo manual. */
+  async runNow(recurrence: Recurrence): Promise<void> {
+    await this.process(recurrence, new Date());
+  }
+
   private shouldProcess(recurrence: Recurrence, now: Date): boolean {
     const lastProcessed = recurrence.lastProcessedAt || recurrence.startsAt;
     const diffTime = now.getTime() - lastProcessed.getTime();

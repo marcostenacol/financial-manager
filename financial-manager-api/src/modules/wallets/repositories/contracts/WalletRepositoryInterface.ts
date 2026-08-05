@@ -8,5 +8,7 @@ export interface WalletRepositoryInterface {
   update(id: string, data: Prisma.WalletUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<Wallet>;
   delete(id: string): Promise<void>;
   deleteAllByUserId(user_id: string, tx?: Prisma.TransactionClient): Promise<void>;
+  findAllByOrganizationId(organization_id: string): Promise<Wallet[]>;
+  deleteAllByOrganizationId(organization_id: string, tx?: Prisma.TransactionClient): Promise<void>;
   setPrimary(id: string, user_id: string, scope: ProfileScope): Promise<Wallet>;
 }

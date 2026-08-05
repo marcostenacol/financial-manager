@@ -23,10 +23,13 @@ export class UpdateWalletService {
 
     assertOwnership(wallet, user_id, organization_ids, 'Carteira não encontrada');
 
+    // Carteira de organização é sempre 'business' — nunca aceitar um `scope` diferente vindo do
+    // DTO pra ela, senão a carteira passa a vazar pra listagem pessoal mesmo pertencendo à
+    // organização (ver CreateWalletService, mesmo racional).
     const update_payload: Prisma.WalletUncheckedUpdateInput = {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.type !== undefined && { type: data.type }),
-      ...(data.scope !== undefined && { scope: data.scope }),
+      ...(data.scope !== undefined && { scope: wallet!.organizationId ? 'business' : data.scope }),
       ...(data.currency !== undefined && { currency: data.currency }),
       ...(data.balance !== undefined && { balance: new Prisma.Decimal(data.balance) }),
     };

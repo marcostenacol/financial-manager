@@ -27,4 +27,12 @@ export class InviteRepository implements InviteRepositoryInterface {
   async update(id: string, data: Prisma.InviteUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<Invite> {
     return (tx ?? prisma).invite.update({ where: { id }, data });
   }
+
+  async delete(id: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).invite.delete({ where: { id } });
+  }
+
+  async deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).invite.deleteMany({ where: { organizationId } });
+  }
 }

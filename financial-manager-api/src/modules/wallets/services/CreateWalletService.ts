@@ -29,12 +29,16 @@ export class CreateWalletService {
       }
     }
 
+    // `scope` nunca deve divergir de `organization_id`: uma carteira de organização é sempre
+    // 'business', independentemente do que o cliente enviar — senão ela pode vazar pra listagem
+    // pessoal (scope=personal) mesmo pertencendo a uma organização, e transações lançadas nela
+    // "somem" da visão pessoal sem o usuário entender por quê.
     const wallet = await this.wallet_repository.create({
       userId: data.organization_id ? null : data.user_id,
       organizationId: data.organization_id ?? null,
       name: data.name,
       type: data.type,
-      scope: data.scope,
+      scope: data.organization_id ? 'business' : data.scope,
       balance: new Prisma.Decimal(data.balance ?? 0),
       currency: data.currency,
     });

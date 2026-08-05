@@ -4,6 +4,7 @@ import { TransactionRepositoryInterface } from '../repositories/contracts/Transa
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { ListTransactionsFilterDTOType } from '../dtos/ListTransactionsFilterDTO';
+import { AppError } from '@/shared/errors/AppError';
 
 export interface ListTransactionsResult {
   transactions: Awaited<ReturnType<TransactionRepositoryInterface['findByUserId']>>['data'];
@@ -39,8 +40,12 @@ export class ListTransactionsService {
       take: filters.per_page,
     };
 
-    if (organizationIds.length > 0) {
-      const { data, total } = await this.transactionRepository.findByOwner(userId, organizationIds, prismaFilters, pagination);
+    if (filters.organization_id) {
+      if (!organizationIds.includes(filters.organization_id)) {
+        throw new AppError('Você não faz parte desta organização', 403);
+      }
+
+      const { data, total } = await this.transactionRepository.findByOrganizationId(filters.organization_id, prismaFilters, pagination);
       return { transactions: data, total };
     }
 

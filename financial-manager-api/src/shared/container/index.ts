@@ -83,6 +83,8 @@ import { ProcessRecurrenceService } from '@/modules/recurrences/services/Process
 import { ToggleRecurrenceService } from '@/modules/recurrences/services/ToggleRecurrenceService';
 import { CancelRecurrenceService } from '@/modules/recurrences/services/CancelRecurrenceService';
 import { ClearAllRecurrencesService } from '@/modules/recurrences/services/ClearAllRecurrencesService';
+import { UpdateRecurrenceService } from '@/modules/recurrences/services/UpdateRecurrenceService';
+import { RunRecurrenceNowService } from '@/modules/recurrences/services/RunRecurrenceNowService';
 import { CreateSavingsGoalService } from '@/modules/savings-goals/services/CreateSavingsGoalService';
 import { ListSavingsGoalsService } from '@/modules/savings-goals/services/ListSavingsGoalsService';
 import { UpdateSavingsGoalService } from '@/modules/savings-goals/services/UpdateSavingsGoalService';
@@ -108,11 +110,14 @@ import { CreateOrganizationService } from '@/modules/organizations/services/Crea
 import { ListMyOrganizationsService } from '@/modules/organizations/services/ListMyOrganizationsService';
 import { ListMembersService } from '@/modules/organizations/services/ListMembersService';
 import { RemoveMemberService } from '@/modules/organizations/services/RemoveMemberService';
+import { TransferOwnershipService } from '@/modules/organizations/services/TransferOwnershipService';
 import { CreateInviteService } from '@/modules/organizations/services/CreateInviteService';
 import { ListInvitesService } from '@/modules/organizations/services/ListInvitesService';
 import { RevokeInviteService } from '@/modules/organizations/services/RevokeInviteService';
 import { ListInviteRedemptionsService } from '@/modules/organizations/services/ListInviteRedemptionsService';
 import { RedeemInviteService } from '@/modules/organizations/services/RedeemInviteService';
+import { DeleteOrganizationService } from '@/modules/organizations/services/DeleteOrganizationService';
+import { DeleteInviteService } from '@/modules/organizations/services/DeleteInviteService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -148,6 +153,8 @@ container.registerSingleton<ListRecurrencesService>('ListRecurrencesService', Li
 container.registerSingleton<ProcessRecurrenceService>('ProcessRecurrenceService', ProcessRecurrenceService);
 container.registerSingleton<ToggleRecurrenceService>('ToggleRecurrenceService', ToggleRecurrenceService);
 container.registerSingleton<CancelRecurrenceService>('CancelRecurrenceService', CancelRecurrenceService);
+container.registerSingleton<UpdateRecurrenceService>('UpdateRecurrenceService', UpdateRecurrenceService);
+container.registerSingleton<RunRecurrenceNowService>('RunRecurrenceNowService', RunRecurrenceNowService);
 container.registerSingleton<ClearAllRecurrencesService>('ClearAllRecurrencesService', ClearAllRecurrencesService);
 container.registerSingleton<SavingsGoalRepositoryInterface>('SavingsGoalRepository', SavingsGoalRepository);
 container.registerSingleton<CreateSavingsGoalService>('CreateSavingsGoalService', CreateSavingsGoalService);
@@ -173,8 +180,11 @@ container.registerSingleton<CreateOrganizationService>('CreateOrganizationServic
 container.registerSingleton<ListMyOrganizationsService>('ListMyOrganizationsService', ListMyOrganizationsService);
 container.registerSingleton<ListMembersService>('ListMembersService', ListMembersService);
 container.registerSingleton<RemoveMemberService>('RemoveMemberService', RemoveMemberService);
+container.registerSingleton<TransferOwnershipService>('TransferOwnershipService', TransferOwnershipService);
 container.registerSingleton<CreateInviteService>('CreateInviteService', CreateInviteService);
 container.registerSingleton<ListInvitesService>('ListInvitesService', ListInvitesService);
 container.registerSingleton<RevokeInviteService>('RevokeInviteService', RevokeInviteService);
 container.registerSingleton<ListInviteRedemptionsService>('ListInviteRedemptionsService', ListInviteRedemptionsService);
 container.registerSingleton<RedeemInviteService>('RedeemInviteService', RedeemInviteService);
+container.registerSingleton<DeleteOrganizationService>('DeleteOrganizationService', DeleteOrganizationService);
+container.registerSingleton<DeleteInviteService>('DeleteInviteService', DeleteInviteService);

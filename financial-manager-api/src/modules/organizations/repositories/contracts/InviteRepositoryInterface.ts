@@ -6,4 +6,6 @@ export interface InviteRepositoryInterface {
   findById(id: string): Promise<Invite | null>;
   findAllByOrganizationId(organizationId: string): Promise<Invite[]>;
   update(id: string, data: Prisma.InviteUncheckedUpdateInput, tx?: Prisma.TransactionClient): Promise<Invite>;
+  delete(id: string, tx?: Prisma.TransactionClient): Promise<void>;
+  deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void>;
 }

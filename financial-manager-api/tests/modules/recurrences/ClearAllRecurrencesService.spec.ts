@@ -10,28 +10,41 @@ vi.mock('@/shared/database/PrismaClient', () => ({
 import { ClearAllRecurrencesService } from '@/modules/recurrences/services/ClearAllRecurrencesService';
 import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositories/contracts/RecurrenceRepositoryInterface';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
+import { OrganizationMemberRepositoryInterface } from '@/modules/organizations/repositories/contracts/OrganizationMemberRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 
 describe('ClearAllRecurrencesService', () => {
   let recurrenceRepository: RecurrenceRepositoryInterface;
   let transactionRepository: TransactionRepositoryInterface;
+  let organizationMemberRepository: OrganizationMemberRepositoryInterface;
   let cacheTrait: CacheTrait;
   let clearAllRecurrencesService: ClearAllRecurrencesService;
 
   beforeEach(() => {
     recurrenceRepository = {
       deleteAllByUserId: vi.fn(),
+      deleteAllByOrganizationId: vi.fn(),
     } as any;
 
     transactionRepository = {
       nullifyRecurrenceForUser: vi.fn(),
+      nullifyRecurrenceForOrganization: vi.fn(),
+    } as any;
+
+    organizationMemberRepository = {
+      findByOrganizationAndUser: vi.fn().mockResolvedValue({ id: 'member-1' }),
     } as any;
 
     cacheTrait = {
       del: vi.fn(),
     } as any;
 
-    clearAllRecurrencesService = new ClearAllRecurrencesService(recurrenceRepository, transactionRepository, cacheTrait);
+    clearAllRecurrencesService = new ClearAllRecurrencesService(
+      recurrenceRepository,
+      transactionRepository,
+      organizationMemberRepository,
+      cacheTrait,
+    );
   });
 
   it('should unlink transactions before deleting recurrences, preserving transaction history', async () => {
