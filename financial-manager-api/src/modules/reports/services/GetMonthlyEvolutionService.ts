@@ -12,9 +12,13 @@ export class GetMonthlyEvolutionService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string): Promise<MonthlyEvolutionData[]> {
+  async execute(userId: string, organizationId?: string): Promise<MonthlyEvolutionData[]> {
+    if (organizationId) {
+      return this.reportRepository.getMonthlyEvolution(userId, organizationId);
+    }
+
     const cacheKey = CacheKeys.reports.monthlyEvolution(userId);
-    
+
     const cached = await this.cache.get<MonthlyEvolutionData[]>(cacheKey);
     if (cached) {
       return cached;

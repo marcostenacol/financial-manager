@@ -45,15 +45,17 @@ export class ReportRepository implements ReportRepositoryInterface {
     };
   }
 
-  async getDashboardOverview(userId: string, range?: DashboardOverviewRange, scope?: string): Promise<DashboardOverviewData> {
+  async getDashboardOverview(userId: string, range?: DashboardOverviewRange, scope?: string, organizationId?: string): Promise<DashboardOverviewData> {
     const { periodStart, periodEnd, previousStart, previousEnd } = this.resolvePeriod(range);
+    const ownerColumn = organizationId ? 'organization_id' : 'user_id';
+    const ownerValue = organizationId ?? userId;
     const scopeFilter = scope ? 'AND w.scope = $6' : '';
 
     const results = await prisma.$queryRawUnsafe<any[]>(`
       WITH wallet_stats AS (
         SELECT COALESCE(SUM(balance), 0) as total_balance
         FROM wallets w
-        WHERE w.user_id = $1
+        WHERE w.${ownerColumn} = $1
           ${scope ? 'AND w.scope = $6' : ''}
       ),
       period_stats AS (
@@ -62,7 +64,7 @@ export class ReportRepository implements ReportRepositoryInterface {
           COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
         FROM transactions t
         JOIN wallets w ON t.wallet_id = w.id
-        WHERE w.user_id = $1
+        WHERE w.${ownerColumn} = $1
           AND t.status = 'completed'
           AND t.occurred_at >= $2
           AND t.occurred_at < $3
@@ -74,7 +76,7 @@ export class ReportRepository implements ReportRepositoryInterface {
           COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
         FROM transactions t
         JOIN wallets w ON t.wallet_id = w.id
-        WHERE w.user_id = $1
+        WHERE w.${ownerColumn} = $1
           AND t.status = 'completed'
           AND t.occurred_at >= $4
           AND t.occurred_at < $5
@@ -87,7 +89,7 @@ export class ReportRepository implements ReportRepositoryInterface {
         pp.income as last_month_income,
         pp.expense as last_month_expense
       FROM wallet_stats w, period_stats p, previous_period_stats pp
-    `, ...(scope ? [userId, periodStart, periodEnd, previousStart, previousEnd, scope] : [userId, periodStart, periodEnd, previousStart, previousEnd]));
+    `, ...(scope ? [ownerValue, periodStart, periodEnd, previousStart, previousEnd, scope] : [ownerValue, periodStart, periodEnd, previousStart, previousEnd]));
 
     const data = results[0];
 
@@ -100,20 +102,22 @@ export class ReportRepository implements ReportRepositoryInterface {
     };
   }
 
-  async getExpensesByCategory(userId: string, month: number, year: number): Promise<ExpenseByCategoryData[]> {
+  async getExpensesByCategory(userId: string, month: number, year: number, organizationId?: string): Promise<ExpenseByCategoryData[]> {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
+    const ownerColumn = organizationId ? 'organization_id' : 'user_id';
+    const ownerValue = organizationId ?? userId;
 
     const results = await prisma.$queryRawUnsafe<any[]>(`
       WITH category_totals AS (
-        SELECT 
+        SELECT
           c.name as category_name,
           c.color,
           SUM(t.amount) as total
         FROM transactions t
         JOIN categories c ON t.category_id = c.id
         JOIN wallets w ON t.wallet_id = w.id
-        WHERE w.user_id = $1
+        WHERE w.${ownerColumn} = $1
           AND t.type = 'expense'
           AND t.status = 'completed'
           AND t.occurred_at >= $2
@@ -133,7 +137,7 @@ export class ReportRepository implements ReportRepositoryInterface {
         END as percentage
       FROM category_totals ct, total_sum ts
       ORDER BY ct.total DESC
-    `, userId, startDate, endDate);
+    `, ownerValue, startDate, endDate);
  
      return results.map(row => ({
        category_name: row.category_name,
@@ -143,7 +147,10 @@ export class ReportRepository implements ReportRepositoryInterface {
      }));
    }
  
-   async getMonthlyEvolution(userId: string): Promise<MonthlyEvolutionData[]> {
+   async getMonthlyEvolution(userId: string, organizationId?: string): Promise<MonthlyEvolutionData[]> {
+     const ownerColumn = organizationId ? 'organization_id' : 'user_id';
+     const ownerValue = organizationId ?? userId;
+
      const results = await prisma.$queryRawUnsafe<any[]>(`
        WITH RECURSIVE months AS (
          SELECT date_trunc('month', now()) as month
@@ -153,13 +160,13 @@ export class ReportRepository implements ReportRepositoryInterface {
          WHERE month > date_trunc('month', now() - interval '5 months')
        ),
        monthly_stats AS (
-         SELECT 
+         SELECT
            date_trunc('month', t.occurred_at) as month,
            COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as income,
            COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
          FROM transactions t
          JOIN wallets w ON t.wallet_id = w.id
-         WHERE w.user_id = $1
+         WHERE w.${ownerColumn} = $1
            AND t.status = 'completed'
          GROUP BY 1
        )
@@ -171,7 +178,7 @@ export class ReportRepository implements ReportRepositoryInterface {
        FROM months m
        LEFT JOIN monthly_stats ms ON m.month = ms.month
        ORDER BY m.month ASC
-     `, userId);
+     `, ownerValue);
  
      return results.map(row => ({
        month_name: row.month_name,
@@ -181,9 +188,11 @@ export class ReportRepository implements ReportRepositoryInterface {
      }));
    }
 
-   async getCashFlowByCostCenter(userId: string, month: number, year: number): Promise<CashFlowByCostCenterData[]> {
+   async getCashFlowByCostCenter(userId: string, month: number, year: number, organizationId?: string): Promise<CashFlowByCostCenterData[]> {
      const startDate = new Date(year, month - 1, 1);
      const endDate = new Date(year, month, 0);
+     const ownerColumn = organizationId ? 'organization_id' : 'user_id';
+     const ownerValue = organizationId ?? userId;
 
      const results = await prisma.$queryRawUnsafe<any[]>(`
        WITH cost_center_totals AS (
@@ -194,7 +203,7 @@ export class ReportRepository implements ReportRepositoryInterface {
          FROM transactions t
          JOIN cost_centers cc ON t.cost_center_id = cc.id
          JOIN wallets w ON t.wallet_id = w.id
-         WHERE w.user_id = $1
+         WHERE w.${ownerColumn} = $1
            AND t.type = 'expense'
            AND t.status = 'completed'
            AND t.occurred_at >= $2
@@ -214,7 +223,7 @@ export class ReportRepository implements ReportRepositoryInterface {
          END as percentage
        FROM cost_center_totals cct, total_sum ts
        ORDER BY cct.total DESC
-     `, userId, startDate, endDate);
+     `, ownerValue, startDate, endDate);
 
      return results.map(row => ({
        cost_center_name: row.cost_center_name,

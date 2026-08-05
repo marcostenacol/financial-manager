@@ -2,11 +2,13 @@ import { FastifyInstance } from 'fastify';
 import { container } from 'tsyringe';
 import { ReportController } from './controllers/ReportController';
 import { authMiddleware } from '@/shared/middlewares/AuthMiddleware';
+import { organizationContextMiddleware } from '@/shared/middlewares/OrganizationContextMiddleware';
 
 export async function reportRoutes(fastify: FastifyInstance): Promise<void> {
   const controller = container.resolve(ReportController);
 
   fastify.addHook('preHandler', authMiddleware);
+  fastify.addHook('preHandler', organizationContextMiddleware);
 
   fastify.get('/export', (request, reply) => controller.export(request, reply));
   fastify.get('/overview', (request, reply) => controller.overview(request, reply));

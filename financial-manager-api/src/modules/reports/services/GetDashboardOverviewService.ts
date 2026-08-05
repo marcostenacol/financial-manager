@@ -12,7 +12,11 @@ export class GetDashboardOverviewService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, range?: DashboardOverviewRange, scope?: string): Promise<DashboardOverviewData> {
+  async execute(userId: string, range?: DashboardOverviewRange, scope?: string, organizationId?: string): Promise<DashboardOverviewData> {
+    if (organizationId) {
+      return this.reportRepository.getDashboardOverview(userId, range, scope, organizationId);
+    }
+
     const cacheKey = CacheKeys.reports.overview(userId, range, scope);
 
     const cached = await this.cache.get<DashboardOverviewData>(cacheKey);

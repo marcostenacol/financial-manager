@@ -12,9 +12,13 @@ export class GetExpensesByCategoryService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, month: number, year: number): Promise<ExpenseByCategoryData[]> {
+  async execute(userId: string, month: number, year: number, organizationId?: string): Promise<ExpenseByCategoryData[]> {
+    if (organizationId) {
+      return this.reportRepository.getExpensesByCategory(userId, month, year, organizationId);
+    }
+
     const cacheKey = CacheKeys.reports.expensesByCategory(userId, month, year);
-    
+
     const cached = await this.cache.get<ExpenseByCategoryData[]>(cacheKey);
     if (cached) {
       return cached;

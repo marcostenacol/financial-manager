@@ -6,6 +6,7 @@ import { GetExpensesByCategoryService } from '../services/GetExpensesByCategoryS
 import { GetMonthlyEvolutionService } from '../services/GetMonthlyEvolutionService';
 import { GetCashFlowByCostCenterService } from '../services/GetCashFlowByCostCenterService';
 import { ExportReportService } from '../services/ExportReportService';
+import { AppError } from '@/shared/errors/AppError';
 
 @injectable()
 export class ReportController extends BaseController {
@@ -39,40 +40,51 @@ export class ReportController extends BaseController {
       .send(buffer);
   }
 
+  private assertOrganizationAccess(request: FastifyRequest, organizationId?: string): void {
+    if (organizationId && !request.organizationIds.includes(organizationId)) {
+      throw new AppError('Você não faz parte desta organização', 403);
+    }
+  }
+
   async overview(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { start_date, end_date, scope } = request.query as { start_date?: string; end_date?: string; scope?: string };
-    const data = await this.getOverview.execute(userId, { start_date, end_date }, scope);
+    const { start_date, end_date, scope, organization_id } = request.query as { start_date?: string; end_date?: string; scope?: string; organization_id?: string };
+    this.assertOrganizationAccess(request, organization_id);
+    const data = await this.getOverview.execute(userId, { start_date, end_date }, scope, organization_id);
     return this.success(reply, data);
   }
 
   async cashFlowByCostCenter(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { month, year } = request.query as { month: string; year: string };
+    const { month, year, organization_id } = request.query as { month: string; year: string; organization_id?: string };
+    this.assertOrganizationAccess(request, organization_id);
 
     const now = new Date();
     const targetMonth = month ? Number(month) : now.getMonth() + 1;
     const targetYear = year ? Number(year) : now.getFullYear();
 
-    const data = await this.getCashFlowByCostCenter.execute(userId, targetMonth, targetYear);
+    const data = await this.getCashFlowByCostCenter.execute(userId, targetMonth, targetYear, organization_id);
     return this.success(reply, data);
   }
 
   async expensesByCategory(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { month, year } = request.query as { month: string; year: string };
-    
+    const { month, year, organization_id } = request.query as { month: string; year: string; organization_id?: string };
+    this.assertOrganizationAccess(request, organization_id);
+
     const now = new Date();
     const targetMonth = month ? Number(month) : now.getMonth() + 1;
     const targetYear = year ? Number(year) : now.getFullYear();
 
-    const data = await this.getExpenses.execute(userId, targetMonth, targetYear);
+    const data = await this.getExpenses.execute(userId, targetMonth, targetYear, organization_id);
     return this.success(reply, data);
   }
 
   async evolution(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const data = await this.getEvolution.execute(userId);
+    const { organization_id } = request.query as { organization_id?: string };
+    this.assertOrganizationAccess(request, organization_id);
+    const data = await this.getEvolution.execute(userId, organization_id);
     return this.success(reply, data);
   }
 }

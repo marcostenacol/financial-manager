@@ -12,7 +12,11 @@ export class GetCashFlowByCostCenterService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, month: number, year: number): Promise<CashFlowByCostCenterData[]> {
+  async execute(userId: string, month: number, year: number, organizationId?: string): Promise<CashFlowByCostCenterData[]> {
+    if (organizationId) {
+      return this.reportRepository.getCashFlowByCostCenter(userId, month, year, organizationId);
+    }
+
     const cacheKey = CacheKeys.reports.cashFlowByCostCenter(userId, month, year);
 
     const cached = await this.cache.get<CashFlowByCostCenterData[]>(cacheKey);
