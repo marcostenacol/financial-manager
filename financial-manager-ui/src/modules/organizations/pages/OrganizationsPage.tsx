@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Building2, Plus, ChevronDown, ChevronRight, KeyRound, Trash2 } from 'lucide-react';
 import { useOrganizations, type Organization } from '../hooks/useOrganizations';
 import { OrganizationDetailPanel } from '../components/OrganizationDetailPanel';
@@ -6,6 +7,7 @@ import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const OrganizationsPage = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { organizations, loading, loadOrganizations, createOrganization, redeemInvite, deleteOrganization } = useOrganizations();
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -17,7 +19,7 @@ export const OrganizationsPage = () => {
 
   useEffect(() => {
 
-    loadOrganizations().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar organizações'), 'error'));
+    loadOrganizations().catch((err) => showToast(getErrorMessage(err, t('organizations.errors.load')), 'error'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -28,9 +30,9 @@ export const OrganizationsPage = () => {
       await createOrganization(newName);
       setNewName('');
       await loadOrganizations();
-      showToast('Organização criada com sucesso', 'success');
+      showToast(t('organizations.toasts.created'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao criar organização'), 'error');
+      showToast(getErrorMessage(err, t('organizations.errors.create')), 'error');
     } finally {
       setCreating(false);
     }
@@ -43,9 +45,9 @@ export const OrganizationsPage = () => {
       await redeemInvite(inviteCode.trim());
       setInviteCode('');
       await loadOrganizations();
-      showToast('Você entrou na organização com sucesso', 'success');
+      showToast(t('organizations.toasts.joined'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Código de convite inválido'), 'error');
+      showToast(getErrorMessage(err, t('organizations.errors.invalidInviteCode')), 'error');
     } finally {
       setRedeeming(false);
     }
@@ -57,15 +59,15 @@ export const OrganizationsPage = () => {
 
   const handleDelete = async (e: React.MouseEvent, organization: Organization) => {
     e.stopPropagation();
-    if (deletingId || !window.confirm(`Excluir a organização "${organization.name}"? Isso remove todos os membros e convites. Só é possível se ela não tiver carteiras, categorias, centros de custo ou metas vinculadas.`)) return;
+    if (deletingId || !window.confirm(t('organizations.confirm.delete', { name: organization.name }))) return;
 
     setDeletingId(organization.id);
     try {
       await deleteOrganization(organization.id);
       await loadOrganizations();
-      showToast('Organização removida com sucesso', 'success');
+      showToast(t('organizations.toasts.deleted'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao excluir organização'), 'error');
+      showToast(getErrorMessage(err, t('organizations.errors.delete')), 'error');
     } finally {
       setDeletingId(null);
     }
@@ -74,22 +76,22 @@ export const OrganizationsPage = () => {
   return (
     <div className="p-4 md:p-8">
       <div className="mb-8">
-        <h1 className="ledger-title text-4xl text-app-ink">Organizações</h1>
-        <p className="text-app-muted">Compartilhe carteiras empresariais com outras pessoas</p>
+        <h1 className="ledger-title text-4xl text-app-ink">{t('organizations.title')}</h1>
+        <p className="text-app-muted">{t('organizations.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <form onSubmit={handleCreate} className="bg-app-surface-2 border border-app-border rounded-3xl p-6 space-y-3">
           <h3 className="text-app-ink font-bold flex items-center gap-2">
             <Building2 className="w-5 h-5 text-app-accent" />
-            Criar organização
+            {t('organizations.createCard.title')}
           </h3>
           <input
             type="text"
             required
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            placeholder="Ex: Padaria do João"
+            placeholder={t('organizations.createCard.namePlaceholder')}
             className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50"
           />
           <button
@@ -98,21 +100,21 @@ export const OrganizationsPage = () => {
             className="bg-app-accent hover:opacity-90 text-app-ink font-bold px-6 py-3 rounded-2xl flex items-center gap-2 disabled:opacity-50"
           >
             <Plus className="w-5 h-5" />
-            Criar
+            {t('common.create')}
           </button>
         </form>
 
         <form onSubmit={handleRedeem} className="bg-app-surface-2 border border-app-border rounded-3xl p-6 space-y-3">
           <h3 className="text-app-ink font-bold flex items-center gap-2">
             <KeyRound className="w-5 h-5 text-amber-400" />
-            Entrar com código de convite
+            {t('organizations.joinCard.title')}
           </h3>
           <input
             type="text"
             required
             value={inviteCode}
             onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-            placeholder="Ex: ABCD-1234"
+            placeholder={t('organizations.joinCard.codePlaceholder')}
             className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink font-mono focus:outline-none focus:ring-2 focus:ring-app-accent/50"
           />
           <button
@@ -120,7 +122,7 @@ export const OrganizationsPage = () => {
             disabled={redeeming}
             className="bg-amber-600 hover:bg-amber-500 text-app-ink font-bold px-6 py-3 rounded-2xl flex items-center gap-2 disabled:opacity-50"
           >
-            Entrar
+            {t('organizations.joinCard.submit')}
           </button>
         </form>
       </div>

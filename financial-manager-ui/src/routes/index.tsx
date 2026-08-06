@@ -11,6 +11,7 @@ import { DashboardPage } from '../modules/reports/pages/DashboardPage';
 import { SavingsGoalsPage } from '../modules/savings-goals/pages/SavingsGoalsPage';
 import { CostCentersPage } from '../modules/cost-centers/pages/CostCentersPage';
 import { OrganizationsPage } from '../modules/organizations/pages/OrganizationsPage';
+import { PeoplePage } from '../modules/people/pages/PeoplePage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
@@ -107,6 +108,15 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <OrganizationsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/people"
+        element={
+          <ProtectedRoute>
+            <PeoplePage />
           </ProtectedRoute>
         }
       />

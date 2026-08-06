@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/useAuth';
 import { useProfile } from '../hooks/useProfile';
 import { User, Mail, Shield, Save, UserCircle, Camera, KeyRound } from 'lucide-react';
@@ -9,6 +10,7 @@ import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 import { ChangePasswordModal } from '../components/ChangePasswordModal';
 
 export const ProfilePage = () => {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const { getProfile, updateProfile, changeProfileType, updateAvatar } = useProfile();
   const { showToast } = useToast();
@@ -41,7 +43,7 @@ export const ProfilePage = () => {
           }
         }
       } catch (err) {
-        showToast(getErrorMessage(err, 'Erro ao carregar perfil'), 'error');
+        showToast(getErrorMessage(err, t('profile.loadError')), 'error');
       }
     };
 
@@ -84,7 +86,7 @@ export const ProfilePage = () => {
       updateUser(updatedUser);
       setSuccess(true);
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao atualizar perfil'), 'error');
+      showToast(getErrorMessage(err, t('profile.updateError')), 'error');
     } finally {
       setLoading(false);
     }
@@ -102,8 +104,8 @@ export const ProfilePage = () => {
             <UserCircle className="w-8 h-8 text-app-accent" />
           </div>
           <div>
-            <h1 className="ledger-title text-4xl text-app-ink">Meu Perfil</h1>
-            <p className="text-app-muted">Gerencie suas informações pessoais</p>
+            <h1 className="ledger-title text-4xl text-app-ink">{t('profile.title')}</h1>
+            <p className="text-app-muted">{t('profile.subtitle')}</p>
           </div>
         </div>
 
@@ -114,14 +116,14 @@ export const ProfilePage = () => {
               <div className="relative group">
                 <div className="w-32 h-32 rounded-full border-2 border-app-border overflow-hidden bg-app-surface flex items-center justify-center relative">
                   {avatar ? (
-                    <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
+                    <img src={avatar} alt={t('profile.avatar.alt')} className="w-full h-full object-cover" />
                   ) : (
                     <User className="w-12 h-12 text-app-muted" />
                   )}
                   
                   <label className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                     <Camera className="w-6 h-6 text-app-ink mb-1" />
-                    <span className="text-[10px] text-app-ink font-bold uppercase tracking-wider">Alterar</span>
+                    <span className="text-[10px] text-app-ink font-bold uppercase tracking-wider">{t('profile.avatar.change')}</span>
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
                   </label>
                 </div>
@@ -130,13 +132,13 @@ export const ProfilePage = () => {
                   <Camera className="w-3.5 h-3.5 text-app-ink" />
                 </div>
               </div>
-              <p className="text-xs text-app-muted mt-4 uppercase tracking-widest font-bold">Foto do Perfil</p>
+              <p className="text-xs text-app-muted mt-4 uppercase tracking-widest font-bold">{t('profile.avatar.label')}</p>
             </div>
 
             <div className="space-y-6">
               {/* Nome */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-app-muted ml-1">Nome Completo</label>
+                <label className="text-sm font-medium text-app-muted ml-1">{t('profile.fields.fullName')}</label>
                 <div className="relative group">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
                   <input
@@ -144,7 +146,7 @@ export const ProfilePage = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 focus:border-app-accent/50 transition-all"
-                    placeholder="Seu nome"
+                    placeholder={t('profile.fields.namePlaceholder')}
                     required
                   />
                 </div>
@@ -152,20 +154,20 @@ export const ProfilePage = () => {
 
               {/* Bio */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-app-muted ml-1">Biografia</label>
+                <label className="text-sm font-medium text-app-muted ml-1">{t('profile.fields.bio')}</label>
                 <div className="relative group">
                   <textarea
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     className="w-full bg-app-surface border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 focus:border-app-accent/50 transition-all resize-none h-24"
-                    placeholder="Conte um pouco sobre você..."
+                    placeholder={t('profile.fields.bioPlaceholder')}
                   />
                 </div>
               </div>
 
               {/* E-mail (Read Only) */}
               <div className="space-y-2 opacity-60">
-                <label className="text-sm font-medium text-app-muted ml-1">E-mail (Não alterável)</label>
+                <label className="text-sm font-medium text-app-muted ml-1">{t('profile.fields.emailReadOnly')}</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                   <input
@@ -179,7 +181,7 @@ export const ProfilePage = () => {
 
               {/* Tipo de Perfil */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-app-muted ml-1">Tipo de Conta</label>
+                <label className="text-sm font-medium text-app-muted ml-1">{t('profile.fields.accountType')}</label>
                 <div className="grid grid-cols-2 gap-4">
                   <button
                     type="button"
@@ -191,7 +193,7 @@ export const ProfilePage = () => {
                     }`}
                   >
                     <User className="w-6 h-6" />
-                    <span className="font-medium">Pessoal</span>
+                    <span className="font-medium">{t('common.personal')}</span>
                   </button>
                   <button
                     type="button"
@@ -203,7 +205,7 @@ export const ProfilePage = () => {
                     }`}
                   >
                     <Shield className="w-6 h-6" />
-                    <span className="font-medium">Empresarial</span>
+                    <span className="font-medium">{t('common.business')}</span>
                   </button>
                 </div>
               </div>
@@ -214,7 +216,7 @@ export const ProfilePage = () => {
                 className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl border border-app-border text-app-ink/80 hover:bg-app-surface-2 transition-all font-medium"
               >
                 <KeyRound className="w-5 h-5" />
-                Trocar Senha
+                {t('profile.changePassword.title')}
               </button>
             </div>
 
@@ -224,7 +226,7 @@ export const ProfilePage = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 className="mt-6 p-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-2xl text-center font-medium"
               >
-                Perfil atualizado com sucesso!
+                {t('profile.updateSuccess')}
               </motion.div>
             )}
 
@@ -238,7 +240,7 @@ export const ProfilePage = () => {
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  Salvar Alterações
+                  {t('profile.saveChanges')}
                 </>
               )}
             </button>
@@ -250,7 +252,7 @@ export const ProfilePage = () => {
             onClick={signOut}
             className="text-app-muted hover:text-red-400 font-medium transition-colors p-2"
           >
-            Sair da conta
+            {t('profile.signOut')}
           </button>
         </div>
       </motion.div>

@@ -7,6 +7,7 @@
     "savingsGoals": "Metas",
     "costCenters": "Centros de Costo",
     "recurrences": "Recurrencias",
+    "people": "Personas",
     "organizations": "Organizaciones",
     "profile": "Mi Perfil",
     "personal": "Personal",
@@ -14,5 +15,355 @@
     "themeLight": "Tema claro",
     "themeDark": "Tema oscuro",
     "signOut": "Salir"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "closeMenu": "Cerrar menú",
+    "openMenu": "Abrir menú",
+    "create": "Crear",
+    "edit": "Editar",
+    "description": "Descripción",
+    "value": "Valor",
+    "category": "Categoría",
+    "wallet": "Cartera",
+    "income": "Ingreso",
+    "expense": "Gasto",
+    "personal": "Personal",
+    "business": "Empresarial"
+  },
+  "shared": {
+    "sidebar": {
+      "ledgerSubtitle": "Libro contable",
+      "entriesSection": "Movimientos"
+    }
+  },
+  "auth": {
+    "brand": {
+      "taglinePrimary": "Un libro contable simple para tu vida financiera.",
+      "taglineSecondary": "Carteras, transacciones y metas — todo en un solo lugar."
+    },
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Accede a tu cuenta para continuar",
+      "emailPlaceholder": "Tu correo electrónico",
+      "passwordPlaceholder": "Tu contraseña",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "forgotPasswordUnavailable": "La recuperación de contraseña aún no está disponible — contacta con soporte.",
+      "submit": "Entrar",
+      "error": "Correo electrónico o contraseña inválidos.",
+      "noAccount": "¿Aún no tienes una cuenta?",
+      "signUpLink": "Regístrate ahora"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Empieza a organizar tus finanzas",
+      "namePlaceholder": "Tu nombre completo",
+      "emailPlaceholder": "Tu correo electrónico",
+      "passwordPlaceholder": "Crea una contraseña",
+      "confirmPasswordPlaceholder": "Confirma tu contraseña",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "submit": "Crear cuenta",
+      "success": "¡Cuenta creada con éxito! Inicia sesión para continuar.",
+      "error": "Error al crear la cuenta.",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "signInLink": "Entrar"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "¡Bienvenido de nuevo! Aquí está el resumen de tus finanzas.",
+    "cards": {
+      "totalBalance": "Saldo Total",
+      "monthlyIncome": "Ingresos del Mes",
+      "monthlyExpense": "Gastos del Mes",
+      "updatedNow": "Actualizado ahora"
+    },
+    "charts": {
+      "monthlyEvolution": "Evolución Mensual",
+      "expensesByCategory": "Gastos por Categoría"
+    },
+    "costCenters": {
+      "title": "Flujo de Caja por Centro de Costo",
+      "manage": "Gestionar centros de costo"
+    },
+    "goals": {
+      "title": "Metas de Ahorro",
+      "viewAll": "Ver todas"
+    },
+    "empty": {
+      "noExpenses": "No hay gastos registrados en este período.",
+      "noCostCenterExpenses": "No hay movimientos por centro de costo en este período.",
+      "noGoals": "No hay metas de ahorro registradas."
+    },
+    "filters": {
+      "startDate": "Fecha inicial",
+      "endDate": "Fecha final"
+    },
+    "periods": {
+      "month": "Este Mes",
+      "7days": "7 días",
+      "30days": "30 días",
+      "custom": "Personalizado"
+    },
+    "errors": {
+      "load": "Error al cargar los datos del dashboard",
+      "export": "Error al exportar el informe"
+    }
+  },
+  "wallets": {
+    "title": "Carteras",
+    "subtitle": "Administra tu dinero en diferentes cuentas",
+    "new": "Nueva Cartera",
+    "transfer": "Transferir",
+    "empty": "Aún no hay carteras",
+    "emptyCta": "Crea tu primera cartera para empezar a organizar tus finanzas.",
+    "deleteWallets": "Eliminar carteras",
+    "selectOrganizationHint": "Selecciona una organización específica para limpiar sus datos",
+    "confirmDelete": "¿Eliminar esta cartera? Esta acción no se puede deshacer.",
+    "deleteBlocked": "No puedes eliminar una cartera con transacciones vinculadas.",
+    "primaryWallet": "Cartera principal",
+    "setAsPrimary": "Definir como principal",
+    "primaryBadge": "Principal",
+    "organization": "Organización",
+    "moveToOrganization": "Mover a organización",
+    "form": {
+      "nameLabel": "Nombre de la cartera",
+      "namePlaceholderCreate": "Ej: Nubank, Cartera, Ahorros...",
+      "namePlaceholderUpdate": "Nombre de la cartera",
+      "typeLabel": "Tipo",
+      "initialBalance": "Saldo inicial",
+      "currentBalance": "Saldo actual",
+      "onlyMine": "Solo mía (no compartida)",
+      "createSubmit": "Crear Cartera",
+      "updateSubmit": "Guardar Cambios",
+      "editTitle": "Editar Cartera"
+    },
+    "clearAll": {
+      "personalTitle": "Vaciar todo (personal)",
+      "organizationTitle": "Vaciar todo (organización)",
+      "personalWarning": "Esto eliminará todas tus carteras personales y los datos vinculados. Esta acción no se puede deshacer.",
+      "walletsDescription": "Elimina permanentemente todas las carteras (y sus transacciones).",
+      "resetLabel": "Vaciar también las metas de ahorro",
+      "resetPersonalDescription": "Además de las carteras, también elimina tus metas de ahorro personales.",
+      "resetOrganizationDescription": "Elimina todas las carteras (y transacciones) de esta organización."
+    },
+    "toast": {
+      "loadError": "Error al cargar las carteras",
+      "createError": "Error al crear la cartera",
+      "updateError": "Error al actualizar la cartera",
+      "deleteError": "Error al eliminar la cartera",
+      "setPrimaryError": "Error al definir la cartera principal",
+      "moveSuccess": "Cartera movida a la organización con éxito",
+      "moveError": "Error al mover la cartera",
+      "clearSuccess": "Carteras eliminadas con éxito",
+      "clearError": "Error al eliminar las carteras",
+      "resetSuccess": "Todos los datos han sido eliminados",
+      "resetError": "Error al vaciar todo"
+    }
+  },
+  "transactions": {
+    "title": "Transacciones",
+    "subtitle": "Sigue tus ingresos y gastos",
+    "advancedFilters": "Filtros avanzados",
+    "exportCsv": "Exportar CSV",
+    "searchPlaceholder": "Buscar por descripción...",
+    "recurringBadge": "Recurrente",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar esta transacción?",
+    "filters": {
+      "all": "Todas",
+      "income": "Ingresos",
+      "expense": "Gastos"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "completed": "Completada"
+    },
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "empty": {
+      "title": "No se encontraron transacciones",
+      "description": "Ajusta los filtros o crea tu primera transacción."
+    },
+    "clearAll": {
+      "titlePersonal": "Vaciar todo (personal)",
+      "titleBusiness": "Vaciar todo (organización)",
+      "warningPersonal": "Esto eliminará todas tus transacciones personales. Esta acción no se puede deshacer.",
+      "warningBusiness": "Esto eliminará todas las transacciones de esta organización. Esta acción no se puede deshacer.",
+      "keepBalanceLabel": "Mantener el saldo actual de las carteras",
+      "keepBalanceDescription": "Las transacciones se eliminan, pero el saldo de las carteras no se recalcula.",
+      "resetBalanceLabel": "Reiniciar el saldo de las carteras",
+      "resetBalanceDescription": "El saldo de cada cartera vuelve a cero junto con la eliminación de las transacciones.",
+      "tooltip": "Eliminar transacciones",
+      "tooltipDisabled": "Selecciona una organización específica para limpiar sus datos",
+      "successToast": "Transacciones eliminadas con éxito"
+    },
+    "errors": {
+      "load": "Error al cargar las transacciones",
+      "delete": "Error al eliminar la transacción",
+      "export": "Error al exportar las transacciones",
+      "clearAll": "Error al eliminar las transacciones"
+    }
+  },
+  "categories": {
+    "title": "Categorías",
+    "subtitle": "Organiza tus transacciones en grupos",
+    "new": "Nueva Categoría",
+    "confirmDelete": "¿Eliminar esta categoría? Esta acción no se puede deshacer.",
+    "type": {
+      "both": "Ambos",
+      "incomePlural": "Ingresos",
+      "expensePlural": "Gastos"
+    },
+    "form": {
+      "nameLabel": "Nombre de la Categoría",
+      "namePlaceholder": "Ej: Alimentación, Ocio...",
+      "typeLabel": "Tipo de Transacción",
+      "usageTypeLabel": "Usada en",
+      "colorLabel": "Color de la Categoría",
+      "organizationLabel": "Organización",
+      "organizationOwnOnly": "Solo mía (no compartida)",
+      "submit": "Guardar Categoría"
+    },
+    "edit": {
+      "title": "Editar Categoría",
+      "submit": "Guardar Cambios"
+    },
+    "system": {
+      "title": "Categoría del sistema",
+      "description": "Las categorías predeterminadas del sistema no se pueden editar ni eliminar."
+    },
+    "empty": {
+      "title": "Aún no hay categorías",
+      "description": "Crea categorías para organizar tus ingresos y gastos."
+    },
+    "errors": {
+      "load": "Error al cargar las categorías",
+      "create": "Error al crear la categoría",
+      "update": "Error al actualizar la categoría",
+      "delete": "Error al eliminar la categoría",
+      "deleteBlocked": "No puedes eliminar una categoría con transacciones vinculadas."
+    }
+  },
+  "recurrences": {
+    "title": "Recurrencias",
+    "subtitle": "Movimientos automáticos que se repiten",
+    "new": "Nueva Recurrencia",
+    "edit": "Editar",
+    "activate": "Activar",
+    "pause": "Pausar",
+    "runNow": "Ejecutar ahora",
+    "runNowDisabledHint": "Recurrencia pausada — actívala para ejecutar ahora",
+    "runNowSuccess": "Movimiento generado con éxito",
+    "ended": "Finalizada",
+    "statusActive": "Activa",
+    "statusPaused": "Pausada",
+    "showCancelled": "Mostrar finalizadas",
+    "cancelPermanently": "Finalizar permanentemente",
+    "confirmCancel": "¿Finalizar esta recurrencia permanentemente? Esta acción no se puede deshacer.",
+    "confirmRunNow": "¿Generar un movimiento ahora para esta recurrencia?",
+    "confirmRunAfterCreate": "¡Recurrencia creada! ¿Deseas generar el primer movimiento ahora?",
+    "period": {
+      "daily": "Diaria",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
+    "form": {
+      "descriptionPlaceholder": "Ej: Alquiler, Suscripción...",
+      "frequency": "Frecuencia",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de fin (opcional)",
+      "selectWallet": "Seleccionar cartera",
+      "selectCategory": "Seleccionar categoría",
+      "keepCategory": "Mantener categoría actual",
+      "submit": "Crear Recurrencia",
+      "saveChanges": "Guardar Cambios"
+    },
+    "empty": {
+      "title": "Aún no hay recurrencias",
+      "description": "Crea movimientos automáticos para no olvidar cuentas recurrentes.",
+      "noneActiveTitle": "No hay recurrencias activas",
+      "noneActiveDescription": "Todas tus recurrencias están pausadas o finalizadas."
+    },
+    "clearAllTitle": "Vaciar recurrencias",
+    "clearAllDisabledHint": "Selecciona una organización específica para limpiar sus datos",
+    "clearAllSuccess": "Recurrencias eliminadas con éxito",
+    "clearAll": {
+      "titlePersonal": "Vaciar recurrencias (personal)",
+      "titleBusiness": "Vaciar recurrencias (organización)",
+      "warningPersonal": "Esto eliminará todas tus recurrencias personales. Esta acción no se puede deshacer.",
+      "warningBusiness": "Esto eliminará todas las recurrencias de esta organización. Esta acción no se puede deshacer.",
+      "actionLabel": "Eliminar recurrencias",
+      "actionDescription": "Elimina permanentemente todas las recurrencias (no afecta los movimientos ya generados)."
+    },
+    "errors": {
+      "load": "Error al cargar las recurrencias",
+      "loadData": "Error al cargar los datos de la recurrencia",
+      "create": "Error al crear la recurrencia",
+      "update": "Error al actualizar la recurrencia",
+      "toggle": "Error al actualizar el estado de la recurrencia",
+      "cancel": "Error al finalizar la recurrencia",
+      "runNow": "Error al generar el movimiento",
+      "clearAll": "Error al eliminar las recurrencias"
+    }
+  },
+  "organizations": {
+    "title": "Organizaciones",
+    "subtitle": "Comparte carteras, categorías e informes con tu equipo",
+    "createCard": {
+      "title": "Crear organización",
+      "namePlaceholder": "Nombre de la organización"
+    },
+    "joinCard": {
+      "title": "Unirse con código de invitación",
+      "codePlaceholder": "Código de invitación",
+      "submit": "Unirse"
+    },
+    "toasts": {
+      "created": "Organización creada con éxito",
+      "deleted": "Organización eliminada con éxito",
+      "joined": "Te has unido a la organización con éxito"
+    },
+    "errors": {
+      "load": "Error al cargar las organizaciones",
+      "create": "Error al crear la organización",
+      "delete": "Error al eliminar la organización",
+      "invalidInviteCode": "Código de invitación inválido o expirado"
+    }
+  },
+  "profile": {
+    "title": "Mi Perfil",
+    "subtitle": "Administra tu información personal",
+    "saveChanges": "Guardar Cambios",
+    "signOut": "Salir",
+    "loadError": "Error al cargar el perfil",
+    "updateSuccess": "Perfil actualizado con éxito",
+    "updateError": "Error al actualizar el perfil",
+    "avatar": {
+      "label": "Foto de perfil",
+      "change": "Cambiar foto",
+      "alt": "Avatar"
+    },
+    "fields": {
+      "fullName": "Nombre completo",
+      "namePlaceholder": "Tu nombre completo",
+      "emailReadOnly": "El correo electrónico no se puede cambiar",
+      "bio": "Sobre ti",
+      "bioPlaceholder": "Cuéntanos un poco sobre ti...",
+      "accountType": "Tipo de cuenta"
+    },
+    "changePassword": {
+      "title": "Cambiar contraseña",
+      "currentPassword": "Contraseña actual",
+      "newPassword": "Nueva contraseña",
+      "confirmNewPassword": "Confirma la nueva contraseña",
+      "mismatch": "Las contraseñas no coinciden",
+      "submit": "Cambiar Contraseña",
+      "success": "Contraseña cambiada con éxito",
+      "error": "Error al cambiar la contraseña"
+    }
   }
 }

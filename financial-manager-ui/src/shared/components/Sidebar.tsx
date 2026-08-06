@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Sun, Moon, Languages } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Sun, Moon, Languages, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
 import { useScope } from '../../contexts/useScope';
 import { getAvatarUrl } from '../lib/getAvatarUrl';
@@ -26,6 +26,7 @@ export const Sidebar = () => {
     ...(scope === 'personal' ? [{ icon: Target, label: t('nav.savingsGoals'), path: '/savings-goals' }] : []),
     ...(scope === 'business' ? [{ icon: Briefcase, label: t('nav.costCenters'), path: '/cost-centers' }] : []),
     { icon: RefreshCw, label: t('nav.recurrences'), path: '/recurrences' },
+    { icon: Users, label: t('nav.people'), path: '/people' },
     { icon: Building2, label: t('nav.organizations'), path: '/organizations' },
     { icon: UserCircle, label: t('nav.profile'), path: '/profile' },
   ];
@@ -35,7 +36,7 @@ export const Sidebar = () => {
       <button
         onClick={() => setMobileOpen(true)}
         className="md:hidden fixed top-4 left-4 z-40 w-10 h-10 flex items-center justify-center bg-app-surface border border-app-border rounded-xl shadow-app-card text-app-ink"
-        aria-label="Abrir menu"
+        aria-label={t('common.openMenu')}
       >
         <Menu className="w-5 h-5" />
       </button>
@@ -55,7 +56,7 @@ export const Sidebar = () => {
         <button
           onClick={() => setMobileOpen(false)}
           className="md:hidden absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-app-muted hover:text-app-ink"
-          aria-label="Fechar menu"
+          aria-label={t('common.closeMenu')}
         >
           <X className="w-5 h-5" />
         </button>
@@ -67,7 +68,7 @@ export const Sidebar = () => {
           </div>
           <div className="flex flex-col min-w-0">
             <span className="ledger-title text-app-ink text-xl leading-none">Croesus</span>
-            <span className="text-[9px] uppercase tracking-[0.22em] text-app-muted mt-1">Livro-caixa</span>
+            <span className="text-[9px] uppercase tracking-[0.22em] text-app-muted mt-1">{t('shared.sidebar.ledgerSubtitle')}</span>
           </div>
         </div>
 
@@ -93,7 +94,7 @@ export const Sidebar = () => {
         </div>
 
         <div className="flex items-center gap-2 mb-3 px-1">
-          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-app-muted">Lançamentos</span>
+          <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-app-muted">{t('shared.sidebar.entriesSection')}</span>
           <span className="flex-1 h-px bg-app-border" />
         </div>
 

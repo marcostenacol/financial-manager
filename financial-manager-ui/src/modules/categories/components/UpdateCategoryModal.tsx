@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Save, Palette, Tag, Trash2 } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useCategories, type Category } from '../hooks/useCategories';
@@ -19,6 +20,7 @@ const PRESET_COLORS = [
 ];
 
 export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: UpdateCategoryModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { updateCategory, deleteCategory } = useCategories();
   const [name, setName] = useState('');
@@ -51,14 +53,14 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
       onSuccess();
       onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao atualizar categoria'), 'error');
+      showToast(getErrorMessage(err, t('categories.errors.update')), 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!category || !window.confirm('Tem certeza que deseja excluir esta categoria?')) return;
+    if (!category || !window.confirm(t('categories.confirmDelete'))) return;
     setDeleting(true);
 
     try {
@@ -66,8 +68,8 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
       onSuccess();
       onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao deletar categoria'), 'error');
-      alert('Não foi possível excluir esta categoria. Verifique se existem transações vinculadas a ela.');
+      showToast(getErrorMessage(err, t('categories.errors.delete')), 'error');
+      alert(t('categories.errors.deleteBlocked'));
     } finally {
       setDeleting(false);
     }
@@ -94,7 +96,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
           className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
           <div className="p-6 border-b border-app-border flex justify-between items-center">
-            <h2 className="text-xl font-bold text-app-ink">Editar Categoria</h2>
+            <h2 className="text-xl font-bold text-app-ink">{t('categories.edit.title')}</h2>
             <div className="flex items-center gap-2">
               {!isSystemCategory && (
                 <button 
@@ -116,21 +118,21 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
               <div className="p-4 bg-app-surface-2 rounded-2xl mb-4 inline-block">
                 <Tag className="w-8 h-8 text-app-muted" />
               </div>
-              <h3 className="text-app-ink font-bold text-lg">Categoria do Sistema</h3>
+              <h3 className="text-app-ink font-bold text-lg">{t('categories.system.title')}</h3>
               <p className="text-app-muted mt-2">
-                Categorias globais não podem ser editadas ou removidas para garantir a integridade dos relatórios padrão.
+                {t('categories.system.description')}
               </p>
               <button 
                 onClick={onClose}
                 className="w-full bg-app-surface-2 hover:bg-app-surface-2 text-app-ink font-bold py-4 rounded-2xl mt-8 transition-all"
               >
-                Fechar
+                {t('common.close')}
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-app-muted ml-1">Nome da Categoria</label>
+                <label className="text-sm font-medium text-app-muted ml-1">{t('categories.form.nameLabel')}</label>
                 <div className="relative">
                   <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                   <input
@@ -138,14 +140,14 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Ex: Alimentação, Lazer..."
+                    placeholder={t('categories.form.namePlaceholder')}
                     className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-app-muted ml-1">Tipo de Uso</label>
+                <label className="text-sm font-medium text-app-muted ml-1">{t('categories.form.usageTypeLabel')}</label>
                 <div className="flex p-1 bg-app-surface-2 border border-app-border rounded-2xl">
                   <button
                     type="button"
@@ -154,7 +156,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                       type === 'income' ? 'bg-emerald-600 text-app-ink shadow-lg' : 'text-app-muted'
                     }`}
                   >
-                    Receitas
+                    {t('categories.type.incomePlural')}
                   </button>
                   <button
                     type="button"
@@ -163,7 +165,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                       type === 'expense' ? 'bg-red-600 text-app-ink shadow-lg' : 'text-app-muted'
                     }`}
                   >
-                    Despesas
+                    {t('categories.type.expensePlural')}
                   </button>
                   <button
                     type="button"
@@ -172,7 +174,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                       type === 'both' ? 'bg-app-accent text-app-ink shadow-lg' : 'text-app-muted'
                     }`}
                   >
-                    Ambos
+                    {t('categories.type.both')}
                   </button>
                 </div>
               </div>
@@ -180,7 +182,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
               <div className="space-y-3">
                 <label className="text-sm font-medium text-app-muted ml-1 flex items-center gap-2">
                   <Palette className="w-4 h-4" />
-                  Cor da Categoria
+                  {t('categories.form.colorLabel')}
                 </label>
                 <div className="grid grid-cols-7 gap-3">
                   {PRESET_COLORS.map((presetColor) => (
@@ -207,7 +209,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                 ) : (
                   <>
                     <Save className="w-5 h-5" />
-                    Salvar Alterações
+                    {t('categories.edit.submit')}
                   </>
                 )}
               </button>

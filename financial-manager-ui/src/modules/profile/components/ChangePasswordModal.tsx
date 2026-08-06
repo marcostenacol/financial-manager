@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Save, Lock } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useProfile } from '../hooks/useProfile';
@@ -11,6 +12,7 @@ interface ChangePasswordModalProps {
 }
 
 export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { changePassword } = useProfile();
   const [currentPassword, setCurrentPassword] = useState('');
@@ -29,7 +31,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
-      showToast('As senhas não coincidem.', 'error');
+      showToast(t('profile.changePassword.mismatch'), 'error');
       return;
     }
 
@@ -37,10 +39,10 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
 
     try {
       await changePassword(currentPassword, newPassword);
-      showToast('Senha alterada com sucesso!', 'success');
+      showToast(t('profile.changePassword.success'), 'success');
       handleClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao alterar senha'), 'error');
+      showToast(getErrorMessage(err, t('profile.changePassword.error')), 'error');
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
           className="relative w-full max-w-md bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
           <div className="p-6 border-b border-app-border flex justify-between items-center">
-            <h2 className="text-xl font-bold text-app-ink">Trocar Senha</h2>
+            <h2 className="text-xl font-bold text-app-ink">{t('profile.changePassword.title')}</h2>
             <button onClick={handleClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
               <X className="w-5 h-5" />
             </button>
@@ -73,7 +75,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
 
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Senha Atual</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('profile.changePassword.currentPassword')}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -87,7 +89,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Nova Senha</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('profile.changePassword.newPassword')}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -102,7 +104,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Confirmar Nova Senha</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('profile.changePassword.confirmNewPassword')}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -126,7 +128,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  Alterar Senha
+                  {t('profile.changePassword.submit')}
                 </>
               )}
             </button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Plus, Wallet as WalletIcon, CreditCard, Banknote, Building2, Star, Trash2 } from 'lucide-react';
 import { CreateWalletModal } from '../components/CreateWalletModal';
 import { UpdateWalletModal } from '../components/UpdateWalletModal';
@@ -16,6 +17,7 @@ import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const WalletsPage = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { scope } = useScope();
   const { activeOrganizationId } = useActiveOrganization();
@@ -40,7 +42,7 @@ export const WalletsPage = () => {
 
   useEffect(() => {
 
-    loadWallets().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar carteiras'), 'error'));
+    loadWallets().catch((err) => showToast(getErrorMessage(err, t('wallets.toast.loadError')), 'error'));
     loadOrganizations().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
@@ -53,9 +55,9 @@ export const WalletsPage = () => {
       await moveWalletToOrganization(walletId, organizationId);
       setMovingWalletId(null);
       await loadWallets();
-      showToast('Carteira movida para a organização com sucesso', 'success');
+      showToast(t('wallets.toast.moveSuccess'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao mover carteira'), 'error');
+      showToast(getErrorMessage(err, t('wallets.toast.moveError')), 'error');
     }
   };
 
@@ -72,7 +74,7 @@ export const WalletsPage = () => {
       await setPrimaryWallet(wallet.id);
       await loadWallets();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao definir carteira principal'), 'error');
+      showToast(getErrorMessage(err, t('wallets.toast.setPrimaryError')), 'error');
     }
   };
 
@@ -89,9 +91,9 @@ export const WalletsPage = () => {
       await clearAllWallets(clearAllTarget);
       setIsClearAllModalOpen(false);
       loadWallets();
-      showToast('Carteiras removidas com sucesso', 'success');
+      showToast(t('wallets.toast.clearSuccess'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao excluir carteiras'), 'error');
+      showToast(getErrorMessage(err, t('wallets.toast.clearError')), 'error');
     }
   };
 
@@ -101,9 +103,9 @@ export const WalletsPage = () => {
       if (scope === 'personal') await clearAllGoals();
       setIsClearAllModalOpen(false);
       loadWallets();
-      showToast('Todos os dados foram removidos', 'success');
+      showToast(t('wallets.toast.resetSuccess'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao zerar tudo'), 'error');
+      showToast(getErrorMessage(err, t('wallets.toast.resetError')), 'error');
     }
   };
 
@@ -120,8 +122,8 @@ export const WalletsPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">Minhas Carteiras</h1>
-          <p className="text-app-muted">Gerencie seu dinheiro em diferentes contas</p>
+          <h1 className="ledger-title text-4xl text-app-ink">{t('wallets.title')}</h1>
+          <p className="text-app-muted">{t('wallets.subtitle')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
@@ -130,20 +132,20 @@ export const WalletsPage = () => {
             className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all border border-app-border active:scale-95"
           >
             <ArrowRightLeft className="w-5 h-5 text-app-accent" />
-            Transferir
+            {t('wallets.transfer')}
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
             className="bg-app-accent hover:opacity-90 text-app-accent-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-5 h-5" />
-            Nova Carteira
+            {t('wallets.new')}
           </button>
           <button
             onClick={() => setIsClearAllModalOpen(true)}
             disabled={!canClearAll}
             className="bg-app-surface hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface disabled:hover:text-app-ink"
-            title={canClearAll ? 'Excluir carteiras' : 'Selecione uma organização específica para limpar os dados dela'}
+            title={canClearAll ? t('wallets.deleteWallets') : t('wallets.selectOrganizationHint')}
           >
             <Trash2 className="w-5 h-5" />
           </button>
@@ -176,7 +178,7 @@ export const WalletsPage = () => {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={(e) => handleSetPrimary(e, wallet)}
-                        title={wallet.isPrimary ? 'Carteira principal' : 'Definir como principal'}
+                        title={wallet.isPrimary ? t('wallets.primaryWallet') : t('wallets.setAsPrimary')}
                         className="p-2 hover:bg-app-surface-2 rounded-lg transition-colors"
                       >
                         <Star className={`w-5 h-5 ${wallet.isPrimary ? 'text-yellow-300 fill-yellow-300' : 'text-app-ink/70'}`} />
@@ -187,7 +189,7 @@ export const WalletsPage = () => {
                             e.stopPropagation();
                             setMovingWalletId((prev) => (prev === wallet.id ? null : wallet.id));
                           }}
-                          title="Mover para organização"
+                          title={t('wallets.moveToOrganization')}
                           className="p-2 hover:bg-app-surface-2 rounded-lg transition-colors"
                         >
                           <Building2 className="w-5 h-5 text-app-ink/70" />
@@ -201,12 +203,12 @@ export const WalletsPage = () => {
                       {wallet.name}
                       {wallet.isPrimary && (
                         <span className="ledger-stamp text-app-ink/80">
-                          Principal
+                          {t('wallets.primaryBadge')}
                         </span>
                       )}
                       {wallet.organizationId && (
                         <span className="ledger-stamp text-app-ink/80">
-                          {organizations.find((organization) => organization.id === wallet.organizationId)?.name ?? 'Organização'}
+                          {organizations.find((organization) => organization.id === wallet.organizationId)?.name ?? t('wallets.organization')}
                         </span>
                       )}
                     </p>
@@ -220,7 +222,7 @@ export const WalletsPage = () => {
                       onClick={(e) => e.stopPropagation()}
                       className="absolute inset-0 bg-black/70 rounded-3xl flex flex-col items-center justify-center gap-3 p-4 z-10"
                     >
-                      <p className="text-app-ink text-sm font-medium text-center">Mover "{wallet.name}" para qual organização?</p>
+                      <p className="text-app-ink text-sm font-medium text-center">{t('wallets.movePrompt', { name: wallet.name })}</p>
                       <div className="flex flex-wrap gap-2 justify-center">
                         {organizations.map((organization) => (
                           <button
@@ -236,7 +238,7 @@ export const WalletsPage = () => {
                         onClick={(e) => { e.stopPropagation(); setMovingWalletId(null); }}
                         className="text-app-ink/70 text-xs hover:text-app-ink"
                       >
-                        Cancelar
+                        {t('common.cancel')}
                       </button>
                     </div>
                   )}
@@ -251,12 +253,12 @@ export const WalletsPage = () => {
               <div className="p-4 bg-app-surface-2 rounded-full mb-4">
                 <WalletIcon className="w-12 h-12 text-app-muted" />
               </div>
-              <p className="text-app-muted font-medium text-lg">Nenhuma carteira cadastrada.</p>
+              <p className="text-app-muted font-medium text-lg">{t('wallets.empty')}</p>
               <button 
                 onClick={() => setIsModalOpen(true)}
                 className="mt-4 text-app-accent hover:opacity-80 font-bold"
               >
-                Clique aqui para criar a primeira
+                {t('wallets.emptyCta')}
               </button>
             </div>
           )}
@@ -285,23 +287,23 @@ export const WalletsPage = () => {
       <ConfirmDangerModal
         isOpen={isClearAllModalOpen}
         onClose={() => setIsClearAllModalOpen(false)}
-        title={scope === 'business' ? 'Excluir carteiras da organização' : 'Excluir carteiras pessoais'}
+        title={scope === 'business' ? t('wallets.clearAll.organizationTitle') : t('wallets.clearAll.personalTitle')}
         warning={
           scope === 'business'
-            ? `Isso remove as carteiras, transações e recorrências da organização "${organizations.find((organization) => organization.id === activeOrganizationId)?.name ?? ''}" — não afeta seus dados pessoais. Não tem como desfazer.`
-            : 'Isso remove suas carteiras, transações e recorrências pessoais — não afeta nenhuma organização. Não tem como desfazer.'
+            ? t('wallets.clearAll.organizationWarning', { name: organizations.find((organization) => organization.id === activeOrganizationId)?.name ?? '' })
+            : t('wallets.clearAll.personalWarning')
         }
         actions={[
           {
-            label: scope === 'business' ? 'Excluir carteiras da organização' : 'Excluir carteiras pessoais',
-            description: 'Remove todas as carteiras, transações e recorrências deste escopo. Metas de economia continuam.',
+            label: scope === 'business' ? t('wallets.clearAll.organizationTitle') : t('wallets.clearAll.personalTitle'),
+            description: t('wallets.clearAll.walletsDescription'),
             onClick: handleClearWallets,
           },
           {
-            label: 'Zerar tudo',
+            label: t('wallets.clearAll.resetLabel'),
             description: scope === 'business'
-              ? 'Remove carteiras, transações e recorrências da organização.'
-              : 'Remove carteiras, transações, recorrências e também todas as suas metas de economia.',
+              ? t('wallets.clearAll.resetOrganizationDescription')
+              : t('wallets.clearAll.resetPersonalDescription'),
             onClick: handleResetEverything,
           },
         ]}

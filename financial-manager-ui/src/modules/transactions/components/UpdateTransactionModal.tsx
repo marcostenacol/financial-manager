@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2 } from 'lucide-react';
+import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2, Ban } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
@@ -54,6 +54,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const loadData = async () => {
     try {
@@ -106,6 +107,28 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
     }
   };
 
+  const handleCancel = async () => {
+    if (!transaction || !window.confirm('Cancelar esta transação? Se ela já estava concluída, o saldo da carteira volta ao que era antes.')) return;
+    setCancelling(true);
+
+    try {
+      await updateTransaction(transaction.id, {
+        description: transaction.description,
+        amount: transaction.amount,
+        type: transaction.type === 'transfer' ? undefined : transaction.type,
+        category_id: transaction.categoryId || undefined,
+        occurred_at: transaction.occurredAt,
+        status: 'cancelled',
+      });
+      onSuccess();
+      onClose();
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao cancelar transação'), 'error');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!transaction || !window.confirm('Tem certeza que deseja excluir esta transação?')) return;
     setDeleting(true);
@@ -139,9 +162,24 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
         className="relative w-full max-w-xl bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
-          <h2 className="text-xl font-bold text-app-ink">Editar Transação</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-app-ink">Editar Transação</h2>
+            {transaction.status === 'cancelled' && (
+              <span className="ledger-stamp text-app-danger">Cancelada</span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
-            <button 
+            {transaction.status !== 'cancelled' && (
+              <button
+                onClick={handleCancel}
+                disabled={cancelling || deleting}
+                className="p-2 hover:bg-amber-500/10 rounded-xl transition-colors text-amber-400 disabled:opacity-50"
+                title="Cancelar transação (reverte o saldo, mantém o histórico)"
+              >
+                <Ban className="w-5 h-5" />
+              </button>
+            )}
+            <button
               onClick={handleDelete}
               disabled={deleting}
               className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-red-400 disabled:opacity-50"

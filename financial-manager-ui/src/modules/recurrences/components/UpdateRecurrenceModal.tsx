@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Save, RefreshCw, Clock, Tag, FileText, Calendar } from 'lucide-react';
 import { useCategories } from '../../categories/hooks/useCategories';
 import { useRecurrences, type Recurrence } from '../hooks/useRecurrences';
@@ -16,6 +17,7 @@ interface UpdateRecurrenceModalProps {
 }
 
 export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }: UpdateRecurrenceModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { scope } = useScope();
   const { categories, loadCategories } = useCategories(scope);
@@ -59,7 +61,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
       onSuccess();
       onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao atualizar recorrência'), 'error');
+      showToast(getErrorMessage(err, t('recurrences.errors.update')), 'error');
     } finally {
       setLoading(false);
     }
@@ -85,7 +87,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
         <div className="p-6 border-b border-app-border flex justify-between items-center bg-app-surface sticky top-0 z-10">
           <h2 className="text-xl font-bold text-app-ink flex items-center gap-2">
             <RefreshCw className="w-5 h-5 text-app-accent" />
-            Editar Recorrência
+            {t('recurrences.edit')}
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
@@ -102,7 +104,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
               }`}
             >
               <RefreshCw className="w-5 h-5" />
-              Receita
+              {t('common.income')}
             </button>
             <button
               type="button"
@@ -112,13 +114,13 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
               }`}
             >
               <RefreshCw className="w-5 h-5" />
-              Despesa
+              {t('common.expense')}
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Descrição</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('common.description')}</label>
               <div className="relative">
                 <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -132,7 +134,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Valor</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('common.value')}</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted font-bold">R$</span>
                 <CurrencyInput
@@ -147,7 +149,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Frequência</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('recurrences.form.frequency')}</label>
               <div className="relative">
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <select
@@ -155,16 +157,16 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
                   onChange={(e) => setPeriod(e.target.value as 'daily' | 'weekly' | 'monthly' | 'yearly')}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
-                  <option value="daily" className="bg-app-surface">Diário</option>
-                  <option value="weekly" className="bg-app-surface">Semanal</option>
-                  <option value="monthly" className="bg-app-surface">Mensal</option>
-                  <option value="yearly" className="bg-app-surface">Anual</option>
+                  <option value="daily" className="bg-app-surface">{t('recurrences.period.daily')}</option>
+                  <option value="weekly" className="bg-app-surface">{t('recurrences.period.weekly')}</option>
+                  <option value="monthly" className="bg-app-surface">{t('recurrences.period.monthly')}</option>
+                  <option value="yearly" className="bg-app-surface">{t('recurrences.period.yearly')}</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Categoria</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('common.category')}</label>
               <div className="relative">
                 <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <select
@@ -172,7 +174,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
-                  <option value="" className="bg-app-surface">Manter categoria atual</option>
+                  <option value="" className="bg-app-surface">{t('recurrences.form.keepCategory')}</option>
                   {categories.map(c => (
                     <option key={c.id} value={c.id} className="bg-app-surface">{c.name}</option>
                   ))}
@@ -182,7 +184,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Data de término (opcional)</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('recurrences.form.endDate')}</label>
             <div className="relative">
               <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
               <input
@@ -204,7 +206,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Salvar Alterações
+                {t('recurrences.form.saveChanges')}
               </>
             )}
           </button>

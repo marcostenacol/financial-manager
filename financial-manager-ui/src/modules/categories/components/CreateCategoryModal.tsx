@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Save, Type, Palette, ArrowUpCircle, ArrowDownCircle, Layers } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useCategories } from '../hooks/useCategories';
@@ -20,6 +21,7 @@ const PREDEFINED_COLORS = [
 ];
 
 export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCategoryModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { createCategory } = useCategories();
   const { organizations, loadOrganizations } = useOrganizations();
@@ -62,7 +64,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
       setType('expense');
       setOrganizationId('');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao criar categoria'), 'error');
+      showToast(getErrorMessage(err, t('categories.errors.create')), 'error');
     } finally {
       setLoading(false);
     }
@@ -84,7 +86,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
         className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
-          <h2 className="text-xl font-bold text-app-ink">Nova Categoria</h2>
+          <h2 className="text-xl font-bold text-app-ink">{t('categories.new')}</h2>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
           </button>
@@ -92,7 +94,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Nome da Categoria</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('categories.form.nameLabel')}</label>
             <div className="relative group">
               <Type className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
               <input
@@ -100,14 +102,14 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Alimentação, Lazer..."
+                placeholder={t('categories.form.namePlaceholder')}
                 className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Tipo de Transação</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('categories.form.typeLabel')}</label>
             <div className="grid grid-cols-3 gap-3">
               <button
                 type="button"
@@ -117,7 +119,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
                 }`}
               >
                 <ArrowUpCircle className="w-5 h-5" />
-                <span className="text-[10px] font-bold uppercase">Receita</span>
+                <span className="text-[10px] font-bold uppercase">{t('common.income')}</span>
               </button>
               <button
                 type="button"
@@ -127,7 +129,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
                 }`}
               >
                 <ArrowDownCircle className="w-5 h-5" />
-                <span className="text-[10px] font-bold uppercase">Despesa</span>
+                <span className="text-[10px] font-bold uppercase">{t('common.expense')}</span>
               </button>
               <button
                 type="button"
@@ -137,20 +139,20 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
                 }`}
               >
                 <Layers className="w-5 h-5" />
-                <span className="text-[10px] font-bold uppercase">Ambos</span>
+                <span className="text-[10px] font-bold uppercase">{t('categories.type.both')}</span>
               </button>
             </div>
           </div>
 
           {scope === 'business' && organizations.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Organização</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('categories.form.organizationLabel')}</label>
               <select
                 value={organizationId}
                 onChange={(e) => setOrganizationId(e.target.value)}
                 className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
               >
-                <option value="" className="bg-app-surface">Só minha (não compartilhada)</option>
+                <option value="" className="bg-app-surface">{t('categories.form.organizationOwnOnly')}</option>
                 {organizations.map((organization) => (
                   <option key={organization.id} value={organization.id} className="bg-app-surface">{organization.name}</option>
                 ))}
@@ -161,7 +163,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
           <div className="space-y-3">
             <label className="text-sm font-medium text-app-muted ml-1 flex items-center gap-2">
               <Palette className="w-4 h-4" />
-              Cor da Categoria
+              {t('categories.form.colorLabel')}
             </label>
             <div className="flex flex-wrap gap-3">
               {PREDEFINED_COLORS.map((c) => (
@@ -188,7 +190,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Salvar Categoria
+                {t('categories.form.submit')}
               </>
             )}
           </button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { 
   Plus, 
   Search, 
@@ -27,6 +28,7 @@ import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const TransactionsPage = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { scope } = useScope();
   const { activeOrganizationId } = useActiveOrganization();
@@ -70,7 +72,7 @@ export const TransactionsPage = () => {
 
       await loadTransactions(params);
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao carregar transações'), 'error');
+      showToast(getErrorMessage(err, t('transactions.errors.load')), 'error');
     }
   };
 
@@ -92,7 +94,7 @@ export const TransactionsPage = () => {
       link.click();
       link.remove();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao exportar transações'), 'error');
+      showToast(getErrorMessage(err, t('transactions.errors.export')), 'error');
     }
   };
 
@@ -121,7 +123,7 @@ export const TransactionsPage = () => {
   };
 
   const handleDelete = async () => {
-    if (isDeleting || !selectedTransaction || !window.confirm('Tem certeza que deseja excluir esta transação?')) return;
+    if (isDeleting || !selectedTransaction || !window.confirm(t('transactions.confirmDelete'))) return;
 
     setIsDeleting(true);
     try {
@@ -129,7 +131,7 @@ export const TransactionsPage = () => {
       setIsDetailModalOpen(false);
       fetchTransactions();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao excluir transação'), 'error');
+      showToast(getErrorMessage(err, t('transactions.errors.delete')), 'error');
     } finally {
       setIsDeleting(false);
     }
@@ -146,9 +148,9 @@ export const TransactionsPage = () => {
       await clearAllTransactions(resetBalances, clearAllTarget);
       setIsClearAllModalOpen(false);
       fetchTransactions();
-      showToast('Transações removidas com sucesso', 'success');
+      showToast(t('transactions.clearAll.successToast'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao limpar transações'), 'error');
+      showToast(getErrorMessage(err, t('transactions.errors.clearAll')), 'error');
     }
   };
 
@@ -163,8 +165,8 @@ export const TransactionsPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">Transações</h1>
-          <p className="text-app-muted">Acompanhe seu fluxo de caixa detalhadamente</p>
+          <h1 className="ledger-title text-4xl text-app-ink">{t('transactions.title')}</h1>
+          <p className="text-app-muted">{t('transactions.subtitle')}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -174,26 +176,26 @@ export const TransactionsPage = () => {
               onClick={() => setFilterType('all')}
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'all' ? 'bg-app-accent text-app-accent-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
-              Tudo
+              {t('transactions.filters.all')}
             </button>
             <button
               onClick={() => setFilterType('income')}
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'income' ? 'bg-app-success text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
-              Entradas
+              {t('transactions.filters.income')}
             </button>
             <button
               onClick={() => setFilterType('expense')}
               className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-app-danger text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
-              Saídas
+              {t('transactions.filters.expense')}
             </button>
           </div>
 
           <button
             onClick={handleExport}
             className="bg-app-surface hover:bg-app-surface-2 text-app-ink p-3 rounded-2xl border border-app-border transition-all active:scale-95"
-            title="Exportar CSV"
+            title={t('transactions.exportCsv')}
           >
             <Download className="w-6 h-6 text-app-accent" />
           </button>
@@ -202,7 +204,7 @@ export const TransactionsPage = () => {
             onClick={() => setIsClearAllModalOpen(true)}
             disabled={!canClearAll}
             className="bg-app-surface hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface disabled:hover:text-app-ink"
-            title={canClearAll ? 'Limpar todas as transações' : 'Selecione uma organização específica para limpar os dados dela'}
+            title={canClearAll ? t('transactions.clearAll.tooltip') : t('transactions.clearAll.tooltipDisabled')}
           >
             <Trash2 className="w-6 h-6" />
           </button>
@@ -225,7 +227,7 @@ export const TransactionsPage = () => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
           <input
             type="text"
-            placeholder="Buscar por descrição..."
+            placeholder={t('transactions.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
@@ -240,7 +242,7 @@ export const TransactionsPage = () => {
           }`}
         >
           <Filter className="w-5 h-5" />
-          Filtros Avançados
+          {t('transactions.advancedFilters')}
           {Object.keys(advancedFilters).length > 0 && (
             <span className="w-5 h-5 bg-app-accent text-app-accent-ink text-[10px] rounded-full flex items-center justify-center">
               {Object.keys(advancedFilters).length}
@@ -252,7 +254,7 @@ export const TransactionsPage = () => {
       <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-app-card">
         <div className="px-6 py-4 border-b border-app-border flex items-center justify-between bg-app-surface-2">
           <span className="text-xs font-bold text-app-muted uppercase tracking-widest">
-            Mostrando {transactions.length} de {total} transações
+            {t('transactions.pagination.showing', { shown: transactions.length, total })}
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -260,7 +262,7 @@ export const TransactionsPage = () => {
               onClick={() => setPage(page - 1)}
               className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
-              Anterior
+              {t('transactions.pagination.previous')}
             </button>
             <span className="text-app-ink font-bold px-3 py-1 bg-app-accent/20 border border-app-accent/30 rounded-lg text-sm">
               {page}
@@ -270,7 +272,7 @@ export const TransactionsPage = () => {
               onClick={() => setPage(page + 1)}
               className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
-              Próximo
+              {t('transactions.pagination.next')}
             </button>
           </div>
         </div>
@@ -300,7 +302,7 @@ export const TransactionsPage = () => {
                       <div className="flex items-center gap-2">
                         <h3 className="text-app-ink font-bold group-hover:text-app-accent transition-colors">{transaction.description}</h3>
                         {transaction.recurrenceId && (
-                          <span title="Transação Recorrente">
+                          <span title={t('transactions.recurringBadge')}>
                             <RefreshCw className="w-3 h-3 text-app-accent" />
                           </span>
                         )}
@@ -313,7 +315,7 @@ export const TransactionsPage = () => {
                         <span className="w-px h-3 bg-app-border" />
                         <span className="flex items-center gap-1 text-xs text-app-muted uppercase tracking-wider">
                           <WalletIcon className="w-3 h-3" />
-                          {transaction.wallet?.name || 'Carteira'}
+                          {transaction.wallet?.name || t('common.wallet')}
                         </span>
                       </div>
                     </div>
@@ -327,7 +329,7 @@ export const TransactionsPage = () => {
                       <span className={`ledger-stamp mt-1 ${
                         transaction.status === 'completed' ? 'text-app-success' : 'text-app-accent'
                       }`}>
-                        {transaction.status === 'completed' ? 'Efetivado' : 'Pendente'}
+                        {transaction.status === 'completed' ? t('transactions.status.completed') : t('transactions.status.pending')}
                       </span>
                     </div>
                     <ChevronRight className="w-5 h-5 text-app-muted group-hover:text-app-ink transition-colors" />
@@ -341,8 +343,8 @@ export const TransactionsPage = () => {
                 <div className="p-4 bg-app-surface rounded-full mb-4">
                   <ArrowUpCircle className="w-12 h-12 text-app-muted" />
                 </div>
-                <h3 className="text-app-ink font-bold text-lg">Nenhuma transação encontrada</h3>
-                <p className="text-app-muted mt-1 max-w-xs">Parece que você ainda não registrou movimentos financeiros com este filtro.</p>
+                <h3 className="text-app-ink font-bold text-lg">{t('transactions.empty.title')}</h3>
+                <p className="text-app-muted mt-1 max-w-xs">{t('transactions.empty.description')}</p>
               </div>
             )}
           </div>
@@ -389,21 +391,21 @@ export const TransactionsPage = () => {
       <ConfirmDangerModal
         isOpen={isClearAllModalOpen}
         onClose={() => setIsClearAllModalOpen(false)}
-        title={scope === 'business' ? 'Limpar transações da organização' : 'Limpar todas as transações pessoais'}
+        title={scope === 'business' ? t('transactions.clearAll.titleBusiness') : t('transactions.clearAll.titlePersonal')}
         warning={
           scope === 'business'
-            ? 'Essa ação remove permanentemente as transações da organização selecionada — não afeta seus dados pessoais. Escolha o que fazer com o saldo das carteiras.'
-            : 'Essa ação remove permanentemente todas as suas transações pessoais — não afeta nenhuma organização. Escolha o que fazer com o saldo das carteiras.'
+            ? t('transactions.clearAll.warningBusiness')
+            : t('transactions.clearAll.warningPersonal')
         }
         actions={[
           {
-            label: 'Excluir mantendo o saldo atual',
-            description: 'As transações somem, mas o saldo de cada carteira continua o mesmo de hoje.',
+            label: t('transactions.clearAll.keepBalanceLabel'),
+            description: t('transactions.clearAll.keepBalanceDescription'),
             onClick: () => handleClearAll(false),
           },
           {
-            label: 'Excluir e zerar o saldo',
-            description: 'As transações somem e o saldo de cada carteira volta para R$ 0,00.',
+            label: t('transactions.clearAll.resetBalanceLabel'),
+            description: t('transactions.clearAll.resetBalanceDescription'),
             onClick: () => handleClearAll(true),
           },
         ]}

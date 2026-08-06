@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins, Trash2 } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../hooks/useWallets';
@@ -21,14 +22,15 @@ interface UpdateWalletModalProps {
 }
 
 const WALLET_TYPES = [
-  { id: 'checking', label: 'Conta Corrente', icon: <Landmark className="w-5 h-5" /> },
-  { id: 'savings', label: 'Poupança', icon: <Banknote className="w-5 h-5" /> },
-  { id: 'credit', label: 'Cartão de Crédito', icon: <CreditCard className="w-5 h-5" /> },
-  { id: 'investment', label: 'Investimento', icon: <WalletIcon className="w-5 h-5" /> },
-  { id: 'cash', label: 'Dinheiro', icon: <Coins className="w-5 h-5" /> },
+  { id: 'checking', labelKey: 'wallets.types.checking', icon: <Landmark className="w-5 h-5" /> },
+  { id: 'savings', labelKey: 'wallets.types.savings', icon: <Banknote className="w-5 h-5" /> },
+  { id: 'credit', labelKey: 'wallets.types.credit', icon: <CreditCard className="w-5 h-5" /> },
+  { id: 'investment', labelKey: 'wallets.types.investment', icon: <WalletIcon className="w-5 h-5" /> },
+  { id: 'cash', labelKey: 'wallets.types.cashShort', icon: <Coins className="w-5 h-5" /> },
 ];
 
 export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: UpdateWalletModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { updateWallet, deleteWallet } = useWallets();
   const [name, setName] = useState('');
@@ -61,14 +63,14 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
       onSuccess();
       onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao atualizar carteira'), 'error');
+      showToast(getErrorMessage(err, t('wallets.toast.updateError')), 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!wallet || !window.confirm('Tem certeza que deseja excluir esta carteira? Todas as transações vinculadas serão afetadas.')) return;
+    if (!wallet || !window.confirm(t('wallets.confirmDelete'))) return;
     setDeleting(true);
 
     try {
@@ -76,8 +78,8 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
       onSuccess();
       onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao deletar carteira'), 'error');
-      alert('Não foi possível excluir esta carteira. Verifique se existem transações ativas.');
+      showToast(getErrorMessage(err, t('wallets.toast.deleteError')), 'error');
+      alert(t('wallets.deleteBlocked'));
     } finally {
       setDeleting(false);
     }
@@ -102,7 +104,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
           className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
           <div className="p-6 border-b border-app-border flex justify-between items-center">
-            <h2 className="text-xl font-bold text-app-ink">Editar Carteira</h2>
+            <h2 className="text-xl font-bold text-app-ink">{t('wallets.form.editTitle')}</h2>
             <div className="flex items-center gap-2">
               <button 
                 onClick={handleDelete}
@@ -119,19 +121,19 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
 
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Nome da Carteira</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('wallets.form.nameLabel')}</label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Nubank, Carteira Pessoal..."
+                placeholder={t('wallets.form.namePlaceholderUpdate')}
                 className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Tipo de Conta</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('wallets.form.typeLabel')}</label>
               <div className="grid grid-cols-2 gap-3">
                 {WALLET_TYPES.map((wType) => (
                   <button
@@ -145,14 +147,14 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
                     }`}
                   >
                     {wType.icon}
-                    <span className="text-xs font-bold">{wType.label}</span>
+                    <span className="text-xs font-bold">{t(wType.labelKey)}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Saldo Atual (R$)</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('wallets.form.currentBalance')}</label>
               <CurrencyInput
                 required
                 allowNegative
@@ -172,7 +174,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  Salvar Alterações
+                  {t('wallets.form.updateSubmit')}
                 </>
               )}
             </button>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight, PieChart, Activity, Target, FileDown, FileSpreadsheet, Briefcase } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useReports, type DashboardOverview, type ExpenseByCategory, type MonthlyEvolution, type CashFlowByCostCenter } from '../hooks/useReports';
@@ -23,6 +24,7 @@ const CHART_COLORS = {
 };
 
 export const DashboardPage = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { getOverview, getExpensesByCategory, getMonthlyEvolution, getCashFlowByCostCenter, exportReport } = useReports();
   const { goals: allGoals, loadGoals } = useSavingsGoals();
@@ -58,7 +60,7 @@ export const DashboardPage = () => {
       setExpensesByCategory(expensesData);
       setEvolution(evolutionData);
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao carregar dashboard'), 'error');
+      showToast(getErrorMessage(err, t('dashboard.errors.load')), 'error');
     } finally {
       setLoading(false);
     }
@@ -110,7 +112,7 @@ export const DashboardPage = () => {
       link.click();
       link.remove();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao exportar'), 'error');
+      showToast(getErrorMessage(err, t('dashboard.errors.export')), 'error');
     }
   };
 
@@ -134,18 +136,18 @@ export const DashboardPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">Dashboard</h1>
-          <p className="text-app-muted">Bem-vindo de volta! Aqui está o resumo das suas finanças.</p>
+          <h1 className="ledger-title text-4xl text-app-ink">{t('dashboard.title')}</h1>
+          <p className="text-app-muted">{t('dashboard.welcome')}</p>
         </div>
 
         {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
 
         <div className="flex flex-wrap bg-app-surface p-1 rounded-2xl border border-app-border">
           {[
-            { id: 'month', label: 'Este Mês' },
-            { id: '7days', label: '7 dias' },
-            { id: '30days', label: '30 dias' },
-            { id: 'custom', label: 'Personalizado' },
+            { id: 'month', label: t('dashboard.periods.month') },
+            { id: '7days', label: t('dashboard.periods.7days') },
+            { id: '30days', label: t('dashboard.periods.30days') },
+            { id: 'custom', label: t('dashboard.periods.custom') },
           ].map((preset) => (
             <button
               key={preset.id}
@@ -186,7 +188,7 @@ export const DashboardPage = () => {
           className="flex flex-wrap gap-4 mb-8 p-4 bg-app-surface border border-app-border rounded-2xl items-end"
         >
           <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted ml-1">Início</label>
+            <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted ml-1">{t('dashboard.filters.startDate')}</label>
             <input 
               type="date" 
               value={start_date}
@@ -195,7 +197,7 @@ export const DashboardPage = () => {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted ml-1">Fim</label>
+            <label className="text-[10px] uppercase tracking-widest font-bold text-app-muted ml-1">{t('dashboard.filters.endDate')}</label>
             <input 
               type="date" 
               value={end_date}
@@ -216,13 +218,13 @@ export const DashboardPage = () => {
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
             <Wallet className="w-24 h-24" />
           </div>
-          <p className="text-app-accent-ink font-medium mb-1">Saldo Total</p>
+          <p className="text-app-accent-ink font-medium mb-1">{t('dashboard.cards.totalBalance')}</p>
           <h2 className="ledger-figure text-4xl text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.total_balance || 0)}
           </h2>
           <div className="mt-4 flex items-center gap-2 text-app-accent-ink/80 text-sm">
             <Activity className="w-4 h-4" />
-            <span>Atualizado agora</span>
+            <span>{t('dashboard.cards.updatedNow')}</span>
           </div>
         </motion.div>
 
@@ -246,7 +248,7 @@ export const DashboardPage = () => {
               </span>
             )}
           </div>
-          <p className="text-app-muted font-medium mb-1">Receitas do Mês</p>
+          <p className="text-app-muted font-medium mb-1">{t('dashboard.cards.monthlyIncome')}</p>
           <h2 className="ledger-figure text-3xl text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.monthly_income || 0)}
           </h2>
@@ -272,7 +274,7 @@ export const DashboardPage = () => {
               </span>
             )}
           </div>
-          <p className="text-app-muted font-medium mb-1">Despesas do Mês</p>
+          <p className="text-app-muted font-medium mb-1">{t('dashboard.cards.monthlyExpense')}</p>
           <h2 className="ledger-figure text-3xl text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.monthly_expense || 0)}
           </h2>
@@ -290,7 +292,7 @@ export const DashboardPage = () => {
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
               <PieChart className="w-5 h-5 text-app-accent" />
-              Gastos por Categoria
+              {t('dashboard.charts.expensesByCategory')}
             </h3>
           </div>
 
@@ -318,7 +320,7 @@ export const DashboardPage = () => {
             
             {expensesByCategory.length === 0 && (
               <div className="text-center py-12 text-app-muted">
-                Sem despesas registradas este mês.
+                {t('dashboard.empty.noExpenses')}
               </div>
             )}
           </div>
@@ -334,7 +336,7 @@ export const DashboardPage = () => {
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-app-accent" />
-              Evolução Mensal
+              {t('dashboard.charts.monthlyEvolution')}
             </h3>
           </div>
 
@@ -382,7 +384,7 @@ export const DashboardPage = () => {
                   strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorIncome)"
-                  name="Receita"
+                  name={t('common.income')}
                   isAnimationActive={false}
                 />
                 <Area
@@ -392,7 +394,7 @@ export const DashboardPage = () => {
                   strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorExpense)"
-                  name="Despesa"
+                  name={t('common.expense')}
                   isAnimationActive={false}
                 />
               </AreaChart>
@@ -411,10 +413,10 @@ export const DashboardPage = () => {
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
               <Target className="w-5 h-5 text-emerald-400" />
-              Progresso das Metas
+              {t('dashboard.goals.title')}
             </h3>
             <Link to="/savings-goals" className="text-app-accent hover:opacity-80 text-sm font-medium transition-colors">
-              Ver todas as metas
+              {t('dashboard.goals.viewAll')}
             </Link>
           </div>
 
@@ -426,7 +428,7 @@ export const DashboardPage = () => {
                   <div className="flex justify-between items-end">
                     <div>
                       <p className="text-app-ink font-bold">{goal.name}</p>
-                      <p className="text-app-muted text-xs">Faltam {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount - goal.currentAmount)}</p>
+                      <p className="text-app-muted text-xs">{t('dashboard.goals.remaining', { amount: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(goal.targetAmount - goal.currentAmount) })}</p>
                     </div>
                     <span className="text-app-ink font-bold text-lg">{progress}%</span>
                   </div>
@@ -445,7 +447,7 @@ export const DashboardPage = () => {
 
             {goals.length === 0 && (
               <div className="col-span-full text-center py-4 text-app-muted">
-                Você ainda não definiu metas de economia.
+                {t('dashboard.empty.noGoals')}
               </div>
             )}
           </div>
@@ -460,10 +462,10 @@ export const DashboardPage = () => {
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-amber-400" />
-              Fluxo de Caixa por Centro de Custo
+              {t('dashboard.costCenters.title')}
             </h3>
             <Link to="/cost-centers" className="text-app-accent hover:opacity-80 text-sm font-medium transition-colors">
-              Gerenciar centros de custo
+              {t('dashboard.costCenters.manage')}
             </Link>
           </div>
 
@@ -491,7 +493,7 @@ export const DashboardPage = () => {
 
             {cashFlowByCostCenter.length === 0 && (
               <div className="text-center py-12 text-app-muted">
-                Sem despesas por centro de custo este mês.
+                {t('dashboard.empty.noCostCenterExpenses')}
               </div>
             )}
           </div>

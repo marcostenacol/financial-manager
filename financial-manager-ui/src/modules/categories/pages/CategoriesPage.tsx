@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Plus, Tag, MoreVertical } from 'lucide-react';
 import { CreateCategoryModal } from '../components/CreateCategoryModal';
 import { UpdateCategoryModal } from '../components/UpdateCategoryModal';
@@ -12,6 +13,7 @@ import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const CategoriesPage = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { scope } = useScope();
   const { activeOrganizationId } = useActiveOrganization();
@@ -26,7 +28,7 @@ export const CategoriesPage = () => {
 
   useEffect(() => {
      
-    loadCategories().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar categorias'), 'error'));
+    loadCategories().catch((err) => showToast(getErrorMessage(err, t('categories.errors.load')), 'error'));
     loadOrganizations().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
@@ -38,9 +40,9 @@ export const CategoriesPage = () => {
 
   const getTypeLabel = (type: string) => {
     switch (type) {
-      case 'income': return 'Receita';
-      case 'expense': return 'Despesa';
-      default: return 'Ambos';
+      case 'income': return t('common.income');
+      case 'expense': return t('common.expense');
+      default: return t('categories.type.both');
     }
   };
 
@@ -48,8 +50,8 @@ export const CategoriesPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">Categorias</h1>
-          <p className="text-app-muted">Organize suas transações por grupos</p>
+          <h1 className="ledger-title text-4xl text-app-ink">{t('categories.title')}</h1>
+          <p className="text-app-muted">{t('categories.subtitle')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">
           {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
@@ -58,7 +60,7 @@ export const CategoriesPage = () => {
             className="bg-app-accent hover:opacity-90 text-app-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-5 h-5" />
-            Nova Categoria
+            {t('categories.new')}
           </button>
         </div>
       </div>
@@ -114,8 +116,8 @@ export const CategoriesPage = () => {
                 <div className="p-4 bg-app-surface-2 rounded-full mb-4">
                   <Tag className="w-12 h-12 text-app-muted" />
                 </div>
-                <h3 className="text-app-ink font-bold text-lg">Nenhuma categoria</h3>
-                <p className="text-app-muted mt-1">Crie categorias para organizar seus gastos e ganhos.</p>
+                <h3 className="text-app-ink font-bold text-lg">{t('categories.empty.title')}</h3>
+                <p className="text-app-muted mt-1">{t('categories.empty.description')}</p>
               </div>
             )}
           </div>

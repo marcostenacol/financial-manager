@@ -1,1 +1,4 @@
 import '@testing-library/jest-dom/vitest';
+import i18n from '../src/i18n';
+
+void i18n.changeLanguage('pt');

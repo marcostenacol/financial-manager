@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Save, RefreshCw, Calendar, Wallet as WalletIcon, Tag, Clock, FileText } from 'lucide-react';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
@@ -16,6 +17,7 @@ interface CreateRecurrenceModalProps {
 }
 
 export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecurrenceModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { scope } = useScope();
   const { wallets, loadWallets } = useWallets(scope);
@@ -38,7 +40,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
       if (loadedWallets.length > 0) setWalletId(loadedWallets[0].id);
       if (loadedCategories.length > 0) setCategoryId(loadedCategories[0].id);
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao carregar dados'), 'error');
+      showToast(getErrorMessage(err, t('recurrences.errors.loadData')), 'error');
     }
   };
 
@@ -68,17 +70,17 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
       onSuccess();
       onClose();
 
-      if (window.confirm('Recorrência criada! Deseja lançar a ocorrência deste ciclo agora, em vez de esperar o próximo processamento automático?')) {
+      if (window.confirm(t('recurrences.confirmRunAfterCreate'))) {
         try {
           await runRecurrenceNow(recurrence.id);
-          showToast('Ocorrência lançada com sucesso', 'success');
+          showToast(t('recurrences.runNowSuccess'), 'success');
           onSuccess();
         } catch (err) {
-          showToast(getErrorMessage(err, 'Erro ao lançar a ocorrência'), 'error');
+          showToast(getErrorMessage(err, t('recurrences.errors.runNow')), 'error');
         }
       }
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao criar recorrência'), 'error');
+      showToast(getErrorMessage(err, t('recurrences.errors.create')), 'error');
     } finally {
       setLoading(false);
     }
@@ -104,7 +106,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
         <div className="p-6 border-b border-app-border flex justify-between items-center bg-app-surface sticky top-0 z-10">
           <h2 className="text-xl font-bold text-app-ink flex items-center gap-2">
             <RefreshCw className="w-5 h-5 text-app-accent" />
-            Nova Recorrência
+            {t('recurrences.new')}
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
@@ -122,7 +124,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
               }`}
             >
               <RefreshCw className="w-5 h-5" />
-              Receita
+              {t('common.income')}
             </button>
             <button
               type="button"
@@ -132,13 +134,13 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
               }`}
             >
               <RefreshCw className="w-5 h-5" />
-              Despesa
+              {t('common.expense')}
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Descrição</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('common.description')}</label>
               <div className="relative">
                 <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -146,14 +148,14 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Ex: Assinatura Netflix..."
+                  placeholder={t('recurrences.form.descriptionPlaceholder')}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Valor</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('common.value')}</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted font-bold">R$</span>
                 <CurrencyInput
@@ -168,7 +170,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Frequência</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('recurrences.form.frequency')}</label>
               <div className="relative">
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <select
@@ -176,16 +178,16 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
                   onChange={(e) => setPeriod(e.target.value as 'daily' | 'weekly' | 'monthly' | 'yearly')}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
-                  <option value="daily" className="bg-app-surface">Diário</option>
-                  <option value="weekly" className="bg-app-surface">Semanal</option>
-                  <option value="monthly" className="bg-app-surface">Mensal</option>
-                  <option value="yearly" className="bg-app-surface">Anual</option>
+                  <option value="daily" className="bg-app-surface">{t('recurrences.period.daily')}</option>
+                  <option value="weekly" className="bg-app-surface">{t('recurrences.period.weekly')}</option>
+                  <option value="monthly" className="bg-app-surface">{t('recurrences.period.monthly')}</option>
+                  <option value="yearly" className="bg-app-surface">{t('recurrences.period.yearly')}</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Data de Início</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('recurrences.form.startDate')}</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -201,7 +203,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Carteira</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('common.wallet')}</label>
               <div className="relative">
                 <WalletIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <select
@@ -210,7 +212,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
                   onChange={(e) => setWalletId(e.target.value)}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
-                  <option value="" disabled className="bg-app-surface">Selecionar Carteira</option>
+                  <option value="" disabled className="bg-app-surface">{t('recurrences.form.selectWallet')}</option>
                   {wallets.map(w => (
                     <option key={w.id} value={w.id} className="bg-app-surface">{w.name}</option>
                   ))}
@@ -219,7 +221,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Categoria</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('common.category')}</label>
               <div className="relative">
                 <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <select
@@ -228,7 +230,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
-                  <option value="" disabled className="bg-app-surface">Selecionar Categoria</option>
+                  <option value="" disabled className="bg-app-surface">{t('recurrences.form.selectCategory')}</option>
                   {categories.map(c => (
                     <option key={c.id} value={c.id} className="bg-app-surface">{c.name}</option>
                   ))}
@@ -247,7 +249,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Salvar Recorrência
+                {t('recurrences.form.submit')}
               </>
             )}
           </button>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Mail, Lock, User, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useRegister } from '../hooks/useRegister';
@@ -12,6 +13,7 @@ export const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { register } = useRegister();
 
@@ -20,7 +22,7 @@ export const RegisterPage = () => {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('As senhas não coincidem.');
+      setError(t('auth.register.passwordMismatch'));
       return;
     }
 
@@ -28,10 +30,10 @@ export const RegisterPage = () => {
 
     try {
       await register({ name, email, password });
-      navigate('/login', { state: { message: 'Conta criada com sucesso! Faça login para continuar.' } });
+      navigate('/login', { state: { message: t('auth.register.success') } });
     } catch (err) {
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      setError(message || 'Erro ao criar conta. Tente novamente.');
+      setError(message || t('auth.register.error'));
     } finally {
       setIsLoading(false);
     }
@@ -45,15 +47,15 @@ export const RegisterPage = () => {
             Croesus<span className="text-app-accent">.</span>
           </div>
           <div className="space-y-3 border-t border-app-border pt-5 font-mono text-xs text-app-muted">
-            <p className="text-app-ink">Um livro-caixa simples pra sua vida financeira.</p>
-            <p>Carteiras, transações e metas — tudo num só lugar.</p>
+            <p className="text-app-ink">{t('auth.brand.taglinePrimary')}</p>
+            <p>{t('auth.brand.taglineSecondary')}</p>
           </div>
         </div>
 
         <div className="flex flex-col justify-center gap-6 bg-app-surface p-8 sm:p-10">
           <div>
-            <h1 className="font-display text-2xl font-medium text-app-ink">Criar nova conta</h1>
-            <p className="mt-1 text-sm text-app-muted">Junte-se a nós e organize sua vida financeira</p>
+            <h1 className="font-display text-2xl font-medium text-app-ink">{t('auth.register.title')}</h1>
+            <p className="mt-1 text-sm text-app-muted">{t('auth.register.subtitle')}</p>
           </div>
 
           {error && (
@@ -71,7 +73,7 @@ export const RegisterPage = () => {
                 type="text"
                 required
                 className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
-                placeholder="Seu nome completo"
+                placeholder={t('auth.register.namePlaceholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -85,7 +87,7 @@ export const RegisterPage = () => {
                 type="email"
                 required
                 className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
-                placeholder="Seu e-mail"
+                placeholder={t('auth.register.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -99,7 +101,7 @@ export const RegisterPage = () => {
                 type="password"
                 required
                 className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
-                placeholder="Crie uma senha"
+                placeholder={t('auth.register.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -113,7 +115,7 @@ export const RegisterPage = () => {
                 type="password"
                 required
                 className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
-                placeholder="Confirme sua senha"
+                placeholder={t('auth.register.confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
@@ -124,14 +126,14 @@ export const RegisterPage = () => {
               disabled={isLoading}
               className="flex w-full items-center justify-center rounded-sm bg-app-accent py-3 text-sm font-bold uppercase tracking-wide text-app-accent-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Cadastrar'}
+              {isLoading ? <Loader2 className="animate-spin" size={20} /> : t('auth.register.submit')}
             </button>
           </form>
 
           <p className="text-center text-sm text-app-muted">
-            Já tem uma conta?{' '}
+            {t('auth.register.hasAccount')}{' '}
             <Link to="/login" className="font-medium text-app-accent hover:opacity-80 transition-opacity">
-              Faça login
+              {t('auth.register.signInLink')}
             </Link>
           </p>
         </div>

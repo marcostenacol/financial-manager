@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../../contexts/useAuth';
@@ -11,6 +12,7 @@ export const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const { t } = useTranslation();
   const { signIn } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -25,7 +27,7 @@ export const LoginPage = () => {
       navigate('/');
     } catch (err) {
       const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
-      setError(message || 'Erro ao realizar login. Tente novamente.');
+      setError(message || t('auth.login.error'));
     } finally {
       setIsLoading(false);
     }
@@ -39,15 +41,15 @@ export const LoginPage = () => {
             Croesus<span className="text-app-accent">.</span>
           </div>
           <div className="space-y-3 border-t border-app-border pt-5 font-mono text-xs text-app-muted">
-            <p className="text-app-ink">Um livro-caixa simples pra sua vida financeira.</p>
-            <p>Carteiras, transações e metas — tudo num só lugar.</p>
+            <p className="text-app-ink">{t('auth.brand.taglinePrimary')}</p>
+            <p>{t('auth.brand.taglineSecondary')}</p>
           </div>
         </div>
 
         <div className="flex flex-col justify-center gap-6 bg-app-surface p-8 sm:p-10">
           <div>
-            <h1 className="font-display text-2xl font-medium text-app-ink">Bem-vindo de volta</h1>
-            <p className="mt-1 text-sm text-app-muted">Acesse sua conta para continuar</p>
+            <h1 className="font-display text-2xl font-medium text-app-ink">{t('auth.login.title')}</h1>
+            <p className="mt-1 text-sm text-app-muted">{t('auth.login.subtitle')}</p>
           </div>
 
           {error && (
@@ -65,7 +67,7 @@ export const LoginPage = () => {
                 type="email"
                 required
                 className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
-                placeholder="Seu e-mail"
+                placeholder={t('auth.login.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -79,7 +81,7 @@ export const LoginPage = () => {
                 type="password"
                 required
                 className="block w-full border-b border-app-border bg-transparent py-2.5 pl-7 text-app-ink placeholder-app-muted transition-colors focus:border-app-accent focus:outline-none"
-                placeholder="Sua senha"
+                placeholder={t('auth.login.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -88,10 +90,10 @@ export const LoginPage = () => {
             <div className="flex justify-end text-sm">
               <button
                 type="button"
-                onClick={() => showToast('Recuperação de senha ainda não está disponível. Entre em contato com o suporte.', 'info')}
+                onClick={() => showToast(t('auth.login.forgotPasswordUnavailable'), 'info')}
                 className="font-medium text-app-muted transition-colors hover:text-app-accent"
               >
-                Esqueceu a senha?
+                {t('auth.login.forgotPassword')}
               </button>
             </div>
 
@@ -100,14 +102,14 @@ export const LoginPage = () => {
               disabled={isLoading}
               className="flex w-full items-center justify-center rounded-sm bg-app-accent py-3 text-sm font-bold uppercase tracking-wide text-app-accent-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Entrar'}
+              {isLoading ? <Loader2 className="animate-spin" size={20} /> : t('auth.login.submit')}
             </button>
           </form>
 
           <p className="text-center text-sm text-app-muted">
-            Ainda não tem uma conta?{' '}
+            {t('auth.login.noAccount')}{' '}
             <Link to="/register" className="font-medium text-app-accent hover:opacity-80 transition-opacity">
-              Cadastre-se agora
+              {t('auth.login.signUpLink')}
             </Link>
           </p>
         </div>

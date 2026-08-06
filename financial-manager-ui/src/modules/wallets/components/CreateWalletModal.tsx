@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Save, Wallet as WalletIcon, CreditCard, Banknote, Landmark, Coins } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../hooks/useWallets';
@@ -16,14 +17,15 @@ interface CreateWalletModalProps {
 }
 
 const WALLET_TYPES = [
-  { id: 'checking', label: 'Conta Corrente', icon: WalletIcon, color: 'text-app-accent' },
-  { id: 'savings', label: 'Poupança', icon: Banknote, color: 'text-emerald-400' },
-  { id: 'credit', label: 'Cartão de Crédito', icon: CreditCard, color: 'text-app-accent' },
-  { id: 'investment', label: 'Investimento', icon: Landmark, color: 'text-amber-400' },
-  { id: 'cash', label: 'Dinheiro em Espécie', icon: Coins, color: 'text-orange-400' },
+  { id: 'checking', labelKey: 'wallets.types.checking', icon: WalletIcon, color: 'text-app-accent' },
+  { id: 'savings', labelKey: 'wallets.types.savings', icon: Banknote, color: 'text-emerald-400' },
+  { id: 'credit', labelKey: 'wallets.types.credit', icon: CreditCard, color: 'text-app-accent' },
+  { id: 'investment', labelKey: 'wallets.types.investment', icon: Landmark, color: 'text-amber-400' },
+  { id: 'cash', labelKey: 'wallets.types.cash', icon: Coins, color: 'text-orange-400' },
 ];
 
 export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { createWallet } = useWallets();
   const { organizations, loadOrganizations } = useOrganizations();
@@ -70,7 +72,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       setBalance(0);
       setOrganizationId('');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao criar carteira'), 'error');
+      showToast(getErrorMessage(err, t('wallets.toast.createError')), 'error');
     } finally {
       setLoading(false);
     }
@@ -93,7 +95,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
         className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
-          <h2 className="text-xl font-bold text-app-ink">Nova Carteira</h2>
+          <h2 className="text-xl font-bold text-app-ink">{t('wallets.new')}</h2>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
           </button>
@@ -101,19 +103,19 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Nome da Carteira</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('wallets.form.nameLabel')}</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ex: Nubank Principal"
+              placeholder={t('wallets.form.namePlaceholderCreate')}
               className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Tipo de Conta</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('wallets.form.typeLabel')}</label>
             <div className="grid grid-cols-2 gap-3">
               {WALLET_TYPES.map((wType) => (
                 <button
@@ -127,7 +129,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
                   }`}
                 >
                   <wType.icon className={`w-5 h-5 ${type === wType.id ? wType.color : ''}`} />
-                  <span className="text-sm font-medium">{wType.label}</span>
+                  <span className="text-sm font-medium">{t(wType.labelKey)}</span>
                 </button>
               ))}
             </div>
@@ -135,13 +137,13 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
 
           {scope === 'business' && organizations.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Organização</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('wallets.organization')}</label>
               <select
                 value={organizationId}
                 onChange={(e) => setOrganizationId(e.target.value)}
                 className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
               >
-                <option value="" className="bg-app-surface">Só minha (não compartilhada)</option>
+                <option value="" className="bg-app-surface">{t('wallets.form.onlyMine')}</option>
                 {organizations.map((organization) => (
                   <option key={organization.id} value={organization.id} className="bg-app-surface">{organization.name}</option>
                 ))}
@@ -150,7 +152,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Saldo Inicial</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('wallets.form.initialBalance')}</label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted font-bold text-lg">R$</span>
               <CurrencyInput
@@ -172,7 +174,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Criar Carteira
+                {t('wallets.form.createSubmit')}
               </>
             )}
           </button>

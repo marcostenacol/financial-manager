@@ -7,6 +7,7 @@
     "savingsGoals": "Goals",
     "costCenters": "Cost Centers",
     "recurrences": "Recurrences",
+    "people": "People",
     "organizations": "Organizations",
     "profile": "My Profile",
     "personal": "Personal",
@@ -14,5 +15,355 @@
     "themeLight": "Light theme",
     "themeDark": "Dark theme",
     "signOut": "Sign out"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu",
+    "create": "Create",
+    "edit": "Edit",
+    "description": "Description",
+    "value": "Amount",
+    "category": "Category",
+    "wallet": "Wallet",
+    "income": "Income",
+    "expense": "Expense",
+    "personal": "Personal",
+    "business": "Business"
+  },
+  "shared": {
+    "sidebar": {
+      "ledgerSubtitle": "Ledger",
+      "entriesSection": "Entries"
+    }
+  },
+  "auth": {
+    "brand": {
+      "taglinePrimary": "A simple ledger for your financial life.",
+      "taglineSecondary": "Wallets, transactions and goals — all in one place."
+    },
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your account to continue",
+      "emailPlaceholder": "Your email",
+      "passwordPlaceholder": "Your password",
+      "forgotPassword": "Forgot password?",
+      "forgotPasswordUnavailable": "Password recovery is not available yet — please contact support.",
+      "submit": "Sign in",
+      "error": "Invalid email or password.",
+      "noAccount": "Don't have an account yet?",
+      "signUpLink": "Sign up now"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Start organizing your finances",
+      "namePlaceholder": "Your full name",
+      "emailPlaceholder": "Your email",
+      "passwordPlaceholder": "Create a password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "passwordMismatch": "Passwords do not match.",
+      "submit": "Create account",
+      "success": "Account created successfully! Sign in to continue.",
+      "error": "Error creating account.",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back! Here's a summary of your finances.",
+    "cards": {
+      "totalBalance": "Total Balance",
+      "monthlyIncome": "Monthly Income",
+      "monthlyExpense": "Monthly Expenses",
+      "updatedNow": "Updated just now"
+    },
+    "charts": {
+      "monthlyEvolution": "Monthly Evolution",
+      "expensesByCategory": "Expenses by Category"
+    },
+    "costCenters": {
+      "title": "Cash Flow by Cost Center",
+      "manage": "Manage cost centers"
+    },
+    "goals": {
+      "title": "Savings Goals",
+      "viewAll": "View all"
+    },
+    "empty": {
+      "noExpenses": "No expenses recorded in this period.",
+      "noCostCenterExpenses": "No cost center entries in this period.",
+      "noGoals": "No savings goals yet."
+    },
+    "filters": {
+      "startDate": "Start date",
+      "endDate": "End date"
+    },
+    "periods": {
+      "month": "This Month",
+      "7days": "7 days",
+      "30days": "30 days",
+      "custom": "Custom"
+    },
+    "errors": {
+      "load": "Error loading dashboard data",
+      "export": "Error exporting report"
+    }
+  },
+  "wallets": {
+    "title": "Wallets",
+    "subtitle": "Manage your money across different accounts",
+    "new": "New Wallet",
+    "transfer": "Transfer",
+    "empty": "No wallets yet",
+    "emptyCta": "Create your first wallet to start organizing your finances.",
+    "deleteWallets": "Delete wallets",
+    "selectOrganizationHint": "Select a specific organization to clear its data",
+    "confirmDelete": "Remove this wallet? This action cannot be undone.",
+    "deleteBlocked": "You can't remove a wallet with linked transactions.",
+    "primaryWallet": "Primary wallet",
+    "setAsPrimary": "Set as primary",
+    "primaryBadge": "Primary",
+    "organization": "Organization",
+    "moveToOrganization": "Move to organization",
+    "form": {
+      "nameLabel": "Wallet name",
+      "namePlaceholderCreate": "E.g.: Checking, Wallet, Savings...",
+      "namePlaceholderUpdate": "Wallet name",
+      "typeLabel": "Type",
+      "initialBalance": "Initial balance",
+      "currentBalance": "Current balance",
+      "onlyMine": "Only mine (not shared)",
+      "createSubmit": "Create Wallet",
+      "updateSubmit": "Save Changes",
+      "editTitle": "Edit Wallet"
+    },
+    "clearAll": {
+      "personalTitle": "Clear everything (personal)",
+      "organizationTitle": "Clear everything (organization)",
+      "personalWarning": "This will remove all your personal wallets and linked data. This action cannot be undone.",
+      "walletsDescription": "Permanently removes all wallets (and their transactions).",
+      "resetLabel": "Also clear savings goals",
+      "resetPersonalDescription": "Besides wallets, this also removes your personal savings goals.",
+      "resetOrganizationDescription": "Removes all wallets (and transactions) from this organization."
+    },
+    "toast": {
+      "loadError": "Error loading wallets",
+      "createError": "Error creating wallet",
+      "updateError": "Error updating wallet",
+      "deleteError": "Error deleting wallet",
+      "setPrimaryError": "Error setting primary wallet",
+      "moveSuccess": "Wallet moved to the organization successfully",
+      "moveError": "Error moving wallet",
+      "clearSuccess": "Wallets removed successfully",
+      "clearError": "Error deleting wallets",
+      "resetSuccess": "All data has been removed",
+      "resetError": "Error clearing everything"
+    }
+  },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "Track your income and expenses",
+    "advancedFilters": "Advanced filters",
+    "exportCsv": "Export CSV",
+    "searchPlaceholder": "Search by description...",
+    "recurringBadge": "Recurring",
+    "confirmDelete": "Are you sure you want to delete this transaction?",
+    "filters": {
+      "all": "All",
+      "income": "Income",
+      "expense": "Expenses"
+    },
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "empty": {
+      "title": "No transactions found",
+      "description": "Adjust the filters or create your first transaction."
+    },
+    "clearAll": {
+      "titlePersonal": "Clear everything (personal)",
+      "titleBusiness": "Clear everything (organization)",
+      "warningPersonal": "This will remove all your personal transactions. This action cannot be undone.",
+      "warningBusiness": "This will remove all transactions from this organization. This action cannot be undone.",
+      "keepBalanceLabel": "Keep the current wallet balances",
+      "keepBalanceDescription": "Transactions are removed, but wallet balances are not recalculated.",
+      "resetBalanceLabel": "Reset wallet balances",
+      "resetBalanceDescription": "Each wallet's balance goes back to zero along with the removed transactions.",
+      "tooltip": "Delete transactions",
+      "tooltipDisabled": "Select a specific organization to clear its data",
+      "successToast": "Transactions removed successfully"
+    },
+    "errors": {
+      "load": "Error loading transactions",
+      "delete": "Error deleting transaction",
+      "export": "Error exporting transactions",
+      "clearAll": "Error deleting transactions"
+    }
+  },
+  "categories": {
+    "title": "Categories",
+    "subtitle": "Organize your transactions into groups",
+    "new": "New Category",
+    "confirmDelete": "Remove this category? This action cannot be undone.",
+    "type": {
+      "both": "Both",
+      "incomePlural": "Income",
+      "expensePlural": "Expenses"
+    },
+    "form": {
+      "nameLabel": "Category name",
+      "namePlaceholder": "E.g.: Food, Leisure...",
+      "typeLabel": "Transaction type",
+      "usageTypeLabel": "Used for",
+      "colorLabel": "Category color",
+      "organizationLabel": "Organization",
+      "organizationOwnOnly": "Only mine (not shared)",
+      "submit": "Save Category"
+    },
+    "edit": {
+      "title": "Edit Category",
+      "submit": "Save Changes"
+    },
+    "system": {
+      "title": "System category",
+      "description": "Default system categories can't be edited or removed."
+    },
+    "empty": {
+      "title": "No categories yet",
+      "description": "Create categories to organize your income and expenses."
+    },
+    "errors": {
+      "load": "Error loading categories",
+      "create": "Error creating category",
+      "update": "Error updating category",
+      "delete": "Error deleting category",
+      "deleteBlocked": "You can't remove a category with linked transactions."
+    }
+  },
+  "recurrences": {
+    "title": "Recurrences",
+    "subtitle": "Automatic entries that repeat over time",
+    "new": "New Recurrence",
+    "edit": "Edit",
+    "activate": "Activate",
+    "pause": "Pause",
+    "runNow": "Run now",
+    "runNowDisabledHint": "Paused recurrence — activate it to run now",
+    "runNowSuccess": "Entry generated successfully",
+    "ended": "Ended",
+    "statusActive": "Active",
+    "statusPaused": "Paused",
+    "showCancelled": "Show ended",
+    "cancelPermanently": "End permanently",
+    "confirmCancel": "End this recurrence permanently? This action cannot be undone.",
+    "confirmRunNow": "Generate an entry now for this recurrence?",
+    "confirmRunAfterCreate": "Recurrence created! Would you like to generate the first entry now?",
+    "period": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "form": {
+      "descriptionPlaceholder": "E.g.: Rent, Subscription...",
+      "frequency": "Frequency",
+      "startDate": "Start date",
+      "endDate": "End date (optional)",
+      "selectWallet": "Select wallet",
+      "selectCategory": "Select category",
+      "keepCategory": "Keep current category",
+      "submit": "Create Recurrence",
+      "saveChanges": "Save Changes"
+    },
+    "empty": {
+      "title": "No recurrences yet",
+      "description": "Create automatic entries so you never miss a recurring bill.",
+      "noneActiveTitle": "No active recurrences",
+      "noneActiveDescription": "All your recurrences are paused or ended."
+    },
+    "clearAllTitle": "Clear recurrences",
+    "clearAllDisabledHint": "Select a specific organization to clear its data",
+    "clearAllSuccess": "Recurrences removed successfully",
+    "clearAll": {
+      "titlePersonal": "Clear recurrences (personal)",
+      "titleBusiness": "Clear recurrences (organization)",
+      "warningPersonal": "This will remove all your personal recurrences. This action cannot be undone.",
+      "warningBusiness": "This will remove all recurrences from this organization. This action cannot be undone.",
+      "actionLabel": "Delete recurrences",
+      "actionDescription": "Permanently removes all recurrences (does not affect already generated entries)."
+    },
+    "errors": {
+      "load": "Error loading recurrences",
+      "loadData": "Error loading recurrence data",
+      "create": "Error creating recurrence",
+      "update": "Error updating recurrence",
+      "toggle": "Error updating recurrence status",
+      "cancel": "Error ending recurrence",
+      "runNow": "Error generating entry",
+      "clearAll": "Error deleting recurrences"
+    }
+  },
+  "organizations": {
+    "title": "Organizations",
+    "subtitle": "Share wallets, categories and reports with your team",
+    "createCard": {
+      "title": "Create organization",
+      "namePlaceholder": "Organization name"
+    },
+    "joinCard": {
+      "title": "Join with invite code",
+      "codePlaceholder": "Invite code",
+      "submit": "Join"
+    },
+    "toasts": {
+      "created": "Organization created successfully",
+      "deleted": "Organization removed successfully",
+      "joined": "You've successfully joined the organization"
+    },
+    "errors": {
+      "load": "Error loading organizations",
+      "create": "Error creating organization",
+      "delete": "Error removing organization",
+      "invalidInviteCode": "Invalid or expired invite code"
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information",
+    "saveChanges": "Save Changes",
+    "signOut": "Sign out",
+    "loadError": "Error loading profile",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Error updating profile",
+    "avatar": {
+      "label": "Profile picture",
+      "change": "Change picture",
+      "alt": "Avatar"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "namePlaceholder": "Your full name",
+      "emailReadOnly": "Email can't be changed",
+      "bio": "About you",
+      "bioPlaceholder": "Tell us a bit about yourself...",
+      "accountType": "Account type"
+    },
+    "changePassword": {
+      "title": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password",
+      "mismatch": "Passwords do not match",
+      "submit": "Change Password",
+      "success": "Password changed successfully",
+      "error": "Error changing password"
+    }
   }
 }

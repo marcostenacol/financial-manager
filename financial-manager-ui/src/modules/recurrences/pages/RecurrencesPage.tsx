@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Plus, RefreshCw, Clock, Wallet as WalletIcon, X, Trash2, Pencil, Play } from 'lucide-react';
 import { useRecurrences, type Recurrence } from '../hooks/useRecurrences';
 import { CreateRecurrenceModal } from '../components/CreateRecurrenceModal';
@@ -13,6 +14,7 @@ import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const RecurrencesPage = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { scope } = useScope();
   const { activeOrganizationId } = useActiveOrganization();
@@ -30,30 +32,30 @@ export const RecurrencesPage = () => {
 
   useEffect(() => {
 
-    loadRecurrences().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar recorrências'), 'error'));
+    loadRecurrences().catch((err) => showToast(getErrorMessage(err, t('recurrences.errors.load')), 'error'));
     loadOrganizations().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getPeriodLabel = (period: string) => {
     const labels: Record<string, string> = {
-      daily: 'Diário',
-      weekly: 'Semanal',
-      monthly: 'Mensal',
-      yearly: 'Anual'
+      daily: t('recurrences.period.daily'),
+      weekly: t('recurrences.period.weekly'),
+      monthly: t('recurrences.period.monthly'),
+      yearly: t('recurrences.period.yearly')
     };
     return labels[period] || period;
   };
 
   const handleCancel = async (id: string) => {
-    if (pendingIds.has(id) || !confirm('Tem certeza que deseja cancelar esta recorrência definitivamente?')) return;
+    if (pendingIds.has(id) || !confirm(t('recurrences.confirmCancel'))) return;
 
     setPendingIds((prev) => new Set(prev).add(id));
     try {
       await cancelRecurrence(id);
       loadRecurrences();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao cancelar recorrência'), 'error');
+      showToast(getErrorMessage(err, t('recurrences.errors.cancel')), 'error');
     } finally {
       setPendingIds((prev) => {
         const next = new Set(prev);
@@ -71,7 +73,7 @@ export const RecurrencesPage = () => {
       await toggleRecurrence(id);
       loadRecurrences();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao alternar status da recorrência'), 'error');
+      showToast(getErrorMessage(err, t('recurrences.errors.toggle')), 'error');
     } finally {
       setPendingIds((prev) => {
         const next = new Set(prev);
@@ -87,15 +89,15 @@ export const RecurrencesPage = () => {
   };
 
   const handleRunNow = async (id: string) => {
-    if (pendingIds.has(id) || !confirm('Lançar a ocorrência desta recorrência agora?')) return;
+    if (pendingIds.has(id) || !confirm(t('recurrences.confirmRunNow'))) return;
 
     setPendingIds((prev) => new Set(prev).add(id));
     try {
       await runRecurrenceNow(id);
       loadRecurrences();
-      showToast('Ocorrência lançada com sucesso', 'success');
+      showToast(t('recurrences.runNowSuccess'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao lançar a ocorrência'), 'error');
+      showToast(getErrorMessage(err, t('recurrences.errors.runNow')), 'error');
     } finally {
       setPendingIds((prev) => {
         const next = new Set(prev);
@@ -126,9 +128,9 @@ export const RecurrencesPage = () => {
       await clearAllRecurrences(clearAllTarget);
       setIsClearAllModalOpen(false);
       loadRecurrences();
-      showToast('Recorrências removidas com sucesso', 'success');
+      showToast(t('recurrences.clearAllSuccess'), 'success');
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao limpar recorrências'), 'error');
+      showToast(getErrorMessage(err, t('recurrences.errors.clearAll')), 'error');
     }
   };
 
@@ -136,8 +138,8 @@ export const RecurrencesPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">Recorrências</h1>
-          <p className="text-app-muted">Gerencie seus gastos e ganhos automáticos</p>
+          <h1 className="ledger-title text-4xl text-app-ink">{t('recurrences.title')}</h1>
+          <p className="text-app-muted">{t('recurrences.subtitle')}</p>
         </div>
         <div className="flex items-center gap-4">
           {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
@@ -148,13 +150,13 @@ export const RecurrencesPage = () => {
               onChange={(e) => setShowCancelled(e.target.checked)}
               className="accent-blue-600"
             />
-            Mostrar canceladas
+            {t('recurrences.showCancelled')}
           </label>
           <button
             onClick={() => setIsClearAllModalOpen(true)}
             disabled={!canClearAll}
             className="bg-app-surface-2 hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface-2 disabled:hover:text-app-ink"
-            title={canClearAll ? 'Limpar todas as recorrências' : 'Selecione uma organização específica para limpar os dados dela'}
+            title={canClearAll ? t('recurrences.clearAllTitle') : t('recurrences.clearAllDisabledHint')}
           >
             <Trash2 className="w-5 h-5" />
           </button>
@@ -163,7 +165,7 @@ export const RecurrencesPage = () => {
             className="bg-app-accent hover:opacity-90 text-app-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-5 h-5" />
-            Nova Recorrência
+            {t('recurrences.new')}
           </button>
         </div>
       </div>
@@ -211,12 +213,12 @@ export const RecurrencesPage = () => {
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(recurrence.amount)}
                       </p>
                       {isExpired(recurrence) ? (
-                        <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">Encerrada</span>
+                        <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">{t('recurrences.ended')}</span>
                       ) : (
                         <div className="flex flex-col items-end gap-1">
-                          <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">Próximo: {new Date(recurrence.startsAt).toLocaleDateString('pt-BR')}</p>
+                          <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">{t('recurrences.next', { date: new Date(recurrence.startsAt).toLocaleDateString('pt-BR') })}</p>
                           <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${recurrence.isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
-                            {recurrence.isActive ? 'Ativa' : 'Pausada'}
+                            {recurrence.isActive ? t('recurrences.statusActive') : t('recurrences.statusPaused')}
                           </span>
                         </div>
                       )}
@@ -227,7 +229,7 @@ export const RecurrencesPage = () => {
                         <button
                           onClick={() => handleEdit(recurrence)}
                           className="p-2 hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-xl transition-all"
-                          title="Editar"
+                          title={t('common.edit')}
                         >
                           <Pencil className="w-5 h-5" />
                         </button>
@@ -235,7 +237,7 @@ export const RecurrencesPage = () => {
                           onClick={() => handleRunNow(recurrence.id)}
                           disabled={pendingIds.has(recurrence.id) || !recurrence.isActive}
                           className="p-2 hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                          title={recurrence.isActive ? 'Rodar agora' : 'Ative a recorrência para rodar manualmente'}
+                          title={recurrence.isActive ? t('recurrences.runNow') : t('recurrences.runNowDisabledHint')}
                         >
                           <Play className="w-5 h-5" />
                         </button>
@@ -243,7 +245,7 @@ export const RecurrencesPage = () => {
                           onClick={() => handleToggleActive(recurrence.id)}
                           disabled={pendingIds.has(recurrence.id)}
                           className={`p-2 rounded-xl transition-all disabled:opacity-50 ${recurrence.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
-                          title={recurrence.isActive ? 'Pausar' : 'Ativar'}
+                          title={recurrence.isActive ? t('recurrences.pause') : t('recurrences.activate')}
                         >
                           <RefreshCw className={`w-5 h-5 ${!recurrence.isActive ? 'animate-pulse' : ''}`} />
                         </button>
@@ -251,7 +253,7 @@ export const RecurrencesPage = () => {
                           onClick={() => handleCancel(recurrence.id)}
                           disabled={pendingIds.has(recurrence.id)}
                           className="p-2 hover:bg-red-500/10 text-app-muted hover:text-red-400 rounded-xl transition-all disabled:opacity-50"
-                          title="Cancelar Definitivamente"
+                          title={t('recurrences.cancelPermanently')}
                         >
                           <X className="w-5 h-5" />
                         </button>
@@ -268,12 +270,12 @@ export const RecurrencesPage = () => {
                   <RefreshCw className="w-12 h-12 text-app-muted" />
                 </div>
                 <h3 className="text-app-ink font-bold text-lg">
-                  {recurrences.length === 0 ? 'Nenhuma recorrência' : 'Nenhuma recorrência ativa'}
+                  {recurrences.length === 0 ? t('recurrences.empty.title') : t('recurrences.empty.noneActiveTitle')}
                 </h3>
                 <p className="text-app-muted mt-1">
                   {recurrences.length === 0
-                    ? 'Configure pagamentos recorrentes para automatizar seu fluxo.'
-                    : 'Todas as recorrências foram canceladas. Marque "Mostrar canceladas" para vê-las.'}
+                    ? t('recurrences.empty.description')
+                    : t('recurrences.empty.noneActiveDescription')}
                 </p>
               </div>
             )}
@@ -297,16 +299,16 @@ export const RecurrencesPage = () => {
       <ConfirmDangerModal
         isOpen={isClearAllModalOpen}
         onClose={() => setIsClearAllModalOpen(false)}
-        title={scope === 'business' ? 'Limpar recorrências da organização' : 'Limpar todas as recorrências pessoais'}
+        title={scope === 'business' ? t('recurrences.clearAll.titleBusiness') : t('recurrences.clearAll.titlePersonal')}
         warning={
           scope === 'business'
-            ? 'Remove as recorrências da organização selecionada — não afeta suas recorrências pessoais. As transações já geradas continuam existindo, só deixam de estar vinculadas a uma recorrência.'
-            : 'Remove suas recorrências pessoais — não afeta nenhuma organização. As transações que elas já geraram no passado continuam existindo, só deixam de estar vinculadas a uma recorrência.'
+            ? t('recurrences.clearAll.warningBusiness')
+            : t('recurrences.clearAll.warningPersonal')
         }
         actions={[
           {
-            label: 'Limpar recorrências',
-            description: 'Remove todas as recorrências configuradas. Não afeta transações já lançadas.',
+            label: t('recurrences.clearAll.actionLabel'),
+            description: t('recurrences.clearAll.actionDescription'),
             onClick: handleClearAll,
           },
         ]}
