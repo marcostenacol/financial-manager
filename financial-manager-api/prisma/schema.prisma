@@ -53,6 +53,7 @@ model User {
    organizationMemberships OrganizationMember[]
    invitesCreated  Invite[]
    inviteRedemptions InviteRedemption[]
+   people          Person[]
 
    @@map("users")
  }
@@ -125,6 +126,7 @@ model Organization {
   costCenters  CostCenter[]
   savingsGoals SavingsGoal[]
   invites      Invite[]
+  people       Person[]
 
   @@map("organizations")
 }
@@ -323,4 +325,50 @@ model Notification {
   user User @relation(fields: [userId], references: [id])
 
   @@map("notifications")
+}
+
+// ─────────────────────────────────────────
+// PEOPLE (pessoas a quem se deve — área isolada, sem vínculo com carteiras)
+// ─────────────────────────────────────────
+
+enum PixKeyType {
+  CPF
+  CNPJ
+  EMAIL
+  PHONE
+  RANDOM
+}
+
+// ONE_TIME: dívida avulsa, "pago" é um estado final (isPaid).
+// MONTHLY: obrigação recorrente (ex.: aluguel) — "pago" vale só para o mês
+// corrente (lastPaidPeriod, formato "YYYY-MM"); vira pendente de novo a cada
+// novo mês sem precisar de job/reset — a leitura só compara com o mês atual.
+enum PaymentFrequency {
+  ONE_TIME
+  MONTHLY
+}
+
+model Person {
+  id               String           @id @default(uuid())
+  userId           String?          @map("user_id")
+  organizationId   String?          @map("organization_id")
+  scope            ProfileScope     @default(personal)
+  name             String
+  theyOweMe        Decimal          @default(0) @map("they_owe_me") @db.Decimal(15, 2)
+  iOweThem         Decimal          @default(0) @map("i_owe_them") @db.Decimal(15, 2)
+  paymentFrequency PaymentFrequency @default(ONE_TIME) @map("payment_frequency")
+  isPaid           Boolean          @default(false) @map("is_paid")
+  lastPaidPeriod   String?          @map("last_paid_period")
+  pixKey           String           @map("pix_key")
+  pixKeyType       PixKeyType       @map("pix_key_type")
+  pixCity          String?          @map("pix_city")
+  notes            String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user         User?         @relation(fields: [userId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+
+  @@map("people")
 }

@@ -16,6 +16,8 @@ import { TransactionRepositoryInterface } from '@/modules/transactions/repositor
 import { TransactionRepository } from '@/modules/transactions/repositories/TransactionRepository';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CategoryRepository } from '@/modules/categories/repositories/CategoryRepository';
+import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
+import { PersonRepository } from '@/modules/people/repositories/PersonRepository';
 import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositories/contracts/RecurrenceRepositoryInterface';
 import { RecurrenceRepository } from '@/modules/recurrences/repositories/RecurrenceRepository';
 import { ReportRepositoryInterface } from '@/modules/reports/repositories/contracts/ReportRepositoryInterface';
@@ -38,6 +40,7 @@ container.registerSingleton<ProfileRepositoryInterface>('ProfileRepository', Pro
 container.registerSingleton<WalletRepositoryInterface>('WalletRepository', WalletRepository);
 container.registerSingleton<TransactionRepositoryInterface>('TransactionRepository', TransactionRepository);
 container.registerSingleton<CategoryRepositoryInterface>('CategoryRepository', CategoryRepository);
+container.registerSingleton<PersonRepositoryInterface>('PersonRepository', PersonRepository);
 container.registerSingleton<RecurrenceRepositoryInterface>('RecurrenceRepository', RecurrenceRepository);
 container.registerSingleton<ReportRepositoryInterface>('ReportRepository', ReportRepository);
 container.registerSingleton<NotificationRepositoryInterface>('NotificationRepository', NotificationRepository);
@@ -118,6 +121,12 @@ import { ListInviteRedemptionsService } from '@/modules/organizations/services/L
 import { RedeemInviteService } from '@/modules/organizations/services/RedeemInviteService';
 import { DeleteOrganizationService } from '@/modules/organizations/services/DeleteOrganizationService';
 import { DeleteInviteService } from '@/modules/organizations/services/DeleteInviteService';
+import { CreatePersonService } from '@/modules/people/services/CreatePersonService';
+import { ListPeopleService } from '@/modules/people/services/ListPeopleService';
+import { UpdatePersonService } from '@/modules/people/services/UpdatePersonService';
+import { DeletePersonService } from '@/modules/people/services/DeletePersonService';
+import { SettlePersonDebtService } from '@/modules/people/services/SettlePersonDebtService';
+import { GetPersonPixQrCodeService } from '@/modules/people/services/GetPersonPixQrCodeService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -188,3 +197,9 @@ container.registerSingleton<ListInviteRedemptionsService>('ListInviteRedemptions
 container.registerSingleton<RedeemInviteService>('RedeemInviteService', RedeemInviteService);
 container.registerSingleton<DeleteOrganizationService>('DeleteOrganizationService', DeleteOrganizationService);
 container.registerSingleton<DeleteInviteService>('DeleteInviteService', DeleteInviteService);
+container.registerSingleton<CreatePersonService>('CreatePersonService', CreatePersonService);
+container.registerSingleton<ListPeopleService>('ListPeopleService', ListPeopleService);
+container.registerSingleton<UpdatePersonService>('UpdatePersonService', UpdatePersonService);
+container.registerSingleton<DeletePersonService>('DeletePersonService', DeletePersonService);
+container.registerSingleton<SettlePersonDebtService>('SettlePersonDebtService', SettlePersonDebtService);
+container.registerSingleton<GetPersonPixQrCodeService>('GetPersonPixQrCodeService', GetPersonPixQrCodeService);
