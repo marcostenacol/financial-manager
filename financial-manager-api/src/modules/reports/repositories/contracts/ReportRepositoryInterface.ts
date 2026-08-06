@@ -34,7 +34,7 @@ export interface CashFlowByCostCenterData {
 
 export interface ReportRepositoryInterface {
   getDashboardOverview(userId: string, range?: DashboardOverviewRange, scope?: string, organizationId?: string): Promise<DashboardOverviewData>;
-  getExpensesByCategory(userId: string, month: number, year: number, organizationId?: string): Promise<ExpenseByCategoryData[]>;
-  getMonthlyEvolution(userId: string, organizationId?: string): Promise<MonthlyEvolutionData[]>;
-  getCashFlowByCostCenter(userId: string, month: number, year: number, organizationId?: string): Promise<CashFlowByCostCenterData[]>;
+  getExpensesByCategory(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange): Promise<ExpenseByCategoryData[]>;
+  getMonthlyEvolution(userId: string, organizationId?: string, range?: DashboardOverviewRange): Promise<MonthlyEvolutionData[]>;
+  getCashFlowByCostCenter(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange): Promise<CashFlowByCostCenterData[]>;
 }

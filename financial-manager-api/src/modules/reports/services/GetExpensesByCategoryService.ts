@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { ReportRepositoryInterface, ExpenseByCategoryData } from '../repositories/contracts/ReportRepositoryInterface';
+import { ReportRepositoryInterface, ExpenseByCategoryData, DashboardOverviewRange } from '../repositories/contracts/ReportRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 
@@ -12,19 +12,19 @@ export class GetExpensesByCategoryService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, month: number, year: number, organizationId?: string): Promise<ExpenseByCategoryData[]> {
+  async execute(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange): Promise<ExpenseByCategoryData[]> {
     if (organizationId) {
-      return this.reportRepository.getExpensesByCategory(userId, month, year, organizationId);
+      return this.reportRepository.getExpensesByCategory(userId, month, year, organizationId, range);
     }
 
-    const cacheKey = CacheKeys.reports.expensesByCategory(userId, month, year);
+    const cacheKey = CacheKeys.reports.expensesByCategory(userId, month, year, range);
 
     const cached = await this.cache.get<ExpenseByCategoryData[]>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    const data = await this.reportRepository.getExpensesByCategory(userId, month, year);
+    const data = await this.reportRepository.getExpensesByCategory(userId, month, year, undefined, range);
 
     await this.cache.set(cacheKey, data, 600); // 10 minutos
 

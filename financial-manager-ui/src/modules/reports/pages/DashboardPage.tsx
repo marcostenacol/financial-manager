@@ -52,9 +52,9 @@ export const DashboardPage = () => {
 
       const [overviewData, expensesData, evolutionData] = await Promise.all([
         getOverview(range, scope, organizationId),
-        getExpensesByCategory(organizationId),
-        getMonthlyEvolution(organizationId),
-        scope === 'personal' ? loadGoals() : getCashFlowByCostCenter(organizationId).then(setCashFlowByCostCenter),
+        getExpensesByCategory(organizationId, range),
+        getMonthlyEvolution(organizationId, range),
+        scope === 'personal' ? loadGoals() : getCashFlowByCostCenter(organizationId, range).then(setCashFlowByCostCenter),
       ]);
       setOverview(overviewData);
       setExpensesByCategory(expensesData);

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { ReportRepositoryInterface, CashFlowByCostCenterData } from '../repositories/contracts/ReportRepositoryInterface';
+import { ReportRepositoryInterface, CashFlowByCostCenterData, DashboardOverviewRange } from '../repositories/contracts/ReportRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 
@@ -12,19 +12,19 @@ export class GetCashFlowByCostCenterService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, month: number, year: number, organizationId?: string): Promise<CashFlowByCostCenterData[]> {
+  async execute(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange): Promise<CashFlowByCostCenterData[]> {
     if (organizationId) {
-      return this.reportRepository.getCashFlowByCostCenter(userId, month, year, organizationId);
+      return this.reportRepository.getCashFlowByCostCenter(userId, month, year, organizationId, range);
     }
 
-    const cacheKey = CacheKeys.reports.cashFlowByCostCenter(userId, month, year);
+    const cacheKey = CacheKeys.reports.cashFlowByCostCenter(userId, month, year, range);
 
     const cached = await this.cache.get<CashFlowByCostCenterData[]>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    const data = await this.reportRepository.getCashFlowByCostCenter(userId, month, year);
+    const data = await this.reportRepository.getCashFlowByCostCenter(userId, month, year, undefined, range);
 
     await this.cache.set(cacheKey, data, 600); // 10 minutos
 

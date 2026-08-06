@@ -40,12 +40,13 @@ export const CacheKeys = {
     overview: (userId: string, range?: { start_date?: string; end_date?: string }, scope?: string): string =>
       `reports:overview:${userId}:${range?.start_date ?? ''}:${range?.end_date ?? ''}:${scope ?? 'all'}`,
     overviewPattern: (userId: string): string => `reports:overview:${userId}:*`,
-    cashFlowByCostCenter: (userId: string, month: number, year: number): string =>
-      `reports:cash-flow-cost-center:${userId}:${month}:${year}`,
+    cashFlowByCostCenter: (userId: string, month: number, year: number, range?: { start_date?: string; end_date?: string }): string =>
+      `reports:cash-flow-cost-center:${userId}:${month}:${year}:${range?.start_date ?? ''}:${range?.end_date ?? ''}`,
     cashFlowByCostCenterPattern: (userId: string): string => `reports:cash-flow-cost-center:${userId}:*`,
-    expensesByCategory: (userId: string, month: number, year: number): string =>
-      `reports:expenses-category:${userId}:${month}:${year}`,
+    expensesByCategory: (userId: string, month: number, year: number, range?: { start_date?: string; end_date?: string }): string =>
+      `reports:expenses-category:${userId}:${month}:${year}:${range?.start_date ?? ''}:${range?.end_date ?? ''}`,
     expensesByCategoryPattern: (userId: string): string => `reports:expenses-category:${userId}:*`,
-    monthlyEvolution: (userId: string): string => `reports:monthly-evolution:${userId}`,
+    monthlyEvolution: (userId: string, range?: { start_date?: string; end_date?: string }): string =>
+      `reports:monthly-evolution:${userId}:${range?.start_date ?? ''}:${range?.end_date ?? ''}`,
   },
 } as const;

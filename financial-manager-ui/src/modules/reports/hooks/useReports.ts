@@ -41,18 +41,18 @@ export function useReports() {
     return response.data.data as DashboardOverview;
   }, []);
 
-  const getCashFlowByCostCenter = useCallback(async (organizationId?: string) => {
-    const response = await api.get('/reports/cash-flow-by-cost-center', { params: { organization_id: organizationId } });
+  const getCashFlowByCostCenter = useCallback(async (organizationId?: string, range?: ReportDateRange) => {
+    const response = await api.get('/reports/cash-flow-by-cost-center', { params: { organization_id: organizationId, ...range } });
     return response.data.data as CashFlowByCostCenter[];
   }, []);
 
-  const getExpensesByCategory = useCallback(async (organizationId?: string) => {
-    const response = await api.get('/reports/expenses-by-category', { params: { organization_id: organizationId } });
+  const getExpensesByCategory = useCallback(async (organizationId?: string, range?: ReportDateRange) => {
+    const response = await api.get('/reports/expenses-by-category', { params: { organization_id: organizationId, ...range } });
     return response.data.data as ExpenseByCategory[];
   }, []);
 
-  const getMonthlyEvolution = useCallback(async (organizationId?: string) => {
-    const response = await api.get('/reports/evolution', { params: { organization_id: organizationId } });
+  const getMonthlyEvolution = useCallback(async (organizationId?: string, range?: ReportDateRange) => {
+    const response = await api.get('/reports/evolution', { params: { organization_id: organizationId, ...range } });
     return response.data.data as MonthlyEvolution[];
   }, []);
 

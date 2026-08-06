@@ -39,6 +39,6 @@ describe('GetCashFlowByCostCenterService', () => {
     const result = await service.execute('user-1', 1, 2026);
 
     expect(result).toEqual(data);
-    expect(cacheTrait.set).toHaveBeenCalledWith('reports:cash-flow-cost-center:user-1:1:2026', data, 600);
+    expect(cacheTrait.set).toHaveBeenCalledWith('reports:cash-flow-cost-center:user-1:1:2026::', data, 600);
   });
 });

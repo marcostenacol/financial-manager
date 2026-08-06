@@ -56,35 +56,47 @@ export class ReportController extends BaseController {
 
   async cashFlowByCostCenter(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { month, year, organization_id } = request.query as { month: string; year: string; organization_id?: string };
+    const { month, year, organization_id, start_date, end_date } = request.query as {
+      month: string;
+      year: string;
+      organization_id?: string;
+      start_date?: string;
+      end_date?: string;
+    };
     this.assertOrganizationAccess(request, organization_id);
 
     const now = new Date();
     const targetMonth = month ? Number(month) : now.getMonth() + 1;
     const targetYear = year ? Number(year) : now.getFullYear();
 
-    const data = await this.getCashFlowByCostCenter.execute(userId, targetMonth, targetYear, organization_id);
+    const data = await this.getCashFlowByCostCenter.execute(userId, targetMonth, targetYear, organization_id, { start_date, end_date });
     return this.success(reply, data);
   }
 
   async expensesByCategory(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { month, year, organization_id } = request.query as { month: string; year: string; organization_id?: string };
+    const { month, year, organization_id, start_date, end_date } = request.query as {
+      month: string;
+      year: string;
+      organization_id?: string;
+      start_date?: string;
+      end_date?: string;
+    };
     this.assertOrganizationAccess(request, organization_id);
 
     const now = new Date();
     const targetMonth = month ? Number(month) : now.getMonth() + 1;
     const targetYear = year ? Number(year) : now.getFullYear();
 
-    const data = await this.getExpenses.execute(userId, targetMonth, targetYear, organization_id);
+    const data = await this.getExpenses.execute(userId, targetMonth, targetYear, organization_id, { start_date, end_date });
     return this.success(reply, data);
   }
 
   async evolution(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { organization_id } = request.query as { organization_id?: string };
+    const { organization_id, start_date, end_date } = request.query as { organization_id?: string; start_date?: string; end_date?: string };
     this.assertOrganizationAccess(request, organization_id);
-    const data = await this.getEvolution.execute(userId, organization_id);
+    const data = await this.getEvolution.execute(userId, organization_id, { start_date, end_date });
     return this.success(reply, data);
   }
 }
