@@ -365,5 +365,71 @@
       "success": "Password changed successfully",
       "error": "Error changing password"
     }
+  },
+  "people": {
+    "title": "People",
+    "subtitle": "Track who owes you, who you owe, and everyone’s PIX key",
+    "newPerson": "New Person",
+    "frequencyMonthly": "Monthly",
+    "frequencyOneTime": "One-time",
+    "paidThisMonth": " · paid this month",
+    "viewPixQrCode": "View PIX QR Code",
+    "theyOweMeLabel": "They owe me",
+    "iOweThemLabel": "I owe them",
+    "registerReceipt": "Register receipt",
+    "registerPayment": "Register payment",
+    "emptyTitle": "No people registered",
+    "emptyText": "Register who owes you, who you owe, and generate PIX on the spot.",
+    "confirmDelete": "Remove \"{{name}}\"? This action cannot be undone.",
+    "errors": {
+      "load": "Could not load people",
+      "create": "Could not create person",
+      "update": "Could not update person",
+      "delete": "Could not remove person",
+      "settle": "Could not register the payment",
+      "qrCode": "Could not generate the QR Code"
+    },
+    "form": {
+      "createTitle": "New Person",
+      "editTitle": "Edit Person",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. John Smith",
+      "theyOweMeOptional": "They owe me (optional)",
+      "iOweThemOptional": "I owe them (optional)",
+      "theyOweMe": "They owe me",
+      "iOweThem": "I owe them",
+      "frequencyLabel": "Payment frequency",
+      "frequencyOneTimeOption": "One-time",
+      "frequencyMonthlyOption": "Monthly (recurring)",
+      "pixKeyTypeLabel": "PIX key type",
+      "pixKeyLabel": "PIX key",
+      "pixKeyPlaceholder": "Key",
+      "pixCityLabel": "PIX key city (optional)",
+      "pixCityPlaceholder": "e.g. Boa Vista",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Any notes about this debt...",
+      "save": "Save Person",
+      "saveChanges": "Save Changes",
+      "pixTypeCpf": "CPF",
+      "pixTypeCnpj": "CNPJ",
+      "pixTypeEmail": "Email",
+      "pixTypePhone": "Phone",
+      "pixTypeRandom": "Random key"
+    },
+    "settle": {
+      "receiveTitle": "Register receipt",
+      "payTitle": "Register payment",
+      "walletLabel": "Wallet",
+      "selectWallet": "Select wallet",
+      "categoryLabel": "Category",
+      "selectCategory": "Select category",
+      "confirm": "Confirm"
+    },
+    "pix": {
+      "titlePrefix": "PIX — {{name}}",
+      "genericError": "Could not generate the QR Code.",
+      "copy": "Copy PIX code",
+      "copied": "Copied!"
+    }
   }
 }

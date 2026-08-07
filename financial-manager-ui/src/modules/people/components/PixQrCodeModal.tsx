@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Copy, Check } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { usePeople, type Person, type PersonPixQrCode } from '../hooks/usePeople';
@@ -12,6 +13,7 @@ interface PixQrCodeModalProps {
 }
 
 export const PixQrCodeModal = ({ isOpen, onClose, person }: PixQrCodeModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { getPersonPixQrCode } = usePeople();
   const [qrCode, setQrCode] = useState<PersonPixQrCode | null>(null);
@@ -25,7 +27,7 @@ export const PixQrCodeModal = ({ isOpen, onClose, person }: PixQrCodeModalProps)
       setQrCode(null);
       getPersonPixQrCode(person.id)
         .then(setQrCode)
-        .catch((err) => showToast(getErrorMessage(err, 'Erro ao gerar QR Code'), 'error'))
+        .catch((err) => showToast(getErrorMessage(err, t('people.errors.qrCode')), 'error'))
         .finally(() => setLoading(false));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,7 +58,7 @@ export const PixQrCodeModal = ({ isOpen, onClose, person }: PixQrCodeModalProps)
         className="relative w-full max-w-sm bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-hidden"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
-          <h2 className="text-xl font-bold text-app-ink">PIX — {person.name}</h2>
+          <h2 className="text-xl font-bold text-app-ink">{t('people.pix.titlePrefix', { name: person.name })}</h2>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
           </button>
@@ -73,7 +75,7 @@ export const PixQrCodeModal = ({ isOpen, onClose, person }: PixQrCodeModalProps)
             ) : qrCode ? (
               <img src={qrCode.qrCodeDataUrl} alt="QR Code PIX" className="w-full h-full object-contain" />
             ) : (
-              <span className="text-sm text-app-muted px-4 text-center">Não foi possível gerar o QR Code.</span>
+              <span className="text-sm text-app-muted px-4 text-center">{t('people.pix.genericError')}</span>
             )}
           </div>
 
@@ -84,7 +86,7 @@ export const PixQrCodeModal = ({ isOpen, onClose, person }: PixQrCodeModalProps)
             className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-4 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-            {copied ? 'Copiado!' : 'Copiar código PIX'}
+            {copied ? t('people.pix.copied') : t('people.pix.copy')}
           </button>
         </div>
       </motion.div>

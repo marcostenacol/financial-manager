@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Check, Wallet as WalletIcon, Tag } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { usePeople, type Person, type SettleDirection } from '../hooks/usePeople';
@@ -17,6 +18,7 @@ interface SettleDebtModalProps {
 }
 
 export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction }: SettleDebtModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { settlePersonDebt } = usePeople();
   const { scope } = useScope();
@@ -40,7 +42,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
   if (!isOpen || !person || !direction) return null;
 
   const amount = direction === 'they_owe_me' ? person.theyOweMe : person.iOweThem;
-  const title = direction === 'they_owe_me' ? 'Registrar recebimento' : 'Registrar pagamento';
+  const title = direction === 'they_owe_me' ? t('people.settle.receiveTitle') : t('people.settle.payTitle');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +53,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
       onSuccess();
       onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao registrar o pagamento'), 'error');
+      showToast(getErrorMessage(err, t('people.errors.settle')), 'error');
     } finally {
       setLoading(false);
     }
@@ -88,7 +90,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-app-muted ml-1 flex items-center gap-2">
-              <WalletIcon className="w-4 h-4" /> Carteira
+              <WalletIcon className="w-4 h-4" /> {t('people.settle.walletLabel')}
             </label>
             <select
               required
@@ -96,7 +98,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
               onChange={(e) => setWalletId(e.target.value)}
               className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 appearance-none"
             >
-              <option value="" className="bg-app-surface">Selecionar carteira</option>
+              <option value="" className="bg-app-surface">{t('people.settle.selectWallet')}</option>
               {wallets.map((wallet) => (
                 <option key={wallet.id} value={wallet.id} className="bg-app-surface">{wallet.name}</option>
               ))}
@@ -105,7 +107,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-app-muted ml-1 flex items-center gap-2">
-              <Tag className="w-4 h-4" /> Categoria
+              <Tag className="w-4 h-4" /> {t('people.settle.categoryLabel')}
             </label>
             <select
               required
@@ -113,7 +115,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
               onChange={(e) => setCategoryId(e.target.value)}
               className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 appearance-none"
             >
-              <option value="" className="bg-app-surface">Selecionar categoria</option>
+              <option value="" className="bg-app-surface">{t('people.settle.selectCategory')}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id} className="bg-app-surface">{category.name}</option>
               ))}
@@ -130,7 +132,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
             ) : (
               <>
                 <Check className="w-5 h-5" />
-                Confirmar
+                {t('people.settle.confirm')}
               </>
             )}
           </button>

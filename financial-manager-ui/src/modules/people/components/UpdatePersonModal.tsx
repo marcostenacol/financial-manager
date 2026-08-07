@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { X, Save, User, DollarSign, Landmark, MapPin, Calendar, Repeat, Trash2 } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { usePeople, type Person, type PixKeyType, type PaymentFrequency } from '../hooks/usePeople';
@@ -12,15 +13,8 @@ interface UpdatePersonModalProps {
   person: Person | null;
 }
 
-const PIX_KEY_TYPES: { value: PixKeyType; label: string }[] = [
-  { value: 'CPF', label: 'CPF' },
-  { value: 'CNPJ', label: 'CNPJ' },
-  { value: 'EMAIL', label: 'E-mail' },
-  { value: 'PHONE', label: 'Telefone' },
-  { value: 'RANDOM', label: 'Chave aleatória' },
-];
-
 export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: UpdatePersonModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { updatePerson, deletePerson } = usePeople();
   const [name, setName] = useState('');
@@ -33,6 +27,14 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const PIX_KEY_TYPES: { value: PixKeyType; label: string }[] = [
+    { value: 'CPF', label: t('people.form.pixTypeCpf') },
+    { value: 'CNPJ', label: t('people.form.pixTypeCnpj') },
+    { value: 'EMAIL', label: t('people.form.pixTypeEmail') },
+    { value: 'PHONE', label: t('people.form.pixTypePhone') },
+    { value: 'RANDOM', label: t('people.form.pixTypeRandom') },
+  ];
 
   useEffect(() => {
     if (isOpen && person) {
@@ -68,14 +70,14 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
       onSuccess();
       onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao atualizar pessoa'), 'error');
+      showToast(getErrorMessage(err, t('people.errors.update')), 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(`Remover "${person.name}"? Essa ação não pode ser desfeita.`)) return;
+    if (!window.confirm(t('people.confirmDelete', { name: person.name }))) return;
     setDeleting(true);
 
     try {
@@ -83,7 +85,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
       onSuccess();
       onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao remover pessoa'), 'error');
+      showToast(getErrorMessage(err, t('people.errors.delete')), 'error');
     } finally {
       setDeleting(false);
     }
@@ -105,7 +107,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
         className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
-          <h2 className="text-xl font-bold text-app-ink">Editar Pessoa</h2>
+          <h2 className="text-xl font-bold text-app-ink">{t('people.form.editTitle')}</h2>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
           </button>
@@ -113,7 +115,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Nome</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('people.form.nameLabel')}</label>
             <div className="relative group">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
               <input
@@ -128,7 +130,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Ela me deve</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('people.form.theyOweMe')}</label>
               <div className="relative group">
                 <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
                 <input
@@ -142,7 +144,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Eu devo a ela</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('people.form.iOweThem')}</label>
               <div className="relative group">
                 <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
                 <input
@@ -158,7 +160,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Frequência do pagamento</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('people.form.frequencyLabel')}</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -168,7 +170,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
                 }`}
               >
                 <Calendar className="w-5 h-5" />
-                <span className="text-[10px] font-bold uppercase">Avulsa (uma vez)</span>
+                <span className="text-[10px] font-bold uppercase">{t('people.form.frequencyOneTimeOption')}</span>
               </button>
               <button
                 type="button"
@@ -178,14 +180,14 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
                 }`}
               >
                 <Repeat className="w-5 h-5" />
-                <span className="text-[10px] font-bold uppercase">Mensal (recorrente)</span>
+                <span className="text-[10px] font-bold uppercase">{t('people.form.frequencyMonthlyOption')}</span>
               </button>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Tipo de chave PIX</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('people.form.pixKeyTypeLabel')}</label>
               <select
                 value={pixKeyType}
                 onChange={(e) => setPixKeyType(e.target.value as PixKeyType)}
@@ -198,7 +200,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Chave PIX</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('people.form.pixKeyLabel')}</label>
               <div className="relative group">
                 <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
                 <input
@@ -213,7 +215,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Cidade da chave PIX (opcional)</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('people.form.pixCityLabel')}</label>
             <div className="relative group">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
               <input
@@ -226,7 +228,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Observações (opcional)</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('people.form.notesLabel')}</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -253,7 +255,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  Salvar Alterações
+                  {t('people.form.saveChanges')}
                 </>
               )}
             </button>

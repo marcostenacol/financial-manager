@@ -365,5 +365,71 @@
       "success": "Contraseña cambiada con éxito",
       "error": "Error al cambiar la contraseña"
     }
+  },
+  "people": {
+    "title": "Personas",
+    "subtitle": "Controla quién te debe, a quién debes y el PIX de cada uno",
+    "newPerson": "Nueva Persona",
+    "frequencyMonthly": "Mensual",
+    "frequencyOneTime": "Puntual",
+    "paidThisMonth": " · pagado este mes",
+    "viewPixQrCode": "Ver código QR PIX",
+    "theyOweMeLabel": "Ella me debe",
+    "iOweThemLabel": "Yo le debo",
+    "registerReceipt": "Registrar cobro",
+    "registerPayment": "Registrar pago",
+    "emptyTitle": "Ninguna persona registrada",
+    "emptyText": "Registra quién te debe, a quién debes, y genera el PIX al instante.",
+    "confirmDelete": "¿Eliminar a \"{{name}}\"? Esta acción no se puede deshacer.",
+    "errors": {
+      "load": "Error al cargar las personas",
+      "create": "Error al crear la persona",
+      "update": "Error al actualizar la persona",
+      "delete": "Error al eliminar la persona",
+      "settle": "Error al registrar el pago",
+      "qrCode": "Error al generar el código QR"
+    },
+    "form": {
+      "createTitle": "Nueva Persona",
+      "editTitle": "Editar Persona",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej: Juan Pérez",
+      "theyOweMeOptional": "Ella me debe (opcional)",
+      "iOweThemOptional": "Yo le debo (opcional)",
+      "theyOweMe": "Ella me debe",
+      "iOweThem": "Yo le debo",
+      "frequencyLabel": "Frecuencia del pago",
+      "frequencyOneTimeOption": "Puntual (una vez)",
+      "frequencyMonthlyOption": "Mensual (recurrente)",
+      "pixKeyTypeLabel": "Tipo de clave PIX",
+      "pixKeyLabel": "Clave PIX",
+      "pixKeyPlaceholder": "Clave",
+      "pixCityLabel": "Ciudad de la clave PIX (opcional)",
+      "pixCityPlaceholder": "ej: Boa Vista",
+      "notesLabel": "Notas (opcional)",
+      "notesPlaceholder": "Alguna nota sobre esta deuda...",
+      "save": "Guardar Persona",
+      "saveChanges": "Guardar Cambios",
+      "pixTypeCpf": "CPF",
+      "pixTypeCnpj": "CNPJ",
+      "pixTypeEmail": "Correo electrónico",
+      "pixTypePhone": "Teléfono",
+      "pixTypeRandom": "Clave aleatoria"
+    },
+    "settle": {
+      "receiveTitle": "Registrar cobro",
+      "payTitle": "Registrar pago",
+      "walletLabel": "Billetera",
+      "selectWallet": "Seleccionar billetera",
+      "categoryLabel": "Categoría",
+      "selectCategory": "Seleccionar categoría",
+      "confirm": "Confirmar"
+    },
+    "pix": {
+      "titlePrefix": "PIX — {{name}}",
+      "genericError": "No se pudo generar el código QR.",
+      "copy": "Copiar código PIX",
+      "copied": "¡Copiado!"
+    }
   }
 }
