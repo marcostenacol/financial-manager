@@ -133,6 +133,8 @@ import { UpdatePersonService } from '@/modules/people/services/UpdatePersonServi
 import { DeletePersonService } from '@/modules/people/services/DeletePersonService';
 import { SettlePersonDebtService } from '@/modules/people/services/SettlePersonDebtService';
 import { GetPersonPixQrCodeService } from '@/modules/people/services/GetPersonPixQrCodeService';
+import { ListCreditCardsService } from '@/modules/credit-cards/services/ListCreditCardsService';
+import { ListWalletInvoicesService } from '@/modules/credit-cards/services/ListWalletInvoicesService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -209,3 +211,5 @@ container.registerSingleton<UpdatePersonService>('UpdatePersonService', UpdatePe
 container.registerSingleton<DeletePersonService>('DeletePersonService', DeletePersonService);
 container.registerSingleton<SettlePersonDebtService>('SettlePersonDebtService', SettlePersonDebtService);
 container.registerSingleton<GetPersonPixQrCodeService>('GetPersonPixQrCodeService', GetPersonPixQrCodeService);
+container.registerSingleton<ListCreditCardsService>('ListCreditCardsService', ListCreditCardsService);
+container.registerSingleton<ListWalletInvoicesService>('ListWalletInvoicesService', ListWalletInvoicesService);
