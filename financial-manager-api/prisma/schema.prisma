@@ -252,6 +252,7 @@ model Transaction {
   categoryId   String   @map("category_id")
   recurrenceId String?  @map("recurrence_id")
   costCenterId String?  @map("cost_center_id")
+  personId     String?  @map("person_id")
   type         String   // income, expense, transfer
   amount       Decimal  @db.Decimal(15, 2)
   description  String?
@@ -265,6 +266,7 @@ model Transaction {
   category   Category    @relation(fields: [categoryId], references: [id])
   recurrence Recurrence? @relation(fields: [recurrenceId], references: [id])
   costCenter CostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+  person     Person?     @relation(fields: [personId], references: [id], onDelete: SetNull)
 
   @@map("transactions")
 }
@@ -369,6 +371,7 @@ model Person {
 
   user         User?         @relation(fields: [userId], references: [id])
   organization Organization? @relation(fields: [organizationId], references: [id])
+  transactions Transaction[]
 
   @@map("people")
 }

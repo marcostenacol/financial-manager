@@ -89,7 +89,8 @@
     },
     "goals": {
       "title": "Savings Goals",
-      "viewAll": "View all"
+      "viewAll": "View all",
+      "remaining": "{{amount}} remaining"
     },
     "empty": {
       "noExpenses": "No expenses recorded in this period.",
@@ -127,6 +128,15 @@
     "primaryBadge": "Primary",
     "organization": "Organization",
     "moveToOrganization": "Move to organization",
+    "movePrompt": "Move \"{{name}}\" to another organization?",
+    "types": {
+      "checking": "Checking account",
+      "savings": "Savings",
+      "credit": "Credit card",
+      "investment": "Investment",
+      "cash": "Cash",
+      "cashShort": "Cash"
+    },
     "form": {
       "nameLabel": "Wallet name",
       "namePlaceholderCreate": "E.g.: Checking, Wallet, Savings...",
@@ -143,6 +153,7 @@
       "personalTitle": "Clear everything (personal)",
       "organizationTitle": "Clear everything (organization)",
       "personalWarning": "This will remove all your personal wallets and linked data. This action cannot be undone.",
+      "organizationWarning": "This will remove all wallets from the organization \"{{name}}\" and linked data. This action cannot be undone.",
       "walletsDescription": "Permanently removes all wallets (and their transactions).",
       "resetLabel": "Also clear savings goals",
       "resetPersonalDescription": "Besides wallets, this also removes your personal savings goals.",
@@ -180,8 +191,11 @@
       "completed": "Completed"
     },
     "pagination": {
+      "first": "First page",
       "previous": "Previous",
-      "next": "Next"
+      "next": "Next",
+      "last": "Last page",
+      "showing": "Showing {{shown}} of {{total}}"
     },
     "empty": {
       "title": "No transactions found",
@@ -260,6 +274,7 @@
     "ended": "Ended",
     "statusActive": "Active",
     "statusPaused": "Paused",
+    "next": "Next on {{date}}",
     "showCancelled": "Show ended",
     "cancelPermanently": "End permanently",
     "confirmCancel": "End this recurrence permanently? This action cannot be undone.",
@@ -321,6 +336,9 @@
       "title": "Join with invite code",
       "codePlaceholder": "Invite code",
       "submit": "Join"
+    },
+    "confirm": {
+      "delete": "Remove the organization \"{{name}}\"? This action cannot be undone."
     },
     "toasts": {
       "created": "Organization created successfully",

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText } from 'lucide-react';
+import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, User } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { usePeople } from '../../people/hooks/usePeople';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
@@ -15,6 +16,11 @@ interface Wallet {
 }
 
 interface Category {
+  id: string;
+  name: string;
+}
+
+interface Person {
   id: string;
   name: string;
 }
@@ -40,25 +46,30 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
   const { scope } = useScope();
   const { loadWallets } = useWallets(scope);
   const { loadCategories } = useCategories(scope);
+  const { loadPeople } = usePeople(scope);
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(0);
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [personId, setPersonId] = useState('');
   const [occurredAt, setOccurredAt] = useState(new Date().toISOString().split('T')[0]);
 
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [people, setPeople] = useState<Person[]>([]);
   const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
     try {
-      const [walletsData, categoriesData] = await Promise.all([
+      const [walletsData, categoriesData, peopleData] = await Promise.all([
         loadWallets(),
         loadCategories(),
+        loadPeople(),
       ]);
       setWallets(walletsData);
       setCategories(categoriesData);
+      setPeople(peopleData);
 
       if (initialData) {
         setType(initialData.type);
@@ -85,6 +96,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
   useEffect(() => {
     if (isOpen) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPersonId('');
       loadData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,6 +115,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
         category_id: categoryId,
         occurred_at: new Date(occurredAt).toISOString(),
         status: 'completed', // Por padrão efetivado para simplificar
+        person_id: type === 'expense' && personId ? personId : undefined,
       });
 
       onSuccess();
@@ -110,6 +123,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
       // Reset
       setDescription('');
       setAmount(0);
+      setPersonId('');
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao criar transação'), 'error');
     } finally {
@@ -146,7 +160,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
           <div className="flex p-1 bg-app-surface-2 border border-app-border rounded-2xl">
             <button
               type="button"
-              onClick={() => setType('income')}
+              onClick={() => { setType('income'); setPersonId(''); }}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
                 type === 'income' ? 'bg-emerald-600 text-app-ink shadow-lg shadow-emerald-600/20' : 'text-app-muted'
               }`}
@@ -247,6 +261,28 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
               </div>
             </div>
           </div>
+
+          {type === 'expense' && people.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-app-muted ml-1">Gasto de outra pessoa (opcional)</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
+                <select
+                  value={personId}
+                  onChange={(e) => setPersonId(e.target.value)}
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
+                >
+                  <option value="" className="bg-app-surface">Foi você quem gastou</option>
+                  {people.map(person => (
+                    <option key={person.id} value={person.id} className="bg-app-surface">{person.name}</option>
+                  ))}
+                </select>
+              </div>
+              {personId && (
+                <p className="text-xs text-app-muted ml-1">Esse valor vai somar em "ela me deve" na aba Pessoas.</p>
+              )}
+            </div>
+          )}
 
           <button
             type="submit"

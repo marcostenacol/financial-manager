@@ -287,7 +287,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="ledger-rules bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
@@ -408,7 +408,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="ledger-rules mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
@@ -457,7 +457,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="ledger-rules mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">

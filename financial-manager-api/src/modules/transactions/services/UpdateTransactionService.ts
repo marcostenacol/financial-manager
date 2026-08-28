@@ -5,6 +5,7 @@ import { TransactionRepositoryInterface } from '../repositories/contracts/Transa
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
+import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
 import { UpdateTransactionDTOType } from '../dtos/UpdateTransactionDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
@@ -28,6 +29,9 @@ export class UpdateTransactionService {
 
     @inject('CostCenterRepository')
     private costCenterRepository: CostCenterRepositoryInterface,
+
+    @inject('PersonRepository')
+    private personRepository: PersonRepositoryInterface,
 
     private cache: CacheTrait,
   ) {}
@@ -84,6 +88,33 @@ export class UpdateTransactionService {
     const balanceDelta = (willBeCompleted ? newSignedAmount : new Prisma.Decimal(0))
       .minus(wasCompleted ? oldSignedAmount : new Prisma.Decimal(0));
 
+    const oldPersonId = transaction.personId;
+    const newPersonId = data.person_id !== undefined ? data.person_id : oldPersonId;
+
+    if (newPersonId && newType !== TransactionTypeEnum.EXPENSE) {
+      throw new AppError('Só é possível vincular uma pessoa a uma despesa', 422);
+    }
+
+    if (newPersonId && newPersonId !== oldPersonId) {
+      const person = await this.personRepository.findById(newPersonId);
+
+      if (!person || !isOwnedByActor(person, userId, organizationIds)) {
+        throw new AppError('Pessoa não encontrada', 404);
+      }
+
+      if (person.scope !== wallet.scope) {
+        throw new AppError('Esta pessoa não é compatível com o escopo da carteira', 422);
+      }
+    }
+
+    // Dívida antiga só existiu de fato se a transação estava concluída, era despesa e tinha pessoa vinculada
+    const oldPersonDebt = (wasCompleted && oldPersonId && transaction.type === TransactionTypeEnum.EXPENSE)
+      ? new Prisma.Decimal(transaction.amount)
+      : new Prisma.Decimal(0);
+    const newPersonDebt = (willBeCompleted && newPersonId && newType === TransactionTypeEnum.EXPENSE)
+      ? newAmount
+      : new Prisma.Decimal(0);
+
     const updatedTransaction = await prisma.$transaction(async (tx) => {
       const updated = await this.transactionRepository.update(id, {
         description: data.description,
@@ -93,12 +124,27 @@ export class UpdateTransactionService {
         categoryId: data.category_id,
         occurredAt: data.occurred_at ? new Date(data.occurred_at) : undefined,
         costCenterId: data.cost_center_id,
+        personId: data.person_id,
       }, tx);
 
       if (!balanceDelta.isZero()) {
         await this.walletRepository.update(wallet.id, {
           balance: { increment: balanceDelta },
         }, tx);
+      }
+
+      if (oldPersonId && newPersonId === oldPersonId) {
+        const personDelta = newPersonDebt.minus(oldPersonDebt);
+        if (!personDelta.isZero()) {
+          await this.personRepository.update(oldPersonId, { theyOweMe: { increment: personDelta } }, tx);
+        }
+      } else {
+        if (oldPersonId && !oldPersonDebt.isZero()) {
+          await this.personRepository.update(oldPersonId, { theyOweMe: { decrement: oldPersonDebt } }, tx);
+        }
+        if (newPersonId && !newPersonDebt.isZero()) {
+          await this.personRepository.update(newPersonId, { theyOweMe: { increment: newPersonDebt } }, tx);
+        }
       }
 
       return updated;

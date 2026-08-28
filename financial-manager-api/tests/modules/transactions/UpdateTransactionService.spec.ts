@@ -13,6 +13,7 @@ import { TransactionRepositoryInterface } from '@/modules/transactions/repositor
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
+import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
@@ -23,6 +24,7 @@ describe('UpdateTransactionService', () => {
   let walletRepository: WalletRepositoryInterface;
   let categoryRepository: CategoryRepositoryInterface;
   let costCenterRepository: CostCenterRepositoryInterface;
+  let personRepository: PersonRepositoryInterface;
   let cacheTrait: CacheTrait;
   let updateTransactionService: UpdateTransactionService;
 
@@ -45,6 +47,11 @@ describe('UpdateTransactionService', () => {
       findById: vi.fn(),
     } as any;
 
+    personRepository = {
+      findById: vi.fn(),
+      update: vi.fn(),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
@@ -55,6 +62,7 @@ describe('UpdateTransactionService', () => {
       walletRepository,
       categoryRepository,
       costCenterRepository,
+      personRepository,
       cacheTrait,
     );
   });

@@ -30,6 +30,7 @@ export class TransactionRepository implements TransactionRepositoryInterface {
       include: {
         category: true,
         wallet: true,
+        person: true,
       },
     });
   }
@@ -76,6 +77,7 @@ export class TransactionRepository implements TransactionRepositoryInterface {
         include: {
           category: true,
           wallet: true,
+          person: true,
         },
         orderBy: {
           occurredAt: 'desc',
@@ -105,6 +107,7 @@ export class TransactionRepository implements TransactionRepositoryInterface {
         include: {
           category: true,
           wallet: true,
+          person: true,
         },
         orderBy: {
           occurredAt: 'desc',

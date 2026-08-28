@@ -89,7 +89,8 @@
     },
     "goals": {
       "title": "Metas de Economia",
-      "viewAll": "Ver todas"
+      "viewAll": "Ver todas",
+      "remaining": "Faltam {{amount}}"
     },
     "empty": {
       "noExpenses": "Nenhuma despesa registrada neste período.",
@@ -127,6 +128,15 @@
     "primaryBadge": "Principal",
     "organization": "Organização",
     "moveToOrganization": "Mover para organização",
+    "movePrompt": "Mover \"{{name}}\" para outra organização?",
+    "types": {
+      "checking": "Conta corrente",
+      "savings": "Poupança",
+      "credit": "Cartão de crédito",
+      "investment": "Investimento",
+      "cash": "Dinheiro",
+      "cashShort": "Dinheiro"
+    },
     "form": {
       "nameLabel": "Nome da carteira",
       "namePlaceholderCreate": "Ex: Nubank, Carteira, Poupança...",
@@ -143,6 +153,7 @@
       "personalTitle": "Zerar tudo (pessoal)",
       "organizationTitle": "Zerar tudo (organização)",
       "personalWarning": "Isso vai remover todas as suas carteiras pessoais e os dados vinculados. Essa ação não pode ser desfeita.",
+      "organizationWarning": "Isso vai remover todas as carteiras da organização \"{{name}}\" e os dados vinculados. Essa ação não pode ser desfeita.",
       "walletsDescription": "Remove todas as carteiras (e suas transações) permanentemente.",
       "resetLabel": "Zerar também as metas de economia",
       "resetPersonalDescription": "Além das carteiras, remove também suas metas de economia pessoais.",
@@ -180,8 +191,11 @@
       "completed": "Concluída"
     },
     "pagination": {
+      "first": "Primeira página",
       "previous": "Anterior",
-      "next": "Próximo"
+      "next": "Próximo",
+      "last": "Última página",
+      "showing": "Mostrando {{shown}} de {{total}}"
     },
     "empty": {
       "title": "Nenhuma transação encontrada",
@@ -260,6 +274,7 @@
     "ended": "Encerrada",
     "statusActive": "Ativa",
     "statusPaused": "Pausada",
+    "next": "Próxima em {{date}}",
     "showCancelled": "Mostrar encerradas",
     "cancelPermanently": "Encerrar permanentemente",
     "confirmCancel": "Encerrar esta recorrência permanentemente? Essa ação não pode ser desfeita.",
@@ -321,6 +336,9 @@
       "title": "Entrar com código de convite",
       "codePlaceholder": "Código do convite",
       "submit": "Entrar"
+    },
+    "confirm": {
+      "delete": "Remover a organização \"{{name}}\"? Essa ação não pode ser desfeita."
     },
     "toasts": {
       "created": "Organização criada com sucesso",

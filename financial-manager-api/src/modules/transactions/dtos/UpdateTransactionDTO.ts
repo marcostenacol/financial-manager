@@ -10,6 +10,7 @@ export const UpdateTransactionDTO = z.object({
   status: z.nativeEnum(TransactionStatusEnum).optional(),
   occurred_at: z.string().datetime().or(z.date()).optional(),
   cost_center_id: z.string().uuid('ID do centro de custo inválido').nullable().optional(),
+  person_id: z.string().uuid('ID da pessoa inválido').nullable().optional(),
 });
 
 export type UpdateTransactionDTOType = z.infer<typeof UpdateTransactionDTO>;
