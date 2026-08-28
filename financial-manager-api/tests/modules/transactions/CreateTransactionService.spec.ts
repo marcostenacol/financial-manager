@@ -13,6 +13,7 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
@@ -24,6 +25,7 @@ describe('CreateTransactionService', () => {
   let categoryRepository: CategoryRepositoryInterface;
   let costCenterRepository: CostCenterRepositoryInterface;
   let personRepository: PersonRepositoryInterface;
+  let invoiceRepository: InvoiceRepositoryInterface;
   let cacheTrait: CacheTrait;
   let createTransactionService: CreateTransactionService;
 
@@ -50,6 +52,10 @@ describe('CreateTransactionService', () => {
       update: vi.fn(),
     } as any;
 
+    invoiceRepository = {
+      findOrCreate: vi.fn(),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
@@ -61,6 +67,7 @@ describe('CreateTransactionService', () => {
       categoryRepository,
       costCenterRepository,
       personRepository,
+      invoiceRepository,
       cacheTrait,
     );
   });
@@ -285,5 +292,56 @@ describe('CreateTransactionService', () => {
     expect(amounts[1]).toBeCloseTo(33.33, 2);
     expect(amounts[2]).toBeCloseTo(33.34, 2);
     expect(amounts.reduce((a: number, b: number) => a + b, 0)).toBeCloseTo(100, 2);
+  });
+
+  it('assigns the transaction to the right invoice when the wallet is a credit card', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const data = {
+      description: 'Compra no cartão',
+      amount: 200,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.COMPLETED,
+      wallet_id: walletId,
+      occurred_at: '2026-08-10T00:00:00.000Z',
+    };
+
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({
+      id: walletId, userId, scope: 'personal', type: 'credit', closingDay: 5, dueDay: 15,
+    } as any);
+    vi.spyOn(invoiceRepository, 'findOrCreate').mockResolvedValue({ id: 'invoice-1' } as any);
+    vi.spyOn(transactionRepository, 'create').mockImplementation(async (input: any) => ({ id: 'tx-1', ...input }) as any);
+
+    await createTransactionService.execute(data as any, userId);
+
+    expect(invoiceRepository.findOrCreate).toHaveBeenCalledWith(
+      walletId,
+      expect.objectContaining({ referenceMonth: '2026-09' }),
+      expect.anything(),
+    );
+    const created = (transactionRepository.create as any).mock.calls[0][0];
+    expect(created.invoiceId).toBe('invoice-1');
+  });
+
+  it('does not assign an invoice for non-credit wallets', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const data = {
+      description: 'Compra no débito',
+      amount: 50,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.COMPLETED,
+      wallet_id: walletId,
+      occurred_at: '2026-08-10T00:00:00.000Z',
+    };
+
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, scope: 'personal', type: 'checking' } as any);
+    vi.spyOn(transactionRepository, 'create').mockImplementation(async (input: any) => ({ id: 'tx-2', ...input }) as any);
+
+    await createTransactionService.execute(data as any, userId);
+
+    expect(invoiceRepository.findOrCreate).not.toHaveBeenCalled();
+    const created = (transactionRepository.create as any).mock.calls[0][0];
+    expect(created.invoiceId).toBeUndefined();
   });
 });

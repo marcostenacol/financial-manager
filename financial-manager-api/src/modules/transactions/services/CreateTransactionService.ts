@@ -6,6 +6,9 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
+import { computeInvoicePeriod } from '@/modules/credit-cards/utils/computeInvoicePeriod';
+import { WalletTypeEnum } from '@/modules/wallets/enums/WalletTypeEnum';
 import { CreateTransactionDTOType } from '../dtos/CreateTransactionDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
@@ -32,6 +35,9 @@ export class CreateTransactionService {
 
     @inject('PersonRepository')
     private personRepository: PersonRepositoryInterface,
+
+    @inject('InvoiceRepository')
+    private invoiceRepository: InvoiceRepositoryInterface,
 
     private cache: CacheTrait,
   ) {}
@@ -120,6 +126,13 @@ export class CreateTransactionService {
           ? `${data.description ?? 'Compra parcelada'} (${i + 1}/${installmentCount})`
           : data.description;
 
+        let invoiceId: string | undefined;
+        if (wallet.type === WalletTypeEnum.CREDIT) {
+          const period = computeInvoicePeriod(occurredAt, wallet.closingDay ?? 1, wallet.dueDay ?? 10);
+          const invoice = await this.invoiceRepository.findOrCreate(wallet.id, period, tx);
+          invoiceId = invoice.id;
+        }
+
         const createdTransaction = await this.transactionRepository.create({
           walletId: data.wallet_id,
           categoryId: data.category_id,
@@ -130,6 +143,7 @@ export class CreateTransactionService {
           occurredAt,
           costCenterId: data.cost_center_id,
           personId: data.person_id,
+          invoiceId,
         }, tx);
 
         if (isCompleted) {
