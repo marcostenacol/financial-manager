@@ -94,6 +94,7 @@ import { notificationRoutes } from '@/modules/notifications/routes';
 import { costCenterRoutes } from '@/modules/cost-centers/routes';
 import { organizationRoutes } from '@/modules/organizations/routes';
 import { personRoutes } from '@/modules/people/routes';
+import { creditCardRoutes } from '@/modules/credit-cards/routes';
 
 app.register(authRoutes, { prefix: '/api/v1/auth' });
 app.register(profileRoutes, { prefix: '/api/v1/profile' });
@@ -107,6 +108,7 @@ app.register(notificationRoutes, { prefix: '/api/v1/notifications' });
 app.register(costCenterRoutes, { prefix: '/api/v1/cost-centers' });
 app.register(organizationRoutes, { prefix: '/api/v1/organizations' });
 app.register(personRoutes, { prefix: '/api/v1/people' });
+app.register(creditCardRoutes, { prefix: '/api/v1/credit-cards' });
 
 // Health Check
 app.get('/health', async () => {
