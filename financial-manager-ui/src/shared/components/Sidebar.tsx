@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Sun, Moon, Languages, Users } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Sun, Moon, Languages, Users, CreditCard } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
 import { useScope } from '../../contexts/useScope';
 import { getAvatarUrl } from '../lib/getAvatarUrl';
@@ -21,6 +21,7 @@ export const Sidebar = () => {
   const menuItems = [
     { icon: LayoutDashboard, label: t('nav.dashboard'), path: '/' },
     { icon: Wallet, label: t('nav.wallets'), path: '/wallets' },
+    { icon: CreditCard, label: 'Cartões', path: '/credit-cards' },
     { icon: History, label: t('nav.transactions'), path: '/transactions' },
     { icon: Tag, label: t('nav.categories'), path: '/categories' },
     ...(scope === 'personal' ? [{ icon: Target, label: t('nav.savingsGoals'), path: '/savings-goals' }] : []),
