@@ -7,8 +7,8 @@ import { CategoryRepositoryInterface } from '@/modules/categories/repositories/c
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
 import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
-import { computeInvoicePeriod } from '@/modules/credit-cards/utils/computeInvoicePeriod';
-import { WalletTypeEnum } from '@/modules/wallets/enums/WalletTypeEnum';
+import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
+import { addMonthsClamped } from '@/modules/credit-cards/utils/computeInvoicePeriod';
 import { CreateTransactionDTOType } from '../dtos/CreateTransactionDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
@@ -119,19 +119,13 @@ export class CreateTransactionService {
         const balanceDelta = data.type === TransactionTypeEnum.INCOME ? installmentAmount : installmentAmount.negated();
         const affectsPersonDebt = isCompleted && !!data.person_id;
 
-        const occurredAt = new Date(baseOccurredAt);
-        occurredAt.setMonth(occurredAt.getMonth() + i);
+        const occurredAt = addMonthsClamped(baseOccurredAt, i);
 
         const description = installmentCount > 1
           ? `${data.description ?? 'Compra parcelada'} (${i + 1}/${installmentCount})`
           : data.description;
 
-        let invoiceId: string | undefined;
-        if (wallet.type === WalletTypeEnum.CREDIT) {
-          const period = computeInvoicePeriod(occurredAt, wallet.closingDay ?? 1, wallet.dueDay ?? 10);
-          const invoice = await this.invoiceRepository.findOrCreate(wallet.id, period, tx);
-          invoiceId = invoice.id;
-        }
+        const invoiceId = await resolveInvoiceId(wallet, occurredAt, this.invoiceRepository, tx);
 
         const createdTransaction = await this.transactionRepository.create({
           walletId: data.wallet_id,

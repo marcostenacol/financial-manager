@@ -273,6 +273,7 @@ model Transaction {
   person     Person?     @relation(fields: [personId], references: [id], onDelete: SetNull)
   invoice    Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 
+  @@index([invoiceId])
   @@map("transactions")
 }
 
@@ -410,5 +411,6 @@ model InvoicePayment {
 
   invoice Invoice @relation(fields: [invoiceId], references: [id])
 
+  @@index([invoiceId])
   @@map("invoice_payments")
 }

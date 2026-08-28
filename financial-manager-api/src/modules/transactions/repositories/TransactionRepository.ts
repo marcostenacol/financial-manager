@@ -157,4 +157,15 @@ export class TransactionRepository implements TransactionRepositoryInterface {
       orderBy: { occurredAt: 'asc' },
     });
   }
+
+  async findAllByInvoiceIds(invoiceIds: string[]): Promise<Transaction[]> {
+    return prisma.transaction.findMany({
+      where: { invoiceId: { in: invoiceIds } },
+      include: {
+        category: true,
+        person: true,
+      },
+      orderBy: { occurredAt: 'asc' },
+    });
+  }
 }

@@ -7,8 +7,7 @@ import { CategoryRepositoryInterface } from '@/modules/categories/repositories/c
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
 import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
-import { computeInvoicePeriod } from '@/modules/credit-cards/utils/computeInvoicePeriod';
-import { WalletTypeEnum } from '@/modules/wallets/enums/WalletTypeEnum';
+import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
 import { UpdateTransactionDTOType } from '../dtos/UpdateTransactionDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
@@ -124,12 +123,7 @@ export class UpdateTransactionService {
     const updatedTransaction = await prisma.$transaction(async (tx) => {
       const effectiveOccurredAt = data.occurred_at ? new Date(data.occurred_at) : transaction.occurredAt;
 
-      let invoiceId: string | undefined;
-      if (wallet.type === WalletTypeEnum.CREDIT) {
-        const period = computeInvoicePeriod(effectiveOccurredAt, wallet.closingDay ?? 1, wallet.dueDay ?? 10);
-        const invoice = await this.invoiceRepository.findOrCreate(wallet.id, period, tx);
-        invoiceId = invoice.id;
-      }
+      const invoiceId = await resolveInvoiceId(wallet, effectiveOccurredAt, this.invoiceRepository, tx);
 
       const updated = await this.transactionRepository.update(id, {
         description: data.description,

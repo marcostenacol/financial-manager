@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CreditCard as CreditCardIcon } from 'lucide-react';
+import { CreditCard as CreditCardIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCreditCards, type CreditCard, type CreditCardInvoice } from '../hooks/useCreditCards';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
@@ -23,11 +23,18 @@ function statusColor(status: CreditCardInvoice['status']): string {
   }
 }
 
+function defaultInvoiceIndex(invoices: CreditCardInvoice[]): number {
+  const now = new Date();
+  const idx = invoices.findIndex((inv) => new Date(inv.dueDate) >= now);
+  return idx === -1 ? invoices.length - 1 : idx;
+}
+
 export const CreditCardsPage = () => {
   const { showToast } = useToast();
   const { cards, loading, loadCards, loadInvoices } = useCreditCards();
   const [invoicesByCard, setInvoicesByCard] = useState<Record<string, CreditCardInvoice[]>>({});
   const [selected, setSelected] = useState<{ walletId: string; invoiceId: string } | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>({});
 
   const fetchAll = async () => {
     try {
@@ -35,7 +42,17 @@ export const CreditCardsPage = () => {
       const entries = await Promise.all(
         cardsData.map(async (card) => [card.id, await loadInvoices(card.id)] as const),
       );
-      setInvoicesByCard(Object.fromEntries(entries));
+      const nextInvoicesByCard = Object.fromEntries(entries);
+      setInvoicesByCard(nextInvoicesByCard);
+      setSelectedIndex((prev) => {
+        const next = { ...prev };
+        for (const [walletId, invs] of Object.entries(nextInvoicesByCard)) {
+          if (!(walletId in next) && invs.length > 0) {
+            next[walletId] = defaultInvoiceIndex(invs);
+          }
+        }
+        return next;
+      });
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao carregar cartões'), 'error');
     }
@@ -75,14 +92,42 @@ export const CreditCardsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {cards.map((card: CreditCard) => {
           const invoices = invoicesByCard[card.id] ?? [];
-          const current = invoices[invoices.length - 1];
+          const idx = selectedIndex[card.id] ?? (invoices.length - 1);
+          const current = invoices[idx];
+
+          const goTo = (nextIdx: number) => {
+            const clamped = Math.min(Math.max(nextIdx, 0), invoices.length - 1);
+            setSelectedIndex((prev) => ({ ...prev, [card.id]: clamped }));
+          };
 
           return (
             <div key={card.id} className="bg-app-surface border border-app-border rounded-3xl p-6 shadow-app-card">
               <h3 className="text-app-ink font-bold text-lg mb-1">{card.name}</h3>
               {current ? (
                 <>
-                  <p className="text-app-muted text-xs uppercase tracking-widest">Fatura {current.referenceMonth}</p>
+                  <div className="flex items-center gap-1">
+                    <p className="text-app-muted text-xs uppercase tracking-widest">Fatura {current.referenceMonth}</p>
+                    <div className="flex items-center gap-0.5 ml-auto">
+                      <button
+                        type="button"
+                        onClick={() => goTo(idx - 1)}
+                        disabled={idx <= 0}
+                        aria-label="Fatura anterior"
+                        className="p-1 rounded-lg text-app-muted hover:text-app-ink disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => goTo(idx + 1)}
+                        disabled={idx >= invoices.length - 1}
+                        aria-label="Próxima fatura"
+                        className="p-1 rounded-lg text-app-muted hover:text-app-ink disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
                   <p className="ledger-figure text-2xl text-app-ink mt-2">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(current.totalAmount)}
                   </p>

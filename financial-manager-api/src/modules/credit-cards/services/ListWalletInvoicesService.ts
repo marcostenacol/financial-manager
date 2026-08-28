@@ -49,12 +49,31 @@ export class ListWalletInvoicesService {
     }
 
     const invoices = await this.invoiceRepository.findAllByWalletId(walletId);
+    const invoiceIds = invoices.map((invoice) => invoice.id);
 
-    return Promise.all(invoices.map(async (invoice) => {
-      const [transactions, payments] = await Promise.all([
-        this.transactionRepository.findAllByInvoiceId(invoice.id),
-        this.invoicePaymentRepository.findAllByInvoiceId(invoice.id),
-      ]);
+    const [allTransactions, allPayments] = await Promise.all([
+      this.transactionRepository.findAllByInvoiceIds(invoiceIds),
+      this.invoicePaymentRepository.findAllByInvoiceIds(invoiceIds),
+    ]);
+
+    const transactionsByInvoiceId = new Map<string, typeof allTransactions>();
+    for (const transaction of allTransactions) {
+      const invoiceId = transaction.invoiceId as string;
+      const list = transactionsByInvoiceId.get(invoiceId) ?? [];
+      list.push(transaction);
+      transactionsByInvoiceId.set(invoiceId, list);
+    }
+
+    const paymentsByInvoiceId = new Map<string, typeof allPayments>();
+    for (const payment of allPayments) {
+      const list = paymentsByInvoiceId.get(payment.invoiceId) ?? [];
+      list.push(payment);
+      paymentsByInvoiceId.set(payment.invoiceId, list);
+    }
+
+    return invoices.map((invoice) => {
+      const transactions = transactionsByInvoiceId.get(invoice.id) ?? [];
+      const payments = paymentsByInvoiceId.get(invoice.id) ?? [];
 
       const totalAmount = transactions.reduce((sum, t) => {
         const amount = new Prisma.Decimal(t.amount);
@@ -73,6 +92,6 @@ export class ListWalletInvoicesService {
         remainingAmount: totalAmount.minus(paidAmount).toNumber(),
         status: computeInvoiceStatus(totalAmount, paidAmount, invoice.closingDate),
       };
-    }));
+    });
   }
 }

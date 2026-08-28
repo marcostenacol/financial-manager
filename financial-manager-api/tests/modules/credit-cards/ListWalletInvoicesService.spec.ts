@@ -17,8 +17,8 @@ describe('ListWalletInvoicesService', () => {
   beforeEach(() => {
     walletRepository = { findById: vi.fn() } as any;
     invoiceRepository = { findAllByWalletId: vi.fn() } as any;
-    invoicePaymentRepository = { findAllByInvoiceId: vi.fn() } as any;
-    transactionRepository = { findAllByInvoiceId: vi.fn() } as any;
+    invoicePaymentRepository = { findAllByInvoiceIds: vi.fn() } as any;
+    transactionRepository = { findAllByInvoiceIds: vi.fn() } as any;
 
     service = new ListWalletInvoicesService(walletRepository, invoiceRepository, invoicePaymentRepository, transactionRepository);
   });
@@ -31,12 +31,12 @@ describe('ListWalletInvoicesService', () => {
     vi.spyOn(invoiceRepository, 'findAllByWalletId').mockResolvedValue([
       { id: 'invoice-1', referenceMonth: '2026-08', closingDate: new Date('2026-08-05'), dueDate: new Date('2026-08-15') },
     ] as any);
-    vi.spyOn(transactionRepository, 'findAllByInvoiceId').mockResolvedValue([
-      { amount: new Prisma.Decimal(200), type: TransactionTypeEnum.EXPENSE },
-      { amount: new Prisma.Decimal(50), type: TransactionTypeEnum.INCOME },
+    vi.spyOn(transactionRepository, 'findAllByInvoiceIds').mockResolvedValue([
+      { invoiceId: 'invoice-1', amount: new Prisma.Decimal(200), type: TransactionTypeEnum.EXPENSE },
+      { invoiceId: 'invoice-1', amount: new Prisma.Decimal(50), type: TransactionTypeEnum.INCOME },
     ] as any);
-    vi.spyOn(invoicePaymentRepository, 'findAllByInvoiceId').mockResolvedValue([
-      { amount: new Prisma.Decimal(60) },
+    vi.spyOn(invoicePaymentRepository, 'findAllByInvoiceIds').mockResolvedValue([
+      { invoiceId: 'invoice-1', amount: new Prisma.Decimal(60) },
     ] as any);
 
     const result = await service.execute(walletId, userId);
@@ -46,6 +46,10 @@ describe('ListWalletInvoicesService', () => {
     expect(result[0].paidAmount).toBe(60);
     expect(result[0].remainingAmount).toBe(90);
     expect(result[0].status).toBe('partially_paid');
+    expect(transactionRepository.findAllByInvoiceIds).toHaveBeenCalledTimes(1);
+    expect(transactionRepository.findAllByInvoiceIds).toHaveBeenCalledWith(['invoice-1']);
+    expect(invoicePaymentRepository.findAllByInvoiceIds).toHaveBeenCalledTimes(1);
+    expect(invoicePaymentRepository.findAllByInvoiceIds).toHaveBeenCalledWith(['invoice-1']);
   });
 
   it('rejects a non-credit wallet', async () => {

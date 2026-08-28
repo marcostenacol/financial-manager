@@ -16,6 +16,13 @@ export class InvoicePaymentRepository implements InvoicePaymentRepositoryInterfa
     });
   }
 
+  async findAllByInvoiceIds(invoiceIds: string[]): Promise<InvoicePayment[]> {
+    return prisma.invoicePayment.findMany({
+      where: { invoiceId: { in: invoiceIds } },
+      orderBy: { paidAt: 'desc' },
+    });
+  }
+
   async findById(id: string): Promise<InvoicePayment | null> {
     return prisma.invoicePayment.findUnique({ where: { id } });
   }

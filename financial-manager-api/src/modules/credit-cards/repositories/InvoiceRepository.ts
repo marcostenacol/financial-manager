@@ -10,7 +10,7 @@ export class InvoiceRepository implements InvoiceRepositoryInterface {
     const client = tx ?? prisma;
     return client.invoice.upsert({
       where: { walletId_referenceMonth: { walletId, referenceMonth: period.referenceMonth } },
-      update: {},
+      update: { closingDate: period.closingDate, dueDate: period.dueDate },
       create: {
         walletId,
         referenceMonth: period.referenceMonth,
