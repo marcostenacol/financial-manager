@@ -41,6 +41,8 @@ export class CreateWalletService {
       scope: data.organization_id ? 'business' : data.scope,
       balance: new Prisma.Decimal(data.balance ?? 0),
       currency: data.currency,
+      closingDay: data.closing_day,
+      dueDay: data.due_day,
     });
 
     // Invalida cache de listagem — se for carteira de organização, todos os membros podem ter cache próprio afetado

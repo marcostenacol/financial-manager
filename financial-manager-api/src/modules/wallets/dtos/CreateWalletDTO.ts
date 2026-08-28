@@ -9,6 +9,8 @@ export const CreateWalletDTO = z.object({
   balance: z.number().default(0),
   currency: z.string().default('BRL'),
   organization_id: z.string().uuid('ID da organização inválido').optional(),
+  closing_day: z.number().int().min(1).max(31).optional(),
+  due_day: z.number().int().min(1).max(31).optional(),
 });
 
 export type CreateWalletDTOType = z.infer<typeof CreateWalletDTO>;
