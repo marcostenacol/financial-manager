@@ -14,6 +14,7 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
@@ -25,6 +26,7 @@ describe('UpdateTransactionService', () => {
   let categoryRepository: CategoryRepositoryInterface;
   let costCenterRepository: CostCenterRepositoryInterface;
   let personRepository: PersonRepositoryInterface;
+  let invoiceRepository: InvoiceRepositoryInterface;
   let cacheTrait: CacheTrait;
   let updateTransactionService: UpdateTransactionService;
 
@@ -52,6 +54,10 @@ describe('UpdateTransactionService', () => {
       update: vi.fn(),
     } as any;
 
+    invoiceRepository = {
+      findOrCreate: vi.fn(),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
@@ -63,6 +69,7 @@ describe('UpdateTransactionService', () => {
       categoryRepository,
       costCenterRepository,
       personRepository,
+      invoiceRepository,
       cacheTrait,
     );
   });
@@ -164,5 +171,38 @@ describe('UpdateTransactionService', () => {
     await expect(
       updateTransactionService.execute('tx-1', { amount: 50 } as any, 'user-1'),
     ).rejects.toThrow(AppError);
+  });
+
+  it('recomputes the invoice when occurred_at changes on a credit wallet', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const transaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.COMPLETED,
+      amount: 200,
+      personId: null,
+      invoiceId: 'invoice-old',
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(transaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({
+      id: walletId, userId, type: 'credit', scope: 'personal', closingDay: 5, dueDay: 15,
+    } as any);
+    vi.spyOn(invoiceRepository, 'findOrCreate').mockResolvedValue({ id: 'invoice-new' } as any);
+
+    await updateTransactionService.execute('tx-1', { occurred_at: '2026-09-01T00:00:00.000Z' } as any, userId);
+
+    expect(invoiceRepository.findOrCreate).toHaveBeenCalledWith(
+      walletId,
+      expect.objectContaining({ referenceMonth: '2026-09' }),
+      expect.anything(),
+    );
+    expect(transactionRepository.update).toHaveBeenCalledWith(
+      'tx-1',
+      expect.objectContaining({ invoiceId: 'invoice-new' }),
+      expect.anything(),
+    );
   });
 });

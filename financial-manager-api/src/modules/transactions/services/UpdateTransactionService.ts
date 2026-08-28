@@ -6,6 +6,9 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
+import { computeInvoicePeriod } from '@/modules/credit-cards/utils/computeInvoicePeriod';
+import { WalletTypeEnum } from '@/modules/wallets/enums/WalletTypeEnum';
 import { UpdateTransactionDTOType } from '../dtos/UpdateTransactionDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
@@ -32,6 +35,9 @@ export class UpdateTransactionService {
 
     @inject('PersonRepository')
     private personRepository: PersonRepositoryInterface,
+
+    @inject('InvoiceRepository')
+    private invoiceRepository: InvoiceRepositoryInterface,
 
     private cache: CacheTrait,
   ) {}
@@ -116,6 +122,15 @@ export class UpdateTransactionService {
       : new Prisma.Decimal(0);
 
     const updatedTransaction = await prisma.$transaction(async (tx) => {
+      const effectiveOccurredAt = data.occurred_at ? new Date(data.occurred_at) : transaction.occurredAt;
+
+      let invoiceId: string | undefined;
+      if (wallet.type === WalletTypeEnum.CREDIT) {
+        const period = computeInvoicePeriod(effectiveOccurredAt, wallet.closingDay ?? 1, wallet.dueDay ?? 10);
+        const invoice = await this.invoiceRepository.findOrCreate(wallet.id, period, tx);
+        invoiceId = invoice.id;
+      }
+
       const updated = await this.transactionRepository.update(id, {
         description: data.description,
         amount: data.amount,
@@ -125,6 +140,7 @@ export class UpdateTransactionService {
         occurredAt: data.occurred_at ? new Date(data.occurred_at) : undefined,
         costCenterId: data.cost_center_id,
         personId: data.person_id,
+        invoiceId,
       }, tx);
 
       if (!balanceDelta.isZero()) {
