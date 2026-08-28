@@ -31,4 +31,5 @@ export interface TransactionRepositoryInterface {
   nullifyRecurrenceForUser(userId: string, tx?: Prisma.TransactionClient): Promise<void>;
   deleteAllByOrganizationId(organizationId: string, tx?: Prisma.TransactionClient): Promise<void>;
   nullifyRecurrenceForOrganization(organizationId: string, tx?: Prisma.TransactionClient): Promise<void>;
+  findAllByInvoiceId(invoiceId: string): Promise<Transaction[]>;
 }
