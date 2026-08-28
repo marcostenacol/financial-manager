@@ -135,6 +135,7 @@ import { SettlePersonDebtService } from '@/modules/people/services/SettlePersonD
 import { GetPersonPixQrCodeService } from '@/modules/people/services/GetPersonPixQrCodeService';
 import { ListCreditCardsService } from '@/modules/credit-cards/services/ListCreditCardsService';
 import { ListWalletInvoicesService } from '@/modules/credit-cards/services/ListWalletInvoicesService';
+import { GetInvoiceDetailService } from '@/modules/credit-cards/services/GetInvoiceDetailService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -213,3 +214,4 @@ container.registerSingleton<SettlePersonDebtService>('SettlePersonDebtService', 
 container.registerSingleton<GetPersonPixQrCodeService>('GetPersonPixQrCodeService', GetPersonPixQrCodeService);
 container.registerSingleton<ListCreditCardsService>('ListCreditCardsService', ListCreditCardsService);
 container.registerSingleton<ListWalletInvoicesService>('ListWalletInvoicesService', ListWalletInvoicesService);
+container.registerSingleton<GetInvoiceDetailService>('GetInvoiceDetailService', GetInvoiceDetailService);
