@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2, Ban } from 'lucide-react';
+import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2, Ban, User } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { usePeople } from '../../people/hooks/usePeople';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
@@ -19,6 +20,11 @@ interface Category {
   name: string;
 }
 
+interface Person {
+  id: string;
+  name: string;
+}
+
 interface Transaction {
   id: string;
   description: string;
@@ -28,6 +34,7 @@ interface Transaction {
   occurredAt: string;
   walletId: string;
   categoryId?: string;
+  personId?: string | null;
 }
 
 interface UpdateTransactionModalProps {
@@ -43,27 +50,32 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
   const { scope } = useScope();
   const { loadWallets } = useWallets(scope);
   const { loadCategories } = useCategories(scope);
+  const { loadPeople } = usePeople(scope);
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(0);
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [personId, setPersonId] = useState('');
   const [occurredAt, setOccurredAt] = useState('');
-  
+
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [people, setPeople] = useState<Person[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
 
   const loadData = async () => {
     try {
-      const [walletsData, categoriesData] = await Promise.all([
+      const [walletsData, categoriesData, peopleData] = await Promise.all([
         loadWallets(),
         loadCategories(),
+        loadPeople(),
       ]);
       setWallets(walletsData);
       setCategories(categoriesData);
+      setPeople(peopleData);
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao carregar dados para transação'), 'error');
     }
@@ -77,6 +89,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       setAmount(Number(transaction.amount));
       setWalletId(transaction.walletId);
       setCategoryId(transaction.categoryId || '');
+      setPersonId(transaction.personId || '');
       setOccurredAt(new Date(transaction.occurredAt).toISOString().split('T')[0]);
       loadData();
     }
@@ -96,6 +109,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
         category_id: categoryId || undefined,
         occurred_at: new Date(occurredAt).toISOString(),
         status: transaction.status,
+        person_id: type === 'expense' ? (personId || null) : null,
       });
 
       onSuccess();
@@ -199,7 +213,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
             <div className="flex p-1 bg-app-surface-2 border border-app-border rounded-2xl">
               <button
                 type="button"
-                onClick={() => setType('income')}
+                onClick={() => { setType('income'); setPersonId(''); }}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
                   type === 'income' ? 'bg-emerald-600 text-app-ink shadow-lg shadow-emerald-600/20' : 'text-app-muted'
                 }`}
@@ -300,6 +314,28 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
               </div>
             </div>
           </div>
+
+          {type === 'expense' && people.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-app-muted ml-1">Gasto de outra pessoa (opcional)</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
+                <select
+                  value={personId}
+                  onChange={(e) => setPersonId(e.target.value)}
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
+                >
+                  <option value="" className="bg-app-surface">Foi você quem gastou</option>
+                  {people.map(person => (
+                    <option key={person.id} value={person.id} className="bg-app-surface">{person.name}</option>
+                  ))}
+                </select>
+              </div>
+              {personId && (
+                <p className="text-xs text-app-muted ml-1">Esse valor vai somar em "ela me deve" na aba Pessoas.</p>
+              )}
+            </div>
+          )}
 
           <button
             type="submit"

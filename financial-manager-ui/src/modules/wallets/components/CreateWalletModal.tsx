@@ -35,6 +35,8 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
   const [type, setType] = useState('checking');
   const [balance, setBalance] = useState(0);
   const [organizationId, setOrganizationId] = useState('');
+  const [closingDay, setClosingDay] = useState('');
+  const [dueDay, setDueDay] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -63,6 +65,8 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
         balance,
         currency: 'BRL',
         organization_id: scope === 'business' && organizationId ? organizationId : undefined,
+        closing_day: type === 'credit' && closingDay ? Number(closingDay) : undefined,
+        due_day: type === 'credit' && dueDay ? Number(dueDay) : undefined,
       });
       onSuccess();
       onClose();
@@ -71,6 +75,8 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
       setType('checking');
       setBalance(0);
       setOrganizationId('');
+      setClosingDay('');
+      setDueDay('');
     } catch (err) {
       showToast(getErrorMessage(err, t('wallets.toast.createError')), 'error');
     } finally {
@@ -134,6 +140,35 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
               ))}
             </div>
           </div>
+
+          {type === 'credit' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-app-muted ml-1">Dia de fechamento</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={closingDay}
+                  onChange={(e) => setClosingDay(e.target.value)}
+                  placeholder="Ex: 5"
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-app-muted ml-1">Dia de vencimento</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={dueDay}
+                  onChange={(e) => setDueDay(e.target.value)}
+                  placeholder="Ex: 15"
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50"
+                />
+              </div>
+            </div>
+          )}
 
           {scope === 'business' && organizations.length > 0 && (
             <div className="space-y-2">

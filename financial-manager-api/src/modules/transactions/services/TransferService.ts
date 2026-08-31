@@ -2,6 +2,8 @@ import { inject, injectable } from 'tsyringe';
 import { CreateTransferDTOType } from '../dtos/CreateTransferDTO';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
+import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
@@ -18,6 +20,9 @@ export class TransferService {
 
     @inject('WalletRepository')
     private walletRepository: WalletRepositoryInterface,
+
+    @inject('InvoiceRepository')
+    private invoiceRepository: InvoiceRepositoryInterface,
 
     private cache: CacheTrait,
   ) {}
@@ -47,6 +52,9 @@ export class TransferService {
 
     // 2. Executar transação atômica
     await prisma.$transaction(async (tx) => {
+      const sourceInvoiceId = await resolveInvoiceId(sourceWallet, date, this.invoiceRepository, tx);
+      const destinationInvoiceId = await resolveInvoiceId(destinationWallet, date, this.invoiceRepository, tx);
+
       // Criar transação de saída
       await tx.transaction.create({
         data: {
@@ -57,6 +65,7 @@ export class TransferService {
           walletId: source_wallet_id,
           categoryId: category_id,
           occurredAt: date,
+          invoiceId: sourceInvoiceId,
         },
       });
 
@@ -70,6 +79,7 @@ export class TransferService {
           walletId: destination_wallet_id,
           categoryId: category_id,
           occurredAt: date,
+          invoiceId: destinationInvoiceId,
         },
       });
 

@@ -4,6 +4,8 @@ import { prisma } from '@/shared/database/PrismaClient';
 import { RecurrenceRepositoryInterface } from '../repositories/contracts/RecurrenceRepositoryInterface';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
+import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
@@ -21,6 +23,9 @@ export class ProcessRecurrenceService {
 
     @inject('WalletRepository')
     private walletRepository: WalletRepositoryInterface,
+
+    @inject('InvoiceRepository')
+    private invoiceRepository: InvoiceRepositoryInterface,
 
     private cache: CacheTrait,
   ) {}
@@ -70,6 +75,8 @@ export class ProcessRecurrenceService {
 
     await prisma.$transaction(async (tx) => {
       // 1. Criar transação
+      const invoiceId = wallet ? await resolveInvoiceId(wallet, now, this.invoiceRepository, tx) : undefined;
+
       await this.transactionRepository.create({
         description: `${recurrence.description} (Recorrente)`,
         amount: recurrence.amount,
@@ -79,6 +86,7 @@ export class ProcessRecurrenceService {
         categoryId: recurrence.categoryId,
         recurrenceId: recurrence.id,
         occurredAt: now,
+        invoiceId,
       }, tx);
 
       // 2. Atualizar saldo da carteira

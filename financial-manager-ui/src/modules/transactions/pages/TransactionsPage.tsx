@@ -11,8 +11,12 @@ import {
   Wallet as WalletIcon,
   RefreshCw,
   ChevronRight,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight,
   Download,
-  Trash2
+  Trash2,
+  User
 } from 'lucide-react';
 import { CreateTransactionModal, type DuplicateTransactionData } from '../components/CreateTransactionModal';
 import { UpdateTransactionModal } from '../components/UpdateTransactionModal';
@@ -154,6 +158,20 @@ export const TransactionsPage = () => {
     }
   };
 
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+
+  const getPageWindow = (current: number, last: number): (number | 'ellipsis')[] => {
+    const pages = new Set([1, last, current, current - 1, current + 1]);
+    const sorted = [...pages].filter((p) => p >= 1 && p <= last).sort((a, b) => a - b);
+
+    const result: (number | 'ellipsis')[] = [];
+    sorted.forEach((p, i) => {
+      if (i > 0 && p - (sorted[i - 1] as number) > 1) result.push('ellipsis');
+      result.push(p);
+    });
+    return result;
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -256,23 +274,60 @@ export const TransactionsPage = () => {
           <span className="text-xs font-bold text-app-muted uppercase tracking-widest">
             {t('transactions.pagination.showing', { shown: transactions.length, total })}
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <button
+              disabled={page === 1 || loading}
+              onClick={() => setPage(1)}
+              title={t('transactions.pagination.first')}
+              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+            >
+              <ChevronsLeft className="w-4 h-4" />
+            </button>
             <button
               disabled={page === 1 || loading}
               onClick={() => setPage(page - 1)}
+              title={t('transactions.pagination.previous')}
               className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
-              {t('transactions.pagination.previous')}
+              <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-app-ink font-bold px-3 py-1 bg-app-accent/20 border border-app-accent/30 rounded-lg text-sm">
-              {page}
-            </span>
+
+            {getPageWindow(page, totalPages).map((item, index) =>
+              item === 'ellipsis' ? (
+                <span key={`ellipsis-${index}`} className="px-2 text-app-muted text-sm select-none">
+                  …
+                </span>
+              ) : (
+                <button
+                  key={item}
+                  disabled={loading}
+                  onClick={() => setPage(item)}
+                  className={`min-w-[2.25rem] px-2 py-1 rounded-lg text-sm font-bold transition-all ${
+                    item === page
+                      ? 'bg-app-accent text-app-accent-ink border border-app-accent/30'
+                      : 'text-app-ink border border-app-border hover:bg-app-surface-2'
+                  } disabled:opacity-30 disabled:cursor-not-allowed`}
+                >
+                  {item}
+                </button>
+              )
+            )}
+
             <button
-              disabled={page * perPage >= total || loading}
+              disabled={page >= totalPages || loading}
               onClick={() => setPage(page + 1)}
+              title={t('transactions.pagination.next')}
               className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
-              {t('transactions.pagination.next')}
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            <button
+              disabled={page >= totalPages || loading}
+              onClick={() => setPage(totalPages)}
+              title={t('transactions.pagination.last')}
+              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+            >
+              <ChevronsRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -283,7 +338,7 @@ export const TransactionsPage = () => {
             ))}
           </div>
         ) : (
-          <div className="ledger-rules">
+          <div>
             <AnimatePresence>
               {transactions.map((transaction) => (
                 <motion.div
@@ -317,6 +372,15 @@ export const TransactionsPage = () => {
                           <WalletIcon className="w-3 h-3" />
                           {transaction.wallet?.name || t('common.wallet')}
                         </span>
+                        {transaction.person && (
+                          <>
+                            <span className="w-px h-3 bg-app-border" />
+                            <span className="flex items-center gap-1 text-xs text-app-accent uppercase tracking-wider" title={`Gasto de ${transaction.person.name}`}>
+                              <User className="w-3 h-3" />
+                              {transaction.person.name}
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>

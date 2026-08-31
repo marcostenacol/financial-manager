@@ -18,6 +18,10 @@ import { CategoryRepositoryInterface } from '@/modules/categories/repositories/c
 import { CategoryRepository } from '@/modules/categories/repositories/CategoryRepository';
 import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
 import { PersonRepository } from '@/modules/people/repositories/PersonRepository';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
+import { InvoiceRepository } from '@/modules/credit-cards/repositories/InvoiceRepository';
+import { InvoicePaymentRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoicePaymentRepositoryInterface';
+import { InvoicePaymentRepository } from '@/modules/credit-cards/repositories/InvoicePaymentRepository';
 import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositories/contracts/RecurrenceRepositoryInterface';
 import { RecurrenceRepository } from '@/modules/recurrences/repositories/RecurrenceRepository';
 import { ReportRepositoryInterface } from '@/modules/reports/repositories/contracts/ReportRepositoryInterface';
@@ -41,6 +45,8 @@ container.registerSingleton<WalletRepositoryInterface>('WalletRepository', Walle
 container.registerSingleton<TransactionRepositoryInterface>('TransactionRepository', TransactionRepository);
 container.registerSingleton<CategoryRepositoryInterface>('CategoryRepository', CategoryRepository);
 container.registerSingleton<PersonRepositoryInterface>('PersonRepository', PersonRepository);
+container.registerSingleton<InvoiceRepositoryInterface>('InvoiceRepository', InvoiceRepository);
+container.registerSingleton<InvoicePaymentRepositoryInterface>('InvoicePaymentRepository', InvoicePaymentRepository);
 container.registerSingleton<RecurrenceRepositoryInterface>('RecurrenceRepository', RecurrenceRepository);
 container.registerSingleton<ReportRepositoryInterface>('ReportRepository', ReportRepository);
 container.registerSingleton<NotificationRepositoryInterface>('NotificationRepository', NotificationRepository);
@@ -127,6 +133,11 @@ import { UpdatePersonService } from '@/modules/people/services/UpdatePersonServi
 import { DeletePersonService } from '@/modules/people/services/DeletePersonService';
 import { SettlePersonDebtService } from '@/modules/people/services/SettlePersonDebtService';
 import { GetPersonPixQrCodeService } from '@/modules/people/services/GetPersonPixQrCodeService';
+import { ListCreditCardsService } from '@/modules/credit-cards/services/ListCreditCardsService';
+import { ListWalletInvoicesService } from '@/modules/credit-cards/services/ListWalletInvoicesService';
+import { GetInvoiceDetailService } from '@/modules/credit-cards/services/GetInvoiceDetailService';
+import { RegisterInvoicePaymentService } from '@/modules/credit-cards/services/RegisterInvoicePaymentService';
+import { DeleteInvoicePaymentService } from '@/modules/credit-cards/services/DeleteInvoicePaymentService';
 
 container.registerSingleton<RegisterService>('RegisterService', RegisterService);
 container.registerSingleton<LoginService>('LoginService', LoginService);
@@ -203,3 +214,8 @@ container.registerSingleton<UpdatePersonService>('UpdatePersonService', UpdatePe
 container.registerSingleton<DeletePersonService>('DeletePersonService', DeletePersonService);
 container.registerSingleton<SettlePersonDebtService>('SettlePersonDebtService', SettlePersonDebtService);
 container.registerSingleton<GetPersonPixQrCodeService>('GetPersonPixQrCodeService', GetPersonPixQrCodeService);
+container.registerSingleton<ListCreditCardsService>('ListCreditCardsService', ListCreditCardsService);
+container.registerSingleton<ListWalletInvoicesService>('ListWalletInvoicesService', ListWalletInvoicesService);
+container.registerSingleton<GetInvoiceDetailService>('GetInvoiceDetailService', GetInvoiceDetailService);
+container.registerSingleton<RegisterInvoicePaymentService>('RegisterInvoicePaymentService', RegisterInvoicePaymentService);
+container.registerSingleton<DeleteInvoicePaymentService>('DeleteInvoicePaymentService', DeleteInvoicePaymentService);

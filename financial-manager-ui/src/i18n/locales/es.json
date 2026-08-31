@@ -89,7 +89,8 @@
     },
     "goals": {
       "title": "Metas de Ahorro",
-      "viewAll": "Ver todas"
+      "viewAll": "Ver todas",
+      "remaining": "Faltan {{amount}}"
     },
     "empty": {
       "noExpenses": "No hay gastos registrados en este período.",
@@ -127,6 +128,15 @@
     "primaryBadge": "Principal",
     "organization": "Organización",
     "moveToOrganization": "Mover a organización",
+    "movePrompt": "¿Mover \"{{name}}\" a otra organización?",
+    "types": {
+      "checking": "Cuenta corriente",
+      "savings": "Ahorros",
+      "credit": "Tarjeta de crédito",
+      "investment": "Inversión",
+      "cash": "Efectivo",
+      "cashShort": "Efectivo"
+    },
     "form": {
       "nameLabel": "Nombre de la cartera",
       "namePlaceholderCreate": "Ej: Nubank, Cartera, Ahorros...",
@@ -143,6 +153,7 @@
       "personalTitle": "Vaciar todo (personal)",
       "organizationTitle": "Vaciar todo (organización)",
       "personalWarning": "Esto eliminará todas tus carteras personales y los datos vinculados. Esta acción no se puede deshacer.",
+      "organizationWarning": "Esto eliminará todas las carteras de la organización \"{{name}}\" y los datos vinculados. Esta acción no se puede deshacer.",
       "walletsDescription": "Elimina permanentemente todas las carteras (y sus transacciones).",
       "resetLabel": "Vaciar también las metas de ahorro",
       "resetPersonalDescription": "Además de las carteras, también elimina tus metas de ahorro personales.",
@@ -180,8 +191,11 @@
       "completed": "Completada"
     },
     "pagination": {
+      "first": "Primera página",
       "previous": "Anterior",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "last": "Última página",
+      "showing": "Mostrando {{shown}} de {{total}}"
     },
     "empty": {
       "title": "No se encontraron transacciones",
@@ -260,6 +274,7 @@
     "ended": "Finalizada",
     "statusActive": "Activa",
     "statusPaused": "Pausada",
+    "next": "Próxima el {{date}}",
     "showCancelled": "Mostrar finalizadas",
     "cancelPermanently": "Finalizar permanentemente",
     "confirmCancel": "¿Finalizar esta recurrencia permanentemente? Esta acción no se puede deshacer.",
@@ -321,6 +336,9 @@
       "title": "Unirse con código de invitación",
       "codePlaceholder": "Código de invitación",
       "submit": "Unirse"
+    },
+    "confirm": {
+      "delete": "¿Eliminar la organización \"{{name}}\"? Esta acción no se puede deshacer."
     },
     "toasts": {
       "created": "Organización creada con éxito",

@@ -11,8 +11,10 @@ export interface Transaction {
   createdAt: string;
   category?: { name: string; color: string };
   wallet?: { name: string };
+  person?: { id: string; name: string } | null;
   walletId: string;
   categoryId?: string;
+  personId?: string | null;
   recurrenceId?: string | null;
   recurrence?: {
     period: string;
@@ -35,6 +37,8 @@ export interface CreateTransactionInput {
   description?: string;
   status?: string;
   occurred_at?: string;
+  person_id?: string;
+  installments?: number;
 }
 
 export interface UpdateTransactionInput {
@@ -44,6 +48,7 @@ export interface UpdateTransactionInput {
   description?: string;
   status?: string;
   occurred_at?: string;
+  person_id?: string | null;
 }
 
 export interface TransferInput {
@@ -73,7 +78,7 @@ export function useTransactions() {
 
   const createTransaction = useCallback(async (data: CreateTransactionInput) => {
     const response = await api.post('/transactions', data);
-    return response.data.data as Transaction;
+    return response.data.data as Transaction | Transaction[];
   }, []);
 
   const updateTransaction = useCallback(async (id: string, data: UpdateTransactionInput) => {

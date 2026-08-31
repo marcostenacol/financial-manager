@@ -199,6 +199,8 @@ model Wallet {
   currency       String  @default("BRL")
   isPrimary      Boolean @default(false) @map("is_primary")
   deletedAt      DateTime? @map("deleted_at")
+  closingDay     Int?    @map("closing_day") // dia do mês em que a fatura fecha — só relevante quando type = credit
+  dueDay         Int?    @map("due_day")     // dia do mês de vencimento — só exibição
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -207,6 +209,7 @@ model Wallet {
   organization Organization? @relation(fields: [organizationId], references: [id])
   transactions Transaction[]
   recurrences  Recurrence[]
+  invoices     Invoice[]
 
   @@map("wallets")
 }
@@ -252,6 +255,8 @@ model Transaction {
   categoryId   String   @map("category_id")
   recurrenceId String?  @map("recurrence_id")
   costCenterId String?  @map("cost_center_id")
+  personId     String?  @map("person_id")
+  invoiceId    String?  @map("invoice_id")
   type         String   // income, expense, transfer
   amount       Decimal  @db.Decimal(15, 2)
   description  String?
@@ -265,7 +270,10 @@ model Transaction {
   category   Category    @relation(fields: [categoryId], references: [id])
   recurrence Recurrence? @relation(fields: [recurrenceId], references: [id])
   costCenter CostCenter? @relation(fields: [costCenterId], references: [id], onDelete: SetNull)
+  person     Person?     @relation(fields: [personId], references: [id], onDelete: SetNull)
+  invoice    Invoice?    @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
 
+  @@index([invoiceId])
   @@map("transactions")
 }
 
@@ -369,6 +377,40 @@ model Person {
 
   user         User?         @relation(fields: [userId], references: [id])
   organization Organization? @relation(fields: [organizationId], references: [id])
+  transactions Transaction[]
 
   @@map("people")
+}
+
+model Invoice {
+  id             String   @id @default(uuid())
+  walletId       String   @map("wallet_id")
+  referenceMonth String   @map("reference_month")
+  closingDate    DateTime @map("closing_date")
+  dueDate        DateTime @map("due_date")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  wallet       Wallet           @relation(fields: [walletId], references: [id])
+  transactions Transaction[]
+  payments     InvoicePayment[]
+
+  @@unique([walletId, referenceMonth])
+  @@map("invoices")
+}
+
+model InvoicePayment {
+  id        String   @id @default(uuid())
+  invoiceId String   @map("invoice_id")
+  amount    Decimal  @db.Decimal(15, 2)
+  paidAt    DateTime @map("paid_at")
+  note      String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+  @@map("invoice_payments")
 }

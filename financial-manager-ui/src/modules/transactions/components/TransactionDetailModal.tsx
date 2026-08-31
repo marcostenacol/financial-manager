@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { X, Pencil, Trash2, Copy, ArrowUpCircle, ArrowDownCircle, Calendar, Tag, Wallet as WalletIcon } from 'lucide-react';
+import { X, Pencil, Trash2, Copy, ArrowUpCircle, ArrowDownCircle, Calendar, Tag, Wallet as WalletIcon, User } from 'lucide-react';
 
 interface Transaction {
   id: string;
@@ -10,6 +10,7 @@ interface Transaction {
   occurredAt: string;
   category?: { name: string; color: string };
   wallet?: { name: string };
+  person?: { id: string; name: string } | null;
 }
 
 interface TransactionDetailModalProps {
@@ -109,6 +110,13 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDu
               <div className="flex items-center gap-3 bg-app-surface-2 border border-app-border rounded-2xl p-4">
                 <Tag className="w-5 h-5 text-app-muted" />
                 <span className="text-app-ink">{transaction.category.name}</span>
+              </div>
+            )}
+
+            {transaction.person && (
+              <div className="flex items-center gap-3 bg-app-accent-soft border border-app-accent/30 rounded-2xl p-4">
+                <User className="w-5 h-5 text-app-accent" />
+                <span className="text-app-ink">Gasto de {transaction.person.name}</span>
               </div>
             )}
           </div>
