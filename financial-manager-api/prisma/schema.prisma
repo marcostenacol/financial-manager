@@ -367,8 +367,8 @@ model Person {
   paymentFrequency PaymentFrequency @default(ONE_TIME) @map("payment_frequency")
   isPaid           Boolean          @default(false) @map("is_paid")
   lastPaidPeriod   String?          @map("last_paid_period")
-  pixKey           String           @map("pix_key")
-  pixKeyType       PixKeyType       @map("pix_key_type")
+  pixKey           String?          @map("pix_key")
+  pixKeyType       PixKeyType?      @map("pix_key_type")
   pixCity          String?          @map("pix_city")
   notes            String?
 

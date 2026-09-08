@@ -3,6 +3,7 @@ import QRCode from 'qrcode';
 import { PersonRepositoryInterface } from '../repositories/contracts/PersonRepositoryInterface';
 import { assertOwnership } from '@/shared/authorization/ownership';
 import { buildPixPayload } from '../utils/buildPixPayload';
+import { AppError } from '@/shared/errors/AppError';
 
 export interface PersonPixQrCode {
   payload: string;
@@ -18,6 +19,10 @@ export class GetPersonPixQrCodeService {
   async execute(id: string, userId: string, organizationIds: string[] = []): Promise<PersonPixQrCode> {
     const person = await this.personRepository.findById(id);
     assertOwnership(person, userId, organizationIds, 'Pessoa não encontrada');
+
+    if (!person!.pixKey) {
+      throw new AppError('Esta pessoa não tem chave PIX cadastrada', 422);
+    }
 
     // O QR/copia-e-cola é sempre para PAGAR essa pessoa — por isso usa i_owe_them
     // (o que eu devo a ela), nunca they_owe_me (o que ela me deve).
