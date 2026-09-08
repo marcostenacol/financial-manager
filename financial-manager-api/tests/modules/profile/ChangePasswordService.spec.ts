@@ -3,9 +3,12 @@ import { hash } from 'bcrypt';
 import { ChangePasswordService } from '@/modules/profile/services/ChangePasswordService';
 import { AuthRepositoryInterface } from '@/modules/auth/repositories/contracts/AuthRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
+import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
 
 describe('ChangePasswordService', () => {
   let authRepository: AuthRepositoryInterface;
+  let cacheTrait: CacheTrait;
   let changePasswordService: ChangePasswordService;
 
   beforeEach(() => {
@@ -15,7 +18,11 @@ describe('ChangePasswordService', () => {
       deleteAllUserRefreshTokens: vi.fn(),
     } as any;
 
-    changePasswordService = new ChangePasswordService(authRepository);
+    cacheTrait = {
+      del: vi.fn(),
+    } as any;
+
+    changePasswordService = new ChangePasswordService(authRepository, cacheTrait);
   });
 
   it('should update password when current password matches', async () => {
@@ -30,6 +37,7 @@ describe('ChangePasswordService', () => {
 
     expect(authRepository.updatePassword).toHaveBeenCalledWith('user-id', expect.any(String));
     expect(authRepository.deleteAllUserRefreshTokens).toHaveBeenCalledWith('user-id');
+    expect(cacheTrait.del).toHaveBeenCalledWith(CacheKeys.auth.token('user-id'));
   });
 
   it('should throw when user is not found', async () => {
