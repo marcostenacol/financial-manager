@@ -7,4 +7,5 @@ export interface CostCenterRepositoryInterface {
   findById(id: string): Promise<CostCenter | null>;
   findAllByUserId(userId: string): Promise<CostCenter[]>;
   findAllByOwner(userId: string, organizationIds: string[]): Promise<CostCenter[]>;
+  findByName(name: string, userId: string | null): Promise<CostCenter | null>;
 }

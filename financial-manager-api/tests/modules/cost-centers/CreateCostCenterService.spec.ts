@@ -3,6 +3,7 @@ import { CreateCostCenterService } from '@/modules/cost-centers/services/CreateC
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { OrganizationMemberRepositoryInterface } from '@/modules/organizations/repositories/contracts/OrganizationMemberRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
+import { AppError } from '@/shared/errors/AppError';
 
 describe('CreateCostCenterService', () => {
   let costCenterRepository: CostCenterRepositoryInterface;
@@ -13,6 +14,7 @@ describe('CreateCostCenterService', () => {
   beforeEach(() => {
     costCenterRepository = {
       create: vi.fn(),
+      findByName: vi.fn().mockResolvedValue(null),
     } as any;
 
     organizationMemberRepository = {
@@ -38,5 +40,15 @@ describe('CreateCostCenterService', () => {
     expect(result).toHaveProperty('id');
     expect(costCenterRepository.create).toHaveBeenCalledWith({ ...data, userId, organizationId: null });
     expect(cacheTrait.del).toHaveBeenCalledWith(`cost-centers:user:${userId}`);
+  });
+
+  it('should throw AppError when a cost center with the same name already exists for the owner', async () => {
+    const userId = 'user-1';
+    const data = { name: 'Marketing', color: '#3b82f6' };
+
+    vi.spyOn(costCenterRepository, 'findByName').mockResolvedValue({ id: 'existing' } as any);
+
+    await expect(createCostCenterService.execute(data, userId)).rejects.toBeInstanceOf(AppError);
+    expect(costCenterRepository.create).not.toHaveBeenCalled();
   });
 });

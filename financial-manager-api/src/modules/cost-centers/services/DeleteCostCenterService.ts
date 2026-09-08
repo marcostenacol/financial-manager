@@ -1,4 +1,6 @@
 import { inject, injectable } from 'tsyringe';
+import { Prisma } from '@prisma/client';
+import { AppError } from '@/shared/errors/AppError';
 import { CostCenterRepositoryInterface } from '../repositories/contracts/CostCenterRepositoryInterface';
 import { assertOwnership } from '@/shared/authorization/ownership';
 import { CacheTrait } from '@/base/traits/CacheTrait';
@@ -18,7 +20,14 @@ export class DeleteCostCenterService {
 
     assertOwnership(costCenter, userId, organizationIds, 'Centro de custo não encontrado');
 
-    await this.costCenterRepository.delete(id);
+    try {
+      await this.costCenterRepository.delete(id);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        throw new AppError('Não é possível excluir um centro de custo com transações vinculadas', 409);
+      }
+      throw error;
+    }
 
     if (costCenter!.organizationId) {
       await this.cache.delPattern(CacheKeys.costCenters.listAllPattern());

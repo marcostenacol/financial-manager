@@ -26,6 +26,7 @@ describe('ProcessRecurrenceService', () => {
   beforeEach(() => {
     recurrenceRepository = {
       findAllActive: vi.fn(),
+      findById: vi.fn().mockResolvedValue({ isActive: true }),
       update: vi.fn(),
     } as any;
 
@@ -136,5 +137,30 @@ describe('ProcessRecurrenceService', () => {
     await processRecurrenceService.execute();
 
     expect(transactionRepository.create).not.toHaveBeenCalled();
+  });
+
+  it('should skip a recurrence that was deactivated between the batch fetch and processing', async () => {
+    const startsAt = new Date();
+    startsAt.setDate(startsAt.getDate() - 31);
+
+    const recurrence = {
+      id: 'rec-1',
+      description: 'Netflix',
+      amount: 50,
+      type: 'expense',
+      period: 'monthly',
+      startsAt,
+      lastProcessedAt: null,
+      walletId: 'wallet-1',
+      categoryId: 'cat-1',
+    };
+
+    vi.spyOn(recurrenceRepository, 'findAllActive').mockResolvedValue([recurrence as any]);
+    vi.spyOn(recurrenceRepository, 'findById').mockResolvedValue({ isActive: false } as any);
+
+    await processRecurrenceService.execute();
+
+    expect(transactionRepository.create).not.toHaveBeenCalled();
+    expect(recurrenceRepository.update).not.toHaveBeenCalled();
   });
 });

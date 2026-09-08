@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { Prisma } from '@prisma/client';
 import { DeleteCostCenterService } from '@/modules/cost-centers/services/DeleteCostCenterService';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
@@ -36,5 +37,14 @@ describe('DeleteCostCenterService', () => {
 
     await expect(deleteCostCenterService.execute('cc-1', 'user-1')).rejects.toThrow(AppError);
     expect(costCenterRepository.delete).not.toHaveBeenCalled();
+  });
+
+  it('should throw a friendly AppError when the cost center has linked records (FK violation)', async () => {
+    vi.spyOn(costCenterRepository, 'findById').mockResolvedValue({ id: 'cc-1', userId: 'user-1' } as any);
+    vi.spyOn(costCenterRepository, 'delete').mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError('FK violation', { code: 'P2003', clientVersion: '7.8.0' }),
+    );
+
+    await expect(deleteCostCenterService.execute('cc-1', 'user-1')).rejects.toThrow(AppError);
   });
 });

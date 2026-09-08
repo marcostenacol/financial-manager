@@ -68,6 +68,13 @@ export class ProcessRecurrenceService {
   }
 
   private async process(recurrence: Recurrence, now: Date): Promise<void> {
+    // Revalida isActive logo antes de processar — evita criar uma transação a mais se a
+    // recorrência foi cancelada/desativada entre o fetch do lote e este item específico.
+    const current = await this.recurrenceRepository.findById(recurrence.id);
+    if (!current || !current.isActive) {
+      return;
+    }
+
     const wallet = await this.walletRepository.findById(recurrence.walletId);
 
     const balanceDelta = recurrence.type === TransactionTypeEnum.INCOME

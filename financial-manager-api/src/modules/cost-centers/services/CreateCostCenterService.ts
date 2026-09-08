@@ -28,6 +28,12 @@ export class CreateCostCenterService {
       }
     }
 
+    const costCenterExists = await this.costCenterRepository.findByName(data.name, organization_id ? null : userId);
+
+    if (costCenterExists) {
+      throw new AppError('Você já possui um centro de custo com este nome');
+    }
+
     const costCenter = await this.costCenterRepository.create({
       ...data,
       userId: organization_id ? null : userId,

@@ -34,4 +34,10 @@ export class CostCenterRepository implements CostCenterRepositoryInterface {
       orderBy: { name: 'asc' },
     });
   }
+
+  async findByName(name: string, userId: string | null): Promise<CostCenter | null> {
+    return prisma.costCenter.findFirst({
+      where: { name, userId },
+    });
+  }
 }
