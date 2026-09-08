@@ -89,7 +89,7 @@ describe('SettlePersonDebtService', () => {
     expect(personRepository.update).toHaveBeenCalledWith('person-1', { theyOweMe: 0 }, expect.anything());
   });
 
-  it('should create an EXPENSE transaction and NOT zero the amount for a MONTHLY person (only updates lastPaidPeriod)', async () => {
+  it('should create an EXPENSE transaction and update both iOweThem and lastPaidPeriod for a MONTHLY person', async () => {
     vi.spyOn(personRepository, 'findById').mockResolvedValue({
       id: 'person-1',
       userId: 'user-1',
@@ -106,7 +106,31 @@ describe('SettlePersonDebtService', () => {
       expect.objectContaining({ type: 'expense' }),
       expect.anything(),
     );
-    expect(personRepository.update).toHaveBeenCalledWith('person-1', { lastPaidPeriod: expect.any(String) }, expect.anything());
+    expect(personRepository.update).toHaveBeenCalledWith(
+      'person-1',
+      { iOweThem: 0, lastPaidPeriod: expect.any(String) },
+      expect.anything(),
+    );
+  });
+
+  it('should decrement iOweThem by the partial amount for a MONTHLY person, keeping lastPaidPeriod updated', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'João',
+      theyOweMe: new Prisma.Decimal(0),
+      iOweThem: new Prisma.Decimal(900),
+      paymentFrequency: 'MONTHLY',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal' } as any);
+
+    await settlePersonDebtService.execute('person-1', { ...baseData, direction: 'i_owe_them', amount: 300 }, 'user-1');
+
+    expect(personRepository.update).toHaveBeenCalledWith(
+      'person-1',
+      { iOweThem: 600, lastPaidPeriod: expect.any(String) },
+      expect.anything(),
+    );
   });
 
   it('should assign an invoiceId when the settlement wallet is a credit card', async () => {
@@ -127,6 +151,39 @@ describe('SettlePersonDebtService', () => {
       expect.objectContaining({ invoiceId: 'invoice-1' }),
       expect.anything(),
     );
+  });
+
+  it('should settle a partial amount and keep the remaining balance on theyOweMe', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'Maria',
+      theyOweMe: new Prisma.Decimal(150),
+      iOweThem: new Prisma.Decimal(0),
+      paymentFrequency: 'ONE_TIME',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal' } as any);
+
+    await settlePersonDebtService.execute('person-1', { ...baseData, amount: 50 }, 'user-1');
+
+    const createdArgs = (transactionRepository.create as any).mock.calls[0][0];
+    expect(new Prisma.Decimal(createdArgs.amount).toNumber()).toBe(50);
+    expect(personRepository.update).toHaveBeenCalledWith('person-1', { theyOweMe: 100 }, expect.anything());
+  });
+
+  it('should throw AppError when the given amount is greater than the pending balance', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'Maria',
+      theyOweMe: new Prisma.Decimal(150),
+      iOweThem: new Prisma.Decimal(0),
+      paymentFrequency: 'ONE_TIME',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal' } as any);
+
+    await expect(settlePersonDebtService.execute('person-1', { ...baseData, amount: 200 }, 'user-1')).rejects.toBeInstanceOf(AppError);
+    expect(transactionRepository.create).not.toHaveBeenCalled();
   });
 
   it('should throw AppError when there is nothing pending in the given direction', async () => {

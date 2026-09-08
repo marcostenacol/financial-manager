@@ -64,6 +64,7 @@ describe('ExportReportService', () => {
     expect(listTransactions.execute).toHaveBeenCalledWith('user-1', {
       start_date: '2024-01-01T00:00:00.000Z',
       end_date: '2024-01-31T00:00:00.000Z',
+      status: 'completed',
       page: 1,
       per_page: 1_000_000,
     });

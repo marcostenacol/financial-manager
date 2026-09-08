@@ -29,5 +29,7 @@ export class ChangePasswordService {
     const hashed_password = await hash(new_password, 10);
 
     await this.auth_repository.updatePassword(user_id, hashed_password);
+
+    await this.auth_repository.deleteAllUserRefreshTokens(user_id);
   }
 }

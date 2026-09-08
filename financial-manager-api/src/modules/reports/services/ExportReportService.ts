@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 import { ListTransactionsService } from '@/modules/transactions/services/ListTransactionsService';
+import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
 
 interface ExportReportFilters {
   format: 'pdf' | 'excel';
@@ -20,6 +21,7 @@ export class ExportReportService {
     const { transactions } = await this.listTransactions.execute(userId, {
       start_date: filters.start_date,
       end_date: filters.end_date,
+      status: TransactionStatusEnum.COMPLETED,
       page: 1,
       per_page: 1_000_000,
     });

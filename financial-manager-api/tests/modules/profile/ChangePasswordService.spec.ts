@@ -12,6 +12,7 @@ describe('ChangePasswordService', () => {
     authRepository = {
       findById: vi.fn(),
       updatePassword: vi.fn(),
+      deleteAllUserRefreshTokens: vi.fn(),
     } as any;
 
     changePasswordService = new ChangePasswordService(authRepository);
@@ -28,6 +29,7 @@ describe('ChangePasswordService', () => {
     });
 
     expect(authRepository.updatePassword).toHaveBeenCalledWith('user-id', expect.any(String));
+    expect(authRepository.deleteAllUserRefreshTokens).toHaveBeenCalledWith('user-id');
   });
 
   it('should throw when user is not found', async () => {

@@ -11,6 +11,7 @@ import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTyp
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { resolveOwnerKey } from '@/shared/lib/resolveOwnerKey';
+import { ProfileScope } from '@prisma/client';
 
 @injectable()
 export class ProcessRecurrenceService {
@@ -111,6 +112,9 @@ export class ProcessRecurrenceService {
       await this.cache.delPattern(CacheKeys.reports.overviewPattern(ownerKey));
       await this.cache.del(CacheKeys.reports.monthlyEvolution(ownerKey));
       await this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(ownerKey));
+      if (wallet.scope === ProfileScope.business) {
+        await this.cache.delPattern(CacheKeys.reports.cashFlowByCostCenterPattern(ownerKey));
+      }
     }
   }
 }

@@ -32,10 +32,16 @@ export class SettlePersonDebtService {
     const person = await this.personRepository.findById(id);
     assertOwnership(person, userId, organizationIds, 'Pessoa não encontrada');
 
-    const amount = data.direction === 'they_owe_me' ? person!.theyOweMe : person!.iOweThem;
+    const pendingAmount = new Prisma.Decimal(data.direction === 'they_owe_me' ? person!.theyOweMe : person!.iOweThem);
 
-    if (new Prisma.Decimal(amount).lessThanOrEqualTo(0)) {
+    if (pendingAmount.lessThanOrEqualTo(0)) {
       throw new AppError('Não há valor pendente nessa direção', 422);
+    }
+
+    const settleAmount = data.amount !== undefined ? new Prisma.Decimal(data.amount) : pendingAmount;
+
+    if (settleAmount.greaterThan(pendingAmount)) {
+      throw new AppError('O valor informado é maior que o saldo pendente', 422);
     }
 
     const wallet = await this.walletRepository.findById(data.wallet_id);
@@ -53,11 +59,11 @@ export class SettlePersonDebtService {
     }
 
     const type = data.direction === 'they_owe_me' ? TransactionTypeEnum.INCOME : TransactionTypeEnum.EXPENSE;
-    const decimalAmount = new Prisma.Decimal(amount);
-    const balanceDelta = type === TransactionTypeEnum.INCOME ? decimalAmount : decimalAmount.negated();
+    const isPartial = settleAmount.lessThan(pendingAmount);
+    const balanceDelta = type === TransactionTypeEnum.INCOME ? settleAmount : settleAmount.negated();
     const description = data.direction === 'they_owe_me'
-      ? `Recebimento de ${person!.name}`
-      : `Pagamento para ${person!.name}`;
+      ? `Recebimento${isPartial ? ' parcial' : ''} de ${person!.name}`
+      : `Pagamento${isPartial ? ' parcial' : ''} para ${person!.name}`;
 
     const isOneTime = person!.paymentFrequency === 'ONE_TIME';
 
@@ -69,7 +75,7 @@ export class SettlePersonDebtService {
         walletId: data.wallet_id,
         categoryId: data.category_id,
         type,
-        amount: decimalAmount,
+        amount: settleAmount,
         description,
         status: TransactionStatusEnum.COMPLETED,
         occurredAt,
@@ -80,10 +86,11 @@ export class SettlePersonDebtService {
         balance: { increment: balanceDelta },
       }, tx);
 
-      const settlementFields = data.direction === 'they_owe_me' ? { theyOweMe: 0 } : { iOweThem: 0 };
+      const remaining = pendingAmount.minus(settleAmount).toNumber();
+      const settlementFields = data.direction === 'they_owe_me' ? { theyOweMe: remaining } : { iOweThem: remaining };
 
       const personUpdated = await this.personRepository.update(id, {
-        ...(isOneTime ? settlementFields : {}),
+        ...settlementFields,
         ...(person!.paymentFrequency === 'MONTHLY' ? { lastPaidPeriod: getCurrentPeriod() } : {}),
       }, tx);
 

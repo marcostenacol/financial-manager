@@ -11,6 +11,7 @@ import { CacheKeys } from '@/shared/cache/CacheKeys';
 import { prisma } from '@/shared/database/PrismaClient';
 import { AppError } from '@/shared/errors/AppError';
 import { isOwnedByActor } from '@/shared/authorization/ownership';
+import { ProfileScope } from '@prisma/client';
 
 @injectable()
 export class TransferService {
@@ -111,5 +112,9 @@ export class TransferService {
       this.cache.del(CacheKeys.reports.monthlyEvolution(userId)),
       this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(userId)),
     ]);
+
+    if (sourceWallet.scope === ProfileScope.business || destinationWallet.scope === ProfileScope.business) {
+      await this.cache.delPattern(CacheKeys.reports.cashFlowByCostCenterPattern(userId));
+    }
   }
 }

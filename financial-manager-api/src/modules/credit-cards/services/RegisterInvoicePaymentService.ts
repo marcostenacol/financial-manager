@@ -3,6 +3,8 @@ import { InvoicePayment, Prisma } from '@prisma/client';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { InvoiceRepositoryInterface } from '../repositories/contracts/InvoiceRepositoryInterface';
 import { InvoicePaymentRepositoryInterface } from '../repositories/contracts/InvoicePaymentRepositoryInterface';
+import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
+import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { RegisterInvoicePaymentDTOType } from '../dtos/RegisterInvoicePaymentDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { isOwnedByActor } from '@/shared/authorization/ownership';
@@ -18,6 +20,9 @@ export class RegisterInvoicePaymentService {
 
     @inject('InvoicePaymentRepository')
     private invoicePaymentRepository: InvoicePaymentRepositoryInterface,
+
+    @inject('TransactionRepository')
+    private transactionRepository: TransactionRepositoryInterface,
   ) {}
 
   async execute(
@@ -41,6 +46,24 @@ export class RegisterInvoicePaymentService {
 
     if (data.amount <= 0) {
       throw new AppError('O valor do pagamento deve ser maior que zero', 422);
+    }
+
+    const [transactions, payments] = await Promise.all([
+      this.transactionRepository.findAllByInvoiceId(invoice.id),
+      this.invoicePaymentRepository.findAllByInvoiceId(invoice.id),
+    ]);
+
+    const totalAmount = transactions.reduce((sum, t) => {
+      const amount = new Prisma.Decimal(t.amount);
+      return t.type === TransactionTypeEnum.INCOME ? sum.minus(amount) : sum.plus(amount);
+    }, new Prisma.Decimal(0));
+
+    const paidAmount = payments.reduce((sum, p) => sum.plus(new Prisma.Decimal(p.amount)), new Prisma.Decimal(0));
+
+    const remainingAmount = totalAmount.minus(paidAmount);
+
+    if (new Prisma.Decimal(data.amount).greaterThan(remainingAmount)) {
+      throw new AppError('O valor informado é maior que o saldo pendente da fatura', 422);
     }
 
     return this.invoicePaymentRepository.create({
