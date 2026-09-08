@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2, Ban, User } from 'lucide-react';
+import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2, Ban, User, Check } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
@@ -8,6 +8,7 @@ import { useCategories } from '../../categories/hooks/useCategories';
 import { usePeople } from '../../people/hooks/usePeople';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { isFutureDate } from '../../../shared/lib/isFutureDate';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
 interface Wallet {
@@ -65,6 +66,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   const loadData = async () => {
     try {
@@ -101,6 +103,16 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
     if (!transaction) return;
     setLoading(true);
 
+    // Regra de futuro força pendente: uma transação com data futura nunca pode
+    // ficar completed/cancelled indevidamente. Só forçamos na direção
+    // "data futura -> pending"; nunca mexemos numa transação já cancelada,
+    // nem revertemos manualmente um status existente quando a data não é futura.
+    const effectiveStatus = transaction.status === 'cancelled'
+      ? transaction.status
+      : isFutureDate(occurredAt)
+        ? 'pending'
+        : transaction.status;
+
     try {
       await updateTransaction(transaction.id, {
         description,
@@ -108,7 +120,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
         type,
         category_id: categoryId || undefined,
         occurred_at: new Date(occurredAt).toISOString(),
-        status: transaction.status,
+        status: effectiveStatus,
         person_id: type === 'expense' ? (personId || null) : null,
       });
 
@@ -118,6 +130,28 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       showToast(getErrorMessage(err, 'Erro ao atualizar transação'), 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!transaction) return;
+    setCompleting(true);
+
+    try {
+      await updateTransaction(transaction.id, {
+        description: transaction.description,
+        amount: transaction.amount,
+        type: transaction.type === 'transfer' ? undefined : transaction.type,
+        category_id: transaction.categoryId || undefined,
+        occurred_at: transaction.occurredAt,
+        status: 'completed',
+      });
+      onSuccess();
+      onClose();
+    } catch (err) {
+      showToast(getErrorMessage(err, 'Erro ao concluir transação'), 'error');
+    } finally {
+      setCompleting(false);
     }
   };
 
@@ -181,8 +215,21 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
             {transaction.status === 'cancelled' && (
               <span className="ledger-stamp text-app-danger">Cancelada</span>
             )}
+            {transaction.status === 'pending' && (
+              <span className="ledger-stamp text-amber-400">Pendente</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
+            {transaction.status === 'pending' && (
+              <button
+                onClick={handleComplete}
+                disabled={completing || deleting}
+                className="p-2 hover:bg-emerald-500/10 rounded-xl transition-colors text-emerald-400 disabled:opacity-50"
+                title="Marcar como concluída (efetiva no saldo agora)"
+              >
+                <Check className="w-5 h-5" />
+              </button>
+            )}
             {transaction.status !== 'cancelled' && (
               <button
                 onClick={handleCancel}
@@ -260,6 +307,9 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
                 />
               </div>
+              {isFutureDate(occurredAt) && transaction.status !== 'pending' && (
+                <p className="text-xs text-app-muted ml-1">Data futura — a transação fica pendente até a data chegar.</p>
+              )}
             </div>
           </div>
 
@@ -283,18 +333,11 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
               <label className="text-sm font-medium text-app-muted ml-1">Carteira</label>
               <div className="relative">
                 <WalletIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
-                <select
-                  required
-                  value={walletId}
-                  onChange={(e) => setWalletId(e.target.value)}
-                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
-                >
-                  <option value="" disabled className="bg-app-surface">Selecionar Carteira</option>
-                  {wallets.map(wallet => (
-                    <option key={wallet.id} value={wallet.id} className="bg-app-surface">{wallet.name}</option>
-                  ))}
-                </select>
+                <p className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink">
+                  {wallets.find((wallet) => wallet.id === walletId)?.name || '—'}
+                </p>
               </div>
+              <p className="text-xs text-app-muted ml-1">Para mover uma transação para outra carteira, exclua e recrie.</p>
             </div>
 
             <div className="space-y-2">

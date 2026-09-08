@@ -13,6 +13,26 @@ import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
+/**
+ * Calcula a próxima data de processamento aproximada, espelhando a mesma
+ * simplificação usada em `ProcessRecurrenceService.shouldProcess` no backend
+ * (30 dias para "monthly", 365 para "yearly") — não é uma previsão precisa,
+ * é só para manter o rótulo da UI consistente com quando o job realmente dispara.
+ */
+function computeNextDueDate(recurrence: Recurrence): Date {
+  const base = recurrence.lastProcessedAt ? new Date(recurrence.lastProcessedAt) : new Date(recurrence.startsAt);
+  const daysByPeriod: Record<Recurrence['period'], number> = {
+    daily: 1,
+    weekly: 7,
+    monthly: 30,
+    yearly: 365,
+  };
+
+  const next = new Date(base);
+  next.setDate(next.getDate() + daysByPeriod[recurrence.period]);
+  return next;
+}
+
 export const RecurrencesPage = () => {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -216,7 +236,7 @@ export const RecurrencesPage = () => {
                         <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">{t('recurrences.ended')}</span>
                       ) : (
                         <div className="flex flex-col items-end gap-1">
-                          <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">{t('recurrences.next', { date: new Date(recurrence.startsAt).toLocaleDateString('pt-BR') })}</p>
+                          <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">{t('recurrences.next', { date: computeNextDueDate(recurrence).toLocaleDateString('pt-BR') })}</p>
                           <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${recurrence.isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
                             {recurrence.isActive ? t('recurrences.statusActive') : t('recurrences.statusPaused')}
                           </span>

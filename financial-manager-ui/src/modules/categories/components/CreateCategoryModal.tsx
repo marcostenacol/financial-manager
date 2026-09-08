@@ -37,10 +37,10 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
     if (isOpen) {
       loadOrganizations().catch(() => {});
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setOrganizationId(activeOrganizationId ?? '');
+      setOrganizationId(scope === 'business' ? (activeOrganizationId ?? '') : '');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, scope]);
 
   if (!isOpen) return null;
 
@@ -54,7 +54,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
         color,
         type,
         scope,
-        organization_id: organizationId || undefined,
+        organization_id: scope === 'business' ? (organizationId || undefined) : undefined,
       });
       onSuccess();
       onClose();

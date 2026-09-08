@@ -5,11 +5,13 @@ import { useOrganizations, type Organization } from '../hooks/useOrganizations';
 import { OrganizationDetailPanel } from '../components/OrganizationDetailPanel';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 
 export const OrganizationsPage = () => {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const { organizations, loading, loadOrganizations, createOrganization, redeemInvite, deleteOrganization } = useOrganizations();
+  const { activeOrganizationId, setActiveOrganizationId } = useActiveOrganization();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
@@ -64,6 +66,9 @@ export const OrganizationsPage = () => {
     setDeletingId(organization.id);
     try {
       await deleteOrganization(organization.id);
+      if (activeOrganizationId === organization.id) {
+        setActiveOrganizationId(null);
+      }
       await loadOrganizations();
       showToast(t('organizations.toasts.deleted'), 'success');
     } catch (err) {

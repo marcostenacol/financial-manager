@@ -9,6 +9,7 @@ export interface Recurrence {
   period: 'daily' | 'weekly' | 'monthly' | 'yearly';
   startsAt: string;
   endsAt: string | null;
+  lastProcessedAt: string | null;
   wallet?: { name: string; organizationId?: string | null };
   category?: { name: string; color: string };
   isActive: boolean;

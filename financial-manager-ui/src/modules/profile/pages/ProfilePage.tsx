@@ -23,6 +23,7 @@ export const ProfilePage = () => {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const { updateUser } = useAuth();
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export const ProfilePage = () => {
             updateUser({ ...user, avatar: profile.avatar });
           }
         }
+        setProfileLoaded(true);
       } catch (err) {
         showToast(getErrorMessage(err, t('profile.loadError')), 'error');
       }
@@ -70,20 +72,19 @@ export const ProfilePage = () => {
 
     try {
       await updateProfile({ name, bio });
-      let updatedUser = { ...user!, name, bio };
+      updateUser({ ...user!, name, bio });
 
       if (type !== savedType) {
         const updatedProfile = await changeProfileType(type as 'personal' | 'business');
-        updatedUser = { ...updatedUser, type: updatedProfile.type };
         setSavedType(updatedProfile.type);
+        updateUser({ ...user!, name, bio, type: updatedProfile.type });
       }
 
       if (avatarFile) {
         const updatedProfile = await updateAvatar(avatarFile);
-        updatedUser = { ...updatedUser, avatar: updatedProfile.avatar ?? undefined };
+        updateUser({ ...user!, name, bio, avatar: updatedProfile.avatar ?? undefined });
       }
 
-      updateUser(updatedUser);
       setSuccess(true);
     } catch (err) {
       showToast(getErrorMessage(err, t('profile.updateError')), 'error');
@@ -185,10 +186,11 @@ export const ProfilePage = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <button
                     type="button"
+                    disabled={!profileLoaded}
                     onClick={() => setType('personal')}
-                    className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${
-                      type === 'personal' 
-                        ? 'bg-app-accent/20 border-app-accent text-app-ink shadow-[0_0_20px_rgba(59,130,246,0.2)]' 
+                    className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      type === 'personal'
+                        ? 'bg-app-accent/20 border-app-accent text-app-ink shadow-[0_0_20px_rgba(59,130,246,0.2)]'
                         : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                     }`}
                   >
@@ -197,10 +199,11 @@ export const ProfilePage = () => {
                   </button>
                   <button
                     type="button"
+                    disabled={!profileLoaded}
                     onClick={() => setType('business')}
-                    className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${
-                      type === 'business' 
-                        ? 'bg-app-accent/20 border-app-accent text-app-ink shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
+                    className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      type === 'business'
+                        ? 'bg-app-accent/20 border-app-accent text-app-ink shadow-[0_0_20px_rgba(168,85,247,0.2)]'
                         : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                     }`}
                   >
