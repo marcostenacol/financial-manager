@@ -420,7 +420,7 @@
       "frequencyOneTimeOption": "One-time",
       "frequencyMonthlyOption": "Monthly (recurring)",
       "pixKeyTypeLabel": "PIX key type",
-      "pixKeyLabel": "PIX key",
+      "pixKeyLabel": "PIX key (optional)",
       "pixKeyPlaceholder": "Key",
       "pixCityLabel": "PIX key city (optional)",
       "pixCityPlaceholder": "e.g. Boa Vista",
@@ -437,6 +437,9 @@
     "settle": {
       "receiveTitle": "Register receipt",
       "payTitle": "Register payment",
+      "pendingTotal": "pending:",
+      "amountLabel": "Amount to register now",
+      "remainingAfter": "{{amount}} will still be pending after this payment.",
       "walletLabel": "Wallet",
       "selectWallet": "Select wallet",
       "categoryLabel": "Category",

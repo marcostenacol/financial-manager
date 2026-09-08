@@ -1,138 +1,95 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, User } from 'lucide-react';
+import { X, Save, FileText, Tag, Calendar, User, Layers } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
-import { useTransactions } from '../hooks/useTransactions';
-import { useWallets } from '../../wallets/hooks/useWallets';
-import { useCategories } from '../../categories/hooks/useCategories';
-import { usePeople } from '../../people/hooks/usePeople';
+import { useTransactions } from '../../transactions/hooks/useTransactions';
+import { useCategories, type Category } from '../../categories/hooks/useCategories';
+import { usePeople, type Person } from '../../people/hooks/usePeople';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { isFutureDate } from '../../../shared/lib/isFutureDate';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
+import type { CreditCard } from '../hooks/useCreditCards';
 
-interface Wallet {
-  id: string;
-  name: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-}
-
-interface Person {
-  id: string;
-  name: string;
-}
-
-export interface DuplicateTransactionData {
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  walletId: string;
-  categoryId?: string;
-}
-
-interface CreateTransactionModalProps {
+interface CreateCardPurchaseModalProps {
   isOpen: boolean;
+  card: CreditCard | null;
   onClose: () => void;
   onSuccess: () => void;
-  initialData?: DuplicateTransactionData | null;
 }
 
-export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData }: CreateTransactionModalProps) => {
+export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: CreateCardPurchaseModalProps) => {
   const { showToast } = useToast();
   const { createTransaction } = useTransactions();
   const { scope } = useScope();
-  const { loadWallets } = useWallets(scope);
   const { loadCategories } = useCategories(scope);
   const { loadPeople } = usePeople(scope);
-  const [type, setType] = useState<'income' | 'expense'>('expense');
+
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(0);
-  const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [personId, setPersonId] = useState('');
   const [occurredAt, setOccurredAt] = useState(new Date().toISOString().split('T')[0]);
+  const [installments, setInstallments] = useState(1);
 
-  const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const loadData = async () => {
-    try {
-      const [walletsData, categoriesData, peopleData] = await Promise.all([
-        loadWallets(),
-        loadCategories(),
-        loadPeople(),
-      ]);
-      setWallets(walletsData);
-      setCategories(categoriesData);
-      setPeople(peopleData);
-
-      if (initialData) {
-        setType(initialData.type);
-        setDescription(initialData.description);
-        setAmount(initialData.amount);
-        setWalletId(initialData.walletId);
-        setCategoryId(initialData.categoryId ?? '');
-        setOccurredAt(new Date().toISOString().split('T')[0]);
-        return;
-      }
-
-      if (walletsData.length > 0) {
-        const primaryWallet = walletsData.find((wallet) => wallet.isPrimary);
-        setWalletId((primaryWallet ?? walletsData[0]).id);
-      }
-      if (categoriesData.length > 0) {
-        setCategoryId(categoriesData[0].id);
-      }
-    } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao carregar dados para transação'), 'error');
-    }
+  const resetForm = () => {
+    setDescription('');
+    setAmount(0);
+    setPersonId('');
+    setOccurredAt(new Date().toISOString().split('T')[0]);
+    setInstallments(1);
   };
 
   useEffect(() => {
-    if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setPersonId('');
-      loadData();
-    }
+    if (!isOpen) return;
+
+    (async () => {
+      try {
+        const [categoriesData, peopleData] = await Promise.all([loadCategories(), loadPeople()]);
+        const expenseCategories = categoriesData.filter((c) => c.type === 'expense' || c.type === 'both');
+        setCategories(expenseCategories);
+        setPeople(peopleData);
+        if (expenseCategories.length > 0) setCategoryId(expenseCategories[0].id);
+      } catch (err) {
+        showToast(getErrorMessage(err, 'Erro ao carregar dados da compra'), 'error');
+      }
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, initialData]);
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!card) return;
     setLoading(true);
 
     try {
       await createTransaction({
         description,
         amount,
-        type,
-        wallet_id: walletId,
+        type: 'expense',
+        wallet_id: card.id,
         category_id: categoryId,
         occurred_at: new Date(occurredAt).toISOString(),
         status: isFutureDate(occurredAt) ? 'pending' : 'completed',
-        person_id: type === 'expense' && personId ? personId : undefined,
+        person_id: personId || undefined,
+        installments: installments > 1 ? installments : undefined,
       });
 
       onSuccess();
       onClose();
-      // Reset
-      setDescription('');
-      setAmount(0);
-      setPersonId('');
+      resetForm();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao criar transação'), 'error');
+      showToast(getErrorMessage(err, 'Erro ao lançar compra'), 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !card) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -143,44 +100,23 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
         onClick={onClose}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
-      
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         className="relative w-full max-w-xl bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
-          <h2 className="text-xl font-bold text-app-ink">{initialData ? 'Duplicar Transação' : 'Nova Transação'}</h2>
+          <div>
+            <h2 className="text-xl font-bold text-app-ink">Nova compra</h2>
+            <p className="text-sm text-app-muted">{card.name}</p>
+          </div>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          {/* Tipo de Transação */}
-          <div className="flex p-1 bg-app-surface-2 border border-app-border rounded-2xl">
-            <button
-              type="button"
-              onClick={() => { setType('income'); setPersonId(''); }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                type === 'income' ? 'bg-emerald-600 text-app-ink shadow-lg shadow-emerald-600/20' : 'text-app-muted'
-              }`}
-            >
-              <ArrowUpCircle className="w-5 h-5" />
-              Receita
-            </button>
-            <button
-              type="button"
-              onClick={() => setType('expense')}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                type === 'expense' ? 'bg-red-600 text-app-ink shadow-lg shadow-red-600/20' : 'text-app-muted'
-              }`}
-            >
-              <ArrowDownCircle className="w-5 h-5" />
-              Despesa
-            </button>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-app-muted ml-1">Valor</label>
@@ -196,7 +132,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Data</label>
+              <label className="text-sm font-medium text-app-muted ml-1">Data da compra</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -208,7 +144,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
                 />
               </div>
               {isFutureDate(occurredAt) && (
-                <p className="text-xs text-app-muted ml-1">Data futura — a transação fica pendente até a data chegar.</p>
+                <p className="text-xs text-app-muted ml-1">Data futura — a compra fica pendente até a data chegar.</p>
               )}
             </div>
           </div>
@@ -222,31 +158,13 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Ex: Aluguel, Supermercado..."
+                placeholder="Ex: Supermercado, Assinatura..."
                 className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Carteira</label>
-              <div className="relative">
-                <WalletIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
-                <select
-                  required
-                  value={walletId}
-                  onChange={(e) => setWalletId(e.target.value)}
-                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
-                >
-                  <option value="" disabled className="bg-app-surface">Selecionar Carteira</option>
-                  {wallets.map(wallet => (
-                    <option key={wallet.id} value={wallet.id} className="bg-app-surface">{wallet.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
             <div className="space-y-2">
               <label className="text-sm font-medium text-app-muted ml-1">Categoria</label>
               <div className="relative">
@@ -258,15 +176,36 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
                   <option value="" disabled className="bg-app-surface">Selecionar categoria</option>
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <option key={category.id} value={category.id} className="bg-app-surface">{category.name}</option>
                   ))}
                 </select>
               </div>
             </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-app-muted ml-1">Parcelas</label>
+              <div className="relative">
+                <Layers className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
+                <input
+                  type="number"
+                  min={1}
+                  max={60}
+                  required
+                  value={installments}
+                  onChange={(e) => setInstallments(Math.min(60, Math.max(1, Number(e.target.value) || 1)))}
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
+                />
+              </div>
+              {installments > 1 && (
+                <p className="text-xs text-app-muted ml-1">
+                  {installments}x de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount / installments)} — uma parcela por fatura seguinte.
+                </p>
+              )}
+            </div>
           </div>
 
-          {type === 'expense' && people.length > 0 && (
+          {people.length > 0 && (
             <div className="space-y-2">
               <label className="text-sm font-medium text-app-muted ml-1">Gasto de outra pessoa (opcional)</label>
               <div className="relative">
@@ -277,13 +216,13 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
                   <option value="" className="bg-app-surface">Foi você quem gastou</option>
-                  {people.map(person => (
+                  {people.map((person) => (
                     <option key={person.id} value={person.id} className="bg-app-surface">{person.name}</option>
                   ))}
                 </select>
               </div>
               {personId && (
-                <p className="text-xs text-app-muted ml-1">Esse valor vai somar em "ela me deve" na aba Pessoas.</p>
+                <p className="text-xs text-app-muted ml-1">Esse valor vai somar em "ela me deve" na aba Pessoas, só quando a compra estiver efetivada.</p>
               )}
             </div>
           )}
@@ -298,7 +237,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Confirmar Transação
+                Lançar compra
               </>
             )}
           </button>

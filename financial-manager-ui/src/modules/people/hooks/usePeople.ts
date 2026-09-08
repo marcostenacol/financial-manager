@@ -16,8 +16,8 @@ export interface Person {
   paymentFrequency: PaymentFrequency;
   isPaid: boolean;
   lastPaidPeriod: string | null;
-  pixKey: string;
-  pixKeyType: PixKeyType;
+  pixKey: string | null;
+  pixKeyType: PixKeyType | null;
   pixCity: string | null;
   notes: string | null;
   createdAt: string;
@@ -29,8 +29,8 @@ export interface CreatePersonInput {
   they_owe_me?: number;
   i_owe_them?: number;
   payment_frequency?: PaymentFrequency;
-  pix_key: string;
-  pix_key_type: PixKeyType;
+  pix_key?: string;
+  pix_key_type?: PixKeyType;
   pix_city?: string;
   notes?: string;
   scope?: 'personal' | 'business';
@@ -48,6 +48,7 @@ export interface SettlePersonDebtInput {
   direction: SettleDirection;
   wallet_id: string;
   category_id: string;
+  amount?: number;
 }
 
 /**

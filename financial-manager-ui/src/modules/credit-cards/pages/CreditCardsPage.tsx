@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { CreditCard as CreditCardIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CreditCard as CreditCardIcon, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useCreditCards, type CreditCard, type CreditCardInvoice } from '../hooks/useCreditCards';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { InvoiceDetailModal } from '../components/InvoiceDetailModal';
+import { CreateCardPurchaseModal } from '../components/CreateCardPurchaseModal';
 
 function statusLabel(status: CreditCardInvoice['status']): string {
   switch (status) {
@@ -35,6 +36,7 @@ export const CreditCardsPage = () => {
   const [invoicesByCard, setInvoicesByCard] = useState<Record<string, CreditCardInvoice[]>>({});
   const [selected, setSelected] = useState<{ walletId: string; invoiceId: string } | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<Record<string, number>>({});
+  const [purchaseCard, setPurchaseCard] = useState<CreditCard | null>(null);
 
   const fetchAll = async () => {
     try {
@@ -132,7 +134,7 @@ export const CreditCardsPage = () => {
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(current.totalAmount)}
                   </p>
                   <span className={`ledger-stamp mt-2 ${statusColor(current.status)}`}>{statusLabel(current.status)}</span>
-                  <div className="mt-4">
+                  <div className="mt-4 flex items-center gap-4">
                     <button
                       onClick={() => setSelected({ walletId: card.id, invoiceId: current.id })}
                       className="text-sm font-bold text-app-accent hover:underline"
@@ -144,6 +146,13 @@ export const CreditCardsPage = () => {
               ) : (
                 <p className="text-app-muted text-sm mt-2">Nenhuma fatura ainda.</p>
               )}
+              <button
+                onClick={() => setPurchaseCard(card)}
+                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-dashed border-app-border text-app-muted hover:text-app-ink hover:border-app-accent transition-colors text-sm font-bold"
+              >
+                <Plus className="w-4 h-4" />
+                Nova compra
+              </button>
             </div>
           );
         })}
@@ -155,6 +164,13 @@ export const CreditCardsPage = () => {
         invoiceId={selected?.invoiceId ?? null}
         onClose={() => setSelected(null)}
         onChanged={fetchAll}
+      />
+
+      <CreateCardPurchaseModal
+        isOpen={!!purchaseCard}
+        card={purchaseCard}
+        onClose={() => setPurchaseCard(null)}
+        onSuccess={fetchAll}
       />
     </div>
   );

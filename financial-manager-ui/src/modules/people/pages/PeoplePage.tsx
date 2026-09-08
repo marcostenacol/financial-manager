@@ -105,13 +105,15 @@ export const PeoplePage = () => {
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button
-                        onClick={(e) => handleShowQrCode(e, person)}
-                        title={t('people.viewPixQrCode')}
-                        className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted hover:text-app-accent"
-                      >
-                        <QrCode className="w-5 h-5" />
-                      </button>
+                      {person.pixKey && (
+                        <button
+                          onClick={(e) => handleShowQrCode(e, person)}
+                          title={t('people.viewPixQrCode')}
+                          className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted hover:text-app-accent"
+                        >
+                          <QrCode className="w-5 h-5" />
+                        </button>
+                      )}
                       <button
                         onClick={(e) => { e.stopPropagation(); handleEdit(person); }}
                         className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted hover:text-app-ink"

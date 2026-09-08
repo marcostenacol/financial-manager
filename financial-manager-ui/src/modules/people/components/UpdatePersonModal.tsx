@@ -43,8 +43,8 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
       setTheyOweMe(String(Number(person.theyOweMe)));
       setIOweThem(String(Number(person.iOweThem)));
       setPaymentFrequency(person.paymentFrequency);
-      setPixKeyType(person.pixKeyType);
-      setPixKey(person.pixKey);
+      setPixKeyType(person.pixKeyType ?? 'EMAIL');
+      setPixKey(person.pixKey ?? '');
       setPixCity(person.pixCity ?? '');
       setNotes(person.notes ?? '');
     }
@@ -62,8 +62,8 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
         they_owe_me: theyOweMe ? Number(theyOweMe) : 0,
         i_owe_them: iOweThem ? Number(iOweThem) : 0,
         payment_frequency: paymentFrequency,
-        pix_key: pixKey,
-        pix_key_type: pixKeyType,
+        pix_key: pixKey || undefined,
+        pix_key_type: pixKey ? pixKeyType : undefined,
         pix_city: pixCity || undefined,
         notes: notes || undefined,
       });
@@ -205,7 +205,6 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
                 <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
                 <input
                   type="text"
-                  required
                   value={pixKey}
                   onChange={(e) => setPixKey(e.target.value)}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"

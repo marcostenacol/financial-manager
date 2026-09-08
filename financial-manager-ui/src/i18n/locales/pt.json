@@ -420,7 +420,7 @@
       "frequencyOneTimeOption": "Avulsa (uma vez)",
       "frequencyMonthlyOption": "Mensal (recorrente)",
       "pixKeyTypeLabel": "Tipo de chave PIX",
-      "pixKeyLabel": "Chave PIX",
+      "pixKeyLabel": "Chave PIX (opcional)",
       "pixKeyPlaceholder": "Chave",
       "pixCityLabel": "Cidade da chave PIX (opcional)",
       "pixCityPlaceholder": "Ex: Boa Vista",
@@ -437,6 +437,9 @@
     "settle": {
       "receiveTitle": "Registrar recebimento",
       "payTitle": "Registrar pagamento",
+      "pendingTotal": "pendente:",
+      "amountLabel": "Valor a registrar agora",
+      "remainingAfter": "Vai ficar faltando {{amount}} depois desse pagamento.",
       "walletLabel": "Carteira",
       "selectWallet": "Selecionar carteira",
       "categoryLabel": "Categoria",

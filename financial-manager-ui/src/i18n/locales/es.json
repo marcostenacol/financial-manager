@@ -420,7 +420,7 @@
       "frequencyOneTimeOption": "Puntual (una vez)",
       "frequencyMonthlyOption": "Mensual (recurrente)",
       "pixKeyTypeLabel": "Tipo de clave PIX",
-      "pixKeyLabel": "Clave PIX",
+      "pixKeyLabel": "Clave PIX (opcional)",
       "pixKeyPlaceholder": "Clave",
       "pixCityLabel": "Ciudad de la clave PIX (opcional)",
       "pixCityPlaceholder": "ej: Boa Vista",
@@ -437,6 +437,9 @@
     "settle": {
       "receiveTitle": "Registrar cobro",
       "payTitle": "Registrar pago",
+      "pendingTotal": "pendiente:",
+      "amountLabel": "Valor a registrar ahora",
+      "remainingAfter": "Quedará pendiente {{amount}} después de este pago.",
       "walletLabel": "Billetera",
       "selectWallet": "Seleccionar billetera",
       "categoryLabel": "Categoría",

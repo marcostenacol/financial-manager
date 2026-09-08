@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { X, Check, Wallet as WalletIcon, Tag } from 'lucide-react';
+import { X, Check, Wallet as WalletIcon, Tag, DollarSign } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { usePeople, type Person, type SettleDirection } from '../hooks/usePeople';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
 interface SettleDebtModalProps {
   isOpen: boolean;
@@ -26,7 +27,12 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
   const { categories, loadCategories } = useCategories(scope);
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [settleAmount, setSettleAmount] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const pendingAmount = person && direction
+    ? Number(direction === 'they_owe_me' ? person.theyOweMe : person.iOweThem)
+    : 0;
 
   useEffect(() => {
     if (isOpen) {
@@ -35,21 +41,23 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setWalletId('');
       setCategoryId('');
+      setSettleAmount(pendingAmount);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [isOpen, person, direction]);
 
   if (!isOpen || !person || !direction) return null;
 
-  const amount = direction === 'they_owe_me' ? person.theyOweMe : person.iOweThem;
   const title = direction === 'they_owe_me' ? t('people.settle.receiveTitle') : t('people.settle.payTitle');
+  const remainingAfter = Math.max(0, pendingAmount - settleAmount);
+  const isPartial = settleAmount > 0 && settleAmount < pendingAmount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await settlePersonDebt(person.id, { direction, wallet_id: walletId, category_id: categoryId });
+      await settlePersonDebt(person.id, { direction, wallet_id: walletId, category_id: categoryId, amount: settleAmount });
       onSuccess();
       onClose();
     } catch (err) {
@@ -83,10 +91,29 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <p className="text-app-muted text-sm">
-            {person.name} — <span className="ledger-figure text-app-ink">
-              {Number(amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            {person.name} — {t('people.settle.pendingTotal')} <span className="ledger-figure text-app-ink">
+              {pendingAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </span>
           </p>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-app-muted ml-1 flex items-center gap-2">
+              <DollarSign className="w-4 h-4" /> {t('people.settle.amountLabel')}
+            </label>
+            <CurrencyInput
+              required
+              value={settleAmount}
+              onChange={setSettleAmount}
+              className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 ledger-figure"
+            />
+            {isPartial && (
+              <p className="text-xs text-amber-400 ml-1">
+                {t('people.settle.remainingAfter', {
+                  amount: remainingAfter.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+                })}
+              </p>
+            )}
+          </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-app-muted ml-1 flex items-center gap-2">
@@ -124,7 +151,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
 
           <button
             type="submit"
-            disabled={loading || !walletId || !categoryId}
+            disabled={loading || !walletId || !categoryId || settleAmount <= 0 || settleAmount > pendingAmount}
             className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-3.5 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? (

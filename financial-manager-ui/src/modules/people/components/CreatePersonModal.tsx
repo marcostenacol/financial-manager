@@ -64,8 +64,8 @@ export const CreatePersonModal = ({ isOpen, onClose, onSuccess }: CreatePersonMo
         they_owe_me: theyOweMe ? Number(theyOweMe) : undefined,
         i_owe_them: iOweThem ? Number(iOweThem) : undefined,
         payment_frequency: paymentFrequency,
-        pix_key: pixKey,
-        pix_key_type: pixKeyType,
+        pix_key: pixKey || undefined,
+        pix_key_type: pixKey ? pixKeyType : undefined,
         pix_city: pixCity || undefined,
         notes: notes || undefined,
         scope,
@@ -197,7 +197,6 @@ export const CreatePersonModal = ({ isOpen, onClose, onSuccess }: CreatePersonMo
                 <Landmark className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted group-focus-within:text-app-accent transition-colors" />
                 <input
                   type="text"
-                  required
                   value={pixKey}
                   onChange={(e) => setPixKey(e.target.value)}
                   placeholder={t('people.form.pixKeyPlaceholder')}
