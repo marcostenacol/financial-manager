@@ -12,25 +12,35 @@ import { useScope } from '../../../contexts/useScope';
 import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { addMonthsClamped } from '../../../shared/lib/addMonthsClamped';
 
 /**
- * Calcula a próxima data de processamento aproximada, espelhando a mesma
- * simplificação usada em `ProcessRecurrenceService.shouldProcess` no backend
- * (30 dias para "monthly", 365 para "yearly") — não é uma previsão precisa,
- * é só para manter o rótulo da UI consistente com quando o job realmente dispara.
+ * Calcula a próxima data de vencimento, espelhando `ProcessRecurrenceService.shouldProcess`
+ * no backend: para "monthly"/"yearly" é ancorada em `startsAt` (dia original, clampado no
+ * fim do mês), nunca em "N dias após o último processamento" — evita o rótulo escorregar
+ * pra frente a cada ciclo. "daily"/"weekly" continuam como soma direta de dias.
  */
 function computeNextDueDate(recurrence: Recurrence): Date {
-  const base = recurrence.lastProcessedAt ? new Date(recurrence.lastProcessedAt) : new Date(recurrence.startsAt);
-  const daysByPeriod: Record<Recurrence['period'], number> = {
-    daily: 1,
-    weekly: 7,
-    monthly: 30,
-    yearly: 365,
-  };
+  const startsAt = new Date(recurrence.startsAt);
+  const after = recurrence.lastProcessedAt ? new Date(recurrence.lastProcessedAt) : startsAt;
 
-  const next = new Date(base);
-  next.setDate(next.getDate() + daysByPeriod[recurrence.period]);
-  return next;
+  if (recurrence.period === 'daily' || recurrence.period === 'weekly') {
+    const days = recurrence.period === 'daily' ? 1 : 7;
+    const next = new Date(after);
+    next.setDate(next.getDate() + days);
+    return next;
+  }
+
+  const monthsStep = recurrence.period === 'yearly' ? 12 : 1;
+  let months = 0;
+  let due = addMonthsClamped(startsAt, months);
+
+  while (due.getTime() <= after.getTime()) {
+    months += monthsStep;
+    due = addMonthsClamped(startsAt, months);
+  }
+
+  return due;
 }
 
 export const RecurrencesPage = () => {

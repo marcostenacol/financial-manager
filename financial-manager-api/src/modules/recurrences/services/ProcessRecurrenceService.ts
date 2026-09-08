@@ -6,6 +6,7 @@ import { TransactionRepositoryInterface } from '@/modules/transactions/repositor
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
 import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
+import { addMonthsClamped } from '@/modules/credit-cards/utils/computeInvoicePeriod';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { CacheTrait } from '@/base/traits/CacheTrait';
@@ -58,13 +59,29 @@ export class ProcessRecurrenceService {
       case 'weekly':
         return diffDays >= 7;
       case 'monthly':
-        // Simplificação: 30 dias. Para precisão maior, usar diffMonths
-        return diffDays >= 30;
+        return now.getTime() >= this.nextAnchoredDue(recurrence.startsAt, lastProcessed, 1).getTime();
       case 'yearly':
-        return diffDays >= 365;
+        return now.getTime() >= this.nextAnchoredDue(recurrence.startsAt, lastProcessed, 12).getTime();
       default:
         return false;
     }
+  }
+
+  /**
+   * Próxima data de vencimento ancorada em `startsAt` (dia original, clampado no fim do
+   * mês quando necessário), não em "N dias após o último processamento" — evita o drift
+   * que uma janela fixa de 30/365 dias acumula mês a mês (meses reais têm 28-31 dias).
+   */
+  private nextAnchoredDue(startsAt: Date, after: Date, monthsStep: number): Date {
+    let months = 0;
+    let due = addMonthsClamped(startsAt, months);
+
+    while (due.getTime() <= after.getTime()) {
+      months += monthsStep;
+      due = addMonthsClamped(startsAt, months);
+    }
+
+    return due;
   }
 
   private async process(recurrence: Recurrence, now: Date): Promise<void> {

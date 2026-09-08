@@ -122,14 +122,16 @@ describe('ProcessRecurrenceService', () => {
   });
 
   it('should not process a recurrence that was recently processed', async () => {
-    const lastProcessedAt = new Date();
-    lastProcessedAt.setDate(lastProcessedAt.getDate() - 15); // 15 dias atrás (mensal)
+    // Ancorado em startsAt (não em "N dias após lastProcessedAt"): criada e processada
+    // há só 15 dias, então o próximo vencimento mensal ainda não chegou.
+    const startsAt = new Date();
+    startsAt.setDate(startsAt.getDate() - 15);
 
     const recurrence = {
       id: 'rec-1',
       period: 'monthly',
-      startsAt: new Date(2020, 1, 1),
-      lastProcessedAt,
+      startsAt,
+      lastProcessedAt: startsAt,
     };
 
     vi.spyOn(recurrenceRepository, 'findAllActive').mockResolvedValue([recurrence as any]);
@@ -137,6 +139,52 @@ describe('ProcessRecurrenceService', () => {
     await processRecurrenceService.execute();
 
     expect(transactionRepository.create).not.toHaveBeenCalled();
+  });
+
+  it('should not drift the due day forward across consecutive monthly cycles', async () => {
+    // Regressão do bug de drift: antes, "30 dias após o último processamento" empurrava
+    // o dia de vencimento pra frente a cada ciclo. Agora due é sempre recalculado a
+    // partir de startsAt, então o dia (clampado no fim do mês) nunca muda.
+    const startsAt = new Date(2026, 0, 1); // 1º de janeiro de 2026
+
+    const firstCycle = {
+      id: 'rec-1',
+      description: 'Netflix',
+      amount: 50,
+      type: 'expense',
+      period: 'monthly',
+      startsAt,
+      lastProcessedAt: null,
+      walletId: 'wallet-1',
+      categoryId: 'cat-1',
+    };
+
+    const wallet = { id: 'wallet-1', userId: 'user-1', balance: 1000 };
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue(wallet as any);
+
+    // "Agora" = 1º de fevereiro (exatamente 1 mês depois) — deve processar.
+    vi.spyOn(recurrenceRepository, 'findAllActive').mockResolvedValue([firstCycle as any]);
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 1, 1));
+
+    await processRecurrenceService.execute();
+    expect(transactionRepository.create).toHaveBeenCalledTimes(1);
+
+    // Simula o "lastProcessedAt" real gravado nesse primeiro ciclo (processado no dia certo).
+    const secondCycle = { ...firstCycle, lastProcessedAt: new Date(2026, 1, 1) };
+    vi.spyOn(recurrenceRepository, 'findAllActive').mockResolvedValue([secondCycle as any]);
+
+    // Um dia antes do próximo vencimento (1º de março) — não deve processar de novo.
+    vi.setSystemTime(new Date(2026, 1, 28));
+    await processRecurrenceService.execute();
+    expect(transactionRepository.create).toHaveBeenCalledTimes(1);
+
+    // No dia certo (1º de março) — processa, sem ter indevidamente escorregado pra frente.
+    vi.setSystemTime(new Date(2026, 2, 1));
+    await processRecurrenceService.execute();
+    expect(transactionRepository.create).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers();
   });
 
   it('should skip a recurrence that was deactivated between the batch fetch and processing', async () => {
