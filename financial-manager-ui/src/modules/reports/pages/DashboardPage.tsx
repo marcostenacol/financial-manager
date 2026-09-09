@@ -13,11 +13,11 @@ import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
-// Recharts requires literal color strings, not CSS var() — keep these in sync with the
-// CSS tokens in src/index.css (--success, --danger, --border, --muted, --surface).
+// Recharts requires literal color strings, not CSS var() — keep income/expense in sync with
+// the --accent/--danger tokens in src/index.css (currently #5B8DEF / #EF5350).
 const CHART_COLORS = {
-  income: '#4ade80',
-  expense: '#f28b74',
+  income: '#5B8DEF',
+  expense: '#EF5350',
   grid: 'rgba(255,255,255,.1)',
   axis: '#94a3b8',
   tooltipBg: '#0f172a',
@@ -142,7 +142,7 @@ export const DashboardPage = () => {
 
         {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
 
-        <div className="flex flex-wrap bg-app-surface p-1 rounded-2xl border border-app-border">
+        <div className="flex flex-wrap bg-app-surface p-1 rounded-full border border-app-border">
           {[
             { id: 'month', label: t('dashboard.periods.month') },
             { id: '7days', label: t('dashboard.periods.7days') },
@@ -152,7 +152,7 @@ export const DashboardPage = () => {
             <button
               key={preset.id}
               onClick={() => handlePresetChange(preset.id)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
                 active_preset === preset.id
                   ? 'bg-app-accent text-app-accent-ink shadow-lg shadow-app-card'
                   : 'text-app-muted hover:text-app-ink'
@@ -166,16 +166,16 @@ export const DashboardPage = () => {
         <div className="flex gap-2">
           <button
             onClick={() => handleExport('pdf')}
-            className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-4 py-2 rounded-xl text-sm font-bold border border-app-border flex items-center gap-2 transition-all"
+            className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-4 py-2 rounded-full text-sm font-bold border border-app-border flex items-center gap-2 transition-all"
           >
-            <FileDown className="w-4 h-4 text-red-400" />
+            <FileDown className="w-4 h-4 text-app-danger" />
             PDF
           </button>
           <button
             onClick={() => handleExport('excel')}
-            className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-4 py-2 rounded-xl text-sm font-bold border border-app-border flex items-center gap-2 transition-all"
+            className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-4 py-2 rounded-full text-sm font-bold border border-app-border flex items-center gap-2 transition-all"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <FileSpreadsheet className="w-4 h-4 text-app-success" />
             Excel
           </button>
         </div>
@@ -213,7 +213,7 @@ export const DashboardPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-app-accent to-app-accent p-6 rounded-3xl shadow-app-card relative overflow-hidden group"
+          className="bg-gradient-to-br from-app-accent to-app-accent p-6 rounded-2xl shadow-app-card relative overflow-hidden group"
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
             <Wallet className="w-24 h-24" />
@@ -233,10 +233,10 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-app-surface border border-app-border shadow-app-card p-6 rounded-3xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-6 rounded-2xl"
         >
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-emerald-500/20 rounded-2xl text-emerald-400">
+            <div className="p-3 bg-app-success/20 rounded-2xl text-app-success">
               <TrendingUp className="w-6 h-6" />
             </div>
             {overview && (
@@ -259,10 +259,10 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-app-surface border border-app-border shadow-app-card p-6 rounded-3xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-6 rounded-2xl"
         >
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-red-500/20 rounded-2xl text-red-400">
+            <div className="p-3 bg-app-danger/20 rounded-2xl text-app-danger">
               <TrendingDown className="w-6 h-6" />
             </div>
             {overview && (
@@ -408,11 +408,11 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="ledger-rules mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="ledger-rules mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-2xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
-              <Target className="w-5 h-5 text-emerald-400" />
+              <Target className="w-5 h-5 text-app-success" />
               {t('dashboard.goals.title')}
             </h3>
             <Link to="/savings-goals" className="text-app-accent hover:opacity-80 text-sm font-medium transition-colors">
@@ -457,11 +457,11 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="ledger-rules mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="ledger-rules mt-8 bg-app-surface border border-app-border shadow-app-card p-8 rounded-2xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-amber-400" />
+              <Briefcase className="w-5 h-5 text-app-danger/70" />
               {t('dashboard.costCenters.title')}
             </h3>
             <Link to="/cost-centers" className="text-app-accent hover:opacity-80 text-sm font-medium transition-colors">
