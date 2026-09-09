@@ -109,12 +109,13 @@ export const WalletsPage = () => {
     }
   };
 
-  const getWalletGradient = (type: string) => {
+  const getWalletAccent = (type: string) => {
     switch (type) {
-      case 'credit': return 'from-app-accent to-app-accent';
-      case 'savings': return 'from-emerald-600 to-teal-600';
-      case 'investment': return 'from-amber-500 to-orange-600';
-      default: return 'from-app-accent to-app-accent';
+      case 'savings': return 'border-app-success';
+      case 'credit': return 'border-app-danger';
+      case 'investment': return 'border-app-biz';
+      case 'cash': return 'border-app-accent';
+      default: return 'border-app-accent';
     }
   };
 
@@ -129,14 +130,14 @@ export const WalletsPage = () => {
           {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
           <button
             onClick={() => setIsTransferModalOpen(true)}
-            className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all border border-app-border active:scale-95"
+            className="bg-app-surface hover:bg-app-surface-2 text-app-ink px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all border border-app-border active:scale-95"
           >
             <ArrowRightLeft className="w-5 h-5 text-app-accent" />
             {t('wallets.transfer')}
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-app-accent hover:opacity-90 text-app-accent-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
+            className="bg-app-accent hover:opacity-90 text-app-accent-ink px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-5 h-5" />
             {t('wallets.new')}
@@ -144,7 +145,7 @@ export const WalletsPage = () => {
           <button
             onClick={() => setIsClearAllModalOpen(true)}
             disabled={!canClearAll}
-            className="bg-app-surface hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface disabled:hover:text-app-ink"
+            className="bg-app-surface hover:bg-app-danger/10 text-app-ink hover:text-app-danger p-3 rounded-full border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface disabled:hover:text-app-ink"
             title={canClearAll ? t('wallets.deleteWallets') : t('wallets.selectOrganizationHint')}
           >
             <Trash2 className="w-5 h-5" />
@@ -155,7 +156,7 @@ export const WalletsPage = () => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-48 bg-app-surface border border-app-border rounded-3xl animate-pulse" />
+            <div key={i} className="h-48 bg-app-surface border border-app-border rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -168,7 +169,7 @@ export const WalletsPage = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 onClick={() => handleEdit(wallet)}
-                className={`relative group h-48 p-6 rounded-3xl border border-app-border bg-gradient-to-br ${getWalletGradient(wallet.type)} shadow-app-card overflow-hidden cursor-pointer`}
+                className={`relative group h-48 p-6 rounded-2xl border border-app-border border-l-2 ${getWalletAccent(wallet.type)} bg-app-surface shadow-app-card overflow-hidden cursor-pointer`}
               >
                 <div className="relative h-full flex flex-col justify-between">
                   <div className="flex justify-between items-start">
@@ -179,9 +180,9 @@ export const WalletsPage = () => {
                       <button
                         onClick={(e) => handleSetPrimary(e, wallet)}
                         title={wallet.isPrimary ? t('wallets.primaryWallet') : t('wallets.setAsPrimary')}
-                        className="p-2 hover:bg-app-surface-2 rounded-lg transition-colors"
+                        className="p-2 hover:bg-app-surface-2 rounded-full transition-colors"
                       >
-                        <Star className={`w-5 h-5 ${wallet.isPrimary ? 'text-yellow-300 fill-yellow-300' : 'text-app-ink/70'}`} />
+                        <Star className={`w-5 h-5 ${wallet.isPrimary ? 'text-app-accent fill-app-accent' : 'text-app-ink/70'}`} />
                       </button>
                       {!wallet.organizationId && organizations.length > 0 && (
                         <button

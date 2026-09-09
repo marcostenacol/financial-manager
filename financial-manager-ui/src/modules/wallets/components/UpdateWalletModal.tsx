@@ -109,7 +109,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
               <button 
                 onClick={handleDelete}
                 disabled={deleting}
-                className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-red-400 disabled:opacity-50"
+                className="p-2 hover:bg-app-danger/10 rounded-xl transition-colors text-app-danger disabled:opacity-50"
               >
                 <Trash2 className="w-5 h-5" />
               </button>

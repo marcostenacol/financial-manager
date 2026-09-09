@@ -18,10 +18,10 @@ interface CreateWalletModalProps {
 
 const WALLET_TYPES = [
   { id: 'checking', labelKey: 'wallets.types.checking', icon: WalletIcon, color: 'text-app-accent' },
-  { id: 'savings', labelKey: 'wallets.types.savings', icon: Banknote, color: 'text-emerald-400' },
-  { id: 'credit', labelKey: 'wallets.types.credit', icon: CreditCard, color: 'text-app-accent' },
-  { id: 'investment', labelKey: 'wallets.types.investment', icon: Landmark, color: 'text-amber-400' },
-  { id: 'cash', labelKey: 'wallets.types.cash', icon: Coins, color: 'text-orange-400' },
+  { id: 'savings', labelKey: 'wallets.types.savings', icon: Banknote, color: 'text-app-success' },
+  { id: 'credit', labelKey: 'wallets.types.credit', icon: CreditCard, color: 'text-app-danger' },
+  { id: 'investment', labelKey: 'wallets.types.investment', icon: Landmark, color: 'text-app-biz' },
+  { id: 'cash', labelKey: 'wallets.types.cash', icon: Coins, color: 'text-app-accent' },
 ];
 
 export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletModalProps) => {
