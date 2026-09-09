@@ -123,7 +123,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
           <button
             type="submit"
             disabled={loading || !walletId || !categoryId}
-            className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-3.5 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+            className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-3.5 rounded-full shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-app-accent/40 border-t-white rounded-full animate-spin" />

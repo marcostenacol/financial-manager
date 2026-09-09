@@ -239,7 +239,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
               type="button"
               onClick={handleDelete}
               disabled={deleting}
-              className="p-4 rounded-2xl border border-app-border text-app-muted hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50"
+              className="p-4 rounded-2xl border border-app-border text-app-muted hover:text-app-danger hover:bg-app-danger/10 transition-all disabled:opacity-50"
             >
               <Trash2 className="w-5 h-5" />
             </button>
