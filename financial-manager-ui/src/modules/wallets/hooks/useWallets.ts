@@ -29,8 +29,8 @@ export interface UpdateWalletInput {
   scope?: 'personal' | 'business';
   balance?: number;
   currency?: string;
-  closing_day?: number;
-  due_day?: number;
+  closing_day?: number | null;
+  due_day?: number | null;
 }
 
 export function useWallets(scope?: 'personal' | 'business') {

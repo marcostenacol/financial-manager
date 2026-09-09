@@ -64,8 +64,8 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
         name,
         type,
         balance,
-        closing_day: type === 'credit' && closingDay ? Number(closingDay) : undefined,
-        due_day: type === 'credit' && dueDay ? Number(dueDay) : undefined,
+        closing_day: type === 'credit' ? (closingDay ? Number(closingDay) : null) : null,
+        due_day: type === 'credit' ? (dueDay ? Number(dueDay) : null) : null,
       });
       
       onSuccess();
