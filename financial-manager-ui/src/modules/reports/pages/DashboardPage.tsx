@@ -136,7 +136,7 @@ export const DashboardPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">{t('dashboard.title')}</h1>
+          <h1 className="ledger-title text-2xl text-app-ink">{t('dashboard.title')}</h1>
           <p className="text-app-muted">{t('dashboard.welcome')}</p>
         </div>
 
@@ -219,7 +219,7 @@ export const DashboardPage = () => {
             <Wallet className="w-4 h-4 text-app-accent" />
             <p className="text-app-accent text-xs uppercase tracking-widest font-bold">{t('dashboard.cards.totalBalance')}</p>
           </div>
-          <h2 className="ledger-figure text-5xl font-bold text-app-ink">
+          <h2 className="ledger-figure text-3xl font-bold text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.total_balance || 0)}
           </h2>
           <div className="mt-3 flex items-center gap-2 text-app-muted text-sm">
@@ -249,7 +249,7 @@ export const DashboardPage = () => {
             )}
           </div>
           <p className="text-app-muted text-xs uppercase tracking-widest font-bold mb-1">{t('dashboard.cards.monthlyIncome')}</p>
-          <h2 className="ledger-figure text-4xl font-bold text-app-ink">
+          <h2 className="ledger-figure text-2xl font-bold text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.monthly_income || 0)}
           </h2>
         </motion.div>
@@ -275,7 +275,7 @@ export const DashboardPage = () => {
             )}
           </div>
           <p className="text-app-muted text-xs uppercase tracking-widest font-bold mb-1">{t('dashboard.cards.monthlyExpense')}</p>
-          <h2 className="ledger-figure text-4xl font-bold text-app-ink">
+          <h2 className="ledger-figure text-2xl font-bold text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.monthly_expense || 0)}
           </h2>
         </motion.div>
@@ -296,7 +296,7 @@ export const DashboardPage = () => {
             </h3>
           </div>
 
-          <div className="h-[300px] w-full">
+          <div className="h-[220px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={evolution}>
                 <defs>

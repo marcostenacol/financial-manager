@@ -116,13 +116,13 @@ export const ProfilePage = () => {
             <UserCircle className="w-8 h-8 text-app-accent" />
           </div>
           <div>
-            <h1 className="ledger-title text-4xl text-app-ink">{t('profile.title')}</h1>
+            <h1 className="ledger-title text-2xl text-app-ink">{t('profile.title')}</h1>
             <p className="text-app-muted">{t('profile.subtitle')}</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-app-surface border border-app-border rounded-2xl shadow-app-card p-8">
+          <div className="bg-app-surface border border-app-border rounded-2xl shadow-app-card p-6">
             {/* Avatar Section */}
             <div className="flex flex-col items-center mb-10">
               <div className="relative group">
@@ -261,7 +261,7 @@ export const ProfilePage = () => {
           </div>
         </form>
 
-        <div className="mt-6 bg-app-surface border border-app-border rounded-2xl shadow-app-card p-8 space-y-2">
+        <div className="mt-6 bg-app-surface border border-app-border rounded-2xl shadow-app-card p-6 space-y-2">
           <h2 className="text-sm font-medium text-app-muted mb-2">{t('profile.preferences.title')}</h2>
 
           <div className="relative">

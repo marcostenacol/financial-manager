@@ -71,7 +71,7 @@ export const CostCentersPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">Centros de Custo</h1>
+          <h1 className="ledger-title text-2xl text-app-ink">Centros de Custo</h1>
           <p className="text-app-muted">Organize o fluxo de caixa empresarial por área</p>
         </div>
         <div className="flex flex-wrap items-center gap-4">

@@ -68,7 +68,7 @@ export const SavingsGoalsPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">Metas de Economia</h1>
+          <h1 className="ledger-title text-2xl text-app-ink">Metas de Economia</h1>
           <p className="text-app-muted">Poupe dinheiro para seus grandes objetivos</p>
         </div>
         <div className="flex items-center gap-4">

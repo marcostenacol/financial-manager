@@ -182,7 +182,7 @@ export const TransactionsPage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">{t('transactions.title')}</h1>
+          <h1 className="ledger-title text-2xl text-app-ink">{t('transactions.title')}</h1>
           <p className="text-app-muted">{t('transactions.subtitle')}</p>
         </div>
 

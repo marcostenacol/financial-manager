@@ -81,7 +81,7 @@ export const CreditCardsPage = () => {
   return (
     <div className="p-4 md:p-8">
       <div className="mb-8">
-        <h1 className="ledger-title text-4xl text-app-ink">{t('creditCards.title')}</h1>
+        <h1 className="ledger-title text-2xl text-app-ink">{t('creditCards.title')}</h1>
         <p className="text-app-muted">{t('creditCards.subtitle')}</p>
       </div>
 

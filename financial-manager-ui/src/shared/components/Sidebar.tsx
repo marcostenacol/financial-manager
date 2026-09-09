@@ -46,7 +46,7 @@ export const Sidebar = () => {
       )}
 
       <aside
-        className={`w-64 bg-app-surface border-r border-app-border flex flex-col h-screen fixed md:sticky top-0 left-0 z-50 transition-transform duration-200 ${
+        className={`w-56 bg-app-surface border-r border-app-border flex flex-col h-screen fixed md:sticky top-0 left-0 z-50 transition-transform duration-200 ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
@@ -58,13 +58,13 @@ export const Sidebar = () => {
           <X className="w-5 h-5" />
         </button>
 
-        <div className="p-6 overflow-y-auto min-h-0 flex-1">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-app-card shrink-0">
+        <div className="p-4 overflow-y-auto min-h-0 flex-1">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 rounded-lg overflow-hidden shadow-app-card shrink-0">
             <img src="/favicon.svg?v=3" alt="Croesus" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="ledger-title text-app-ink text-xl leading-none">Croesus</span>
+            <span className="ledger-title text-app-ink text-base leading-none">Croesus</span>
             <span className="text-[9px] uppercase tracking-[0.22em] text-app-muted mt-1">{t('shared.sidebar.ledgerSubtitle')}</span>
           </div>
         </div>
@@ -105,7 +105,7 @@ export const Sidebar = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-full transition-all duration-200 group ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-full transition-all duration-200 group ${
                   isActive
                     ? 'bg-app-accent text-app-accent-ink shadow-app-card'
                     : 'text-app-muted hover:bg-app-surface-2 hover:text-app-ink'
@@ -125,7 +125,7 @@ export const Sidebar = () => {
         </nav>
       </div>
 
-      <div className="shrink-0 p-6 border-t border-app-border">
+      <div className="shrink-0 p-4 border-t border-app-border">
         <div className="flex items-center gap-3 mb-6 px-2">
           <div className="w-10 h-10 rounded-full bg-app-accent-soft border border-app-accent/20 flex items-center justify-center text-app-accent font-bold overflow-hidden shrink-0">
             {getAvatarUrl(user?.avatar) ? (
