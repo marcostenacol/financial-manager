@@ -105,7 +105,7 @@ export const SavingsGoalsPage = () => {
                   key={goal.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-app-surface-2 backdrop-blur-xl border border-app-border p-6 rounded-2xl hover:bg-white/[0.07] transition-all group"
+                  className="bg-app-surface-2 border border-app-border p-6 rounded-2xl hover:bg-app-accent-soft transition-all group"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div 

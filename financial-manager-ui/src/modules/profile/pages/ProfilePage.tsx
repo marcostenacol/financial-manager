@@ -111,7 +111,7 @@ export const ProfilePage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-2xl p-8 shadow-2xl">
+          <div className="bg-app-surface border border-app-border rounded-2xl shadow-app-card p-8">
             {/* Avatar Section */}
             <div className="flex flex-col items-center mb-10">
               <div className="relative group">
