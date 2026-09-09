@@ -100,7 +100,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
               type="button"
               onClick={() => setType('income')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                type === 'income' ? 'bg-emerald-600 text-app-ink shadow-lg shadow-emerald-600/20' : 'text-app-muted'
+                type === 'income' ? 'bg-app-success text-app-ink shadow-lg shadow-app-success/20' : 'text-app-muted'
               }`}
             >
               <RefreshCw className="w-5 h-5" />
@@ -110,7 +110,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
               type="button"
               onClick={() => setType('expense')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                type === 'expense' ? 'bg-red-600 text-app-ink shadow-lg shadow-red-600/20' : 'text-app-muted'
+                type === 'expense' ? 'bg-app-danger text-app-ink shadow-lg shadow-app-danger/20' : 'text-app-muted'
               }`}
             >
               <RefreshCw className="w-5 h-5" />
@@ -199,7 +199,7 @@ export const UpdateRecurrenceModal = ({ isOpen, onClose, onSuccess, recurrence }
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-4 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
+            className="w-full bg-app-accent hover:opacity-90 text-app-ink font-bold py-4 rounded-full shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
           >
             {loading ? (
               <div className="w-6 h-6 border-2 border-app-accent/40 border-t-white rounded-full animate-spin" />
