@@ -109,7 +109,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
           <div className="p-6 border-b border-app-border flex justify-between items-center">
             <h2 className="text-xl font-bold text-app-ink">{t('wallets.form.editTitle')}</h2>
@@ -117,7 +117,7 @@ export const UpdateWalletModal = ({ isOpen, onClose, onSuccess, wallet }: Update
               <button 
                 onClick={handleDelete}
                 disabled={deleting}
-                className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-red-400 disabled:opacity-50"
+                className="p-2 hover:bg-app-danger/10 rounded-xl transition-colors text-app-danger disabled:opacity-50"
               >
                 <Trash2 className="w-5 h-5" />
               </button>

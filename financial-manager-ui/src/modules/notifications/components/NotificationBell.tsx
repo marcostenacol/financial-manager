@@ -69,9 +69,9 @@ export const NotificationBell = () => {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'success': return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
-      case 'warning': return <AlertTriangle className="w-4 h-4 text-amber-400" />;
-      case 'error': return <AlertCircle className="w-4 h-4 text-red-400" />;
+      case 'success': return <CheckCircle2 className="w-4 h-4 text-app-success" />;
+      case 'warning': return <AlertTriangle className="w-4 h-4 text-app-danger/70" />;
+      case 'error': return <AlertCircle className="w-4 h-4 text-app-danger" />;
       default: return <Info className="w-4 h-4 text-app-accent" />;
     }
   };
@@ -97,7 +97,7 @@ export const NotificationBell = () => {
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-app-ink text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-app-surface">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-app-danger text-app-ink text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-app-surface">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -109,7 +109,7 @@ export const NotificationBell = () => {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute right-0 mt-3 w-80 bg-[#1e293b] border border-app-border rounded-3xl shadow-2xl overflow-hidden z-[60]"
+            className="absolute right-0 mt-3 w-80 bg-app-surface-2 border border-app-border rounded-2xl shadow-2xl overflow-hidden z-[60]"
           >
             <div className="p-4 border-b border-app-border flex items-center justify-between bg-white/[0.02]">
               <h3 className="text-sm font-bold text-app-ink">Notificações</h3>
@@ -137,9 +137,9 @@ export const NotificationBell = () => {
                     >
                       <div className="flex gap-3">
                         <div className={`mt-1 p-2 rounded-lg shrink-0 ${
-                          notification.type === 'success' ? 'bg-emerald-500/10' :
-                          notification.type === 'warning' ? 'bg-amber-500/10' :
-                          notification.type === 'error' ? 'bg-red-500/10' : 'bg-app-accent-soft'
+                          notification.type === 'success' ? 'bg-app-success-soft' :
+                          notification.type === 'warning' ? 'bg-app-danger/10' :
+                          notification.type === 'error' ? 'bg-app-danger/10' : 'bg-app-accent-soft'
                         }`}>
                           {getTypeIcon(notification.type)}
                         </div>

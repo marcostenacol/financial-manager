@@ -189,22 +189,22 @@ export const TransactionsPage = () => {
 
         <div className="flex flex-wrap items-center gap-3">
           {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
-          <div className="bg-app-surface border border-app-border rounded-2xl p-1 flex items-center">
+          <div className="bg-app-surface border border-app-border rounded-full p-1 flex items-center">
             <button
               onClick={() => setFilterType('all')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'all' ? 'bg-app-accent text-app-accent-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterType === 'all' ? 'bg-app-accent text-app-accent-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               {t('transactions.filters.all')}
             </button>
             <button
               onClick={() => setFilterType('income')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'income' ? 'bg-app-success text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterType === 'income' ? 'bg-app-success text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               {t('transactions.filters.income')}
             </button>
             <button
               onClick={() => setFilterType('expense')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-app-danger text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-app-danger text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               {t('transactions.filters.expense')}
             </button>
@@ -212,7 +212,7 @@ export const TransactionsPage = () => {
 
           <button
             onClick={handleExport}
-            className="bg-app-surface hover:bg-app-surface-2 text-app-ink p-3 rounded-2xl border border-app-border transition-all active:scale-95"
+            className="bg-app-surface hover:bg-app-surface-2 text-app-ink p-3 rounded-full border border-app-border transition-all active:scale-95"
             title={t('transactions.exportCsv')}
           >
             <Download className="w-6 h-6 text-app-accent" />
@@ -221,7 +221,7 @@ export const TransactionsPage = () => {
           <button
             onClick={() => setIsClearAllModalOpen(true)}
             disabled={!canClearAll}
-            className="bg-app-surface hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface disabled:hover:text-app-ink"
+            className="bg-app-surface hover:bg-app-danger/10 text-app-ink hover:text-app-danger p-3 rounded-full border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface disabled:hover:text-app-ink"
             title={canClearAll ? t('transactions.clearAll.tooltip') : t('transactions.clearAll.tooltipDisabled')}
           >
             <Trash2 className="w-6 h-6" />
@@ -232,7 +232,7 @@ export const TransactionsPage = () => {
               setDuplicateData(null);
               setIsModalOpen(true);
             }}
-            className="bg-app-accent hover:bg-app-accent/90 text-app-accent-ink p-3 rounded-2xl transition-all active:scale-95 shadow-lg shadow-app-card"
+            className="bg-app-accent hover:bg-app-accent/90 text-app-accent-ink p-3 rounded-full transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-6 h-6" />
           </button>
@@ -248,7 +248,7 @@ export const TransactionsPage = () => {
             placeholder={t('transactions.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
+            className="w-full bg-app-surface border border-app-border rounded-lg py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
           />
         </div>
         <button
@@ -269,7 +269,7 @@ export const TransactionsPage = () => {
         </button>
       </div>
 
-      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-app-card">
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl overflow-hidden shadow-app-card">
         <div className="px-6 py-4 border-b border-app-border flex items-center justify-between bg-app-surface-2">
           <span className="text-xs font-bold text-app-muted uppercase tracking-widest">
             {t('transactions.pagination.showing', { shown: transactions.length, total })}
@@ -279,7 +279,7 @@ export const TransactionsPage = () => {
               disabled={page === 1 || loading}
               onClick={() => setPage(1)}
               title={t('transactions.pagination.first')}
-              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+              className="p-2 rounded-full bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               <ChevronsLeft className="w-4 h-4" />
             </button>
@@ -287,7 +287,7 @@ export const TransactionsPage = () => {
               disabled={page === 1 || loading}
               onClick={() => setPage(page - 1)}
               title={t('transactions.pagination.previous')}
-              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+              className="p-2 rounded-full bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -317,7 +317,7 @@ export const TransactionsPage = () => {
               disabled={page >= totalPages || loading}
               onClick={() => setPage(page + 1)}
               title={t('transactions.pagination.next')}
-              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+              className="p-2 rounded-full bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -325,7 +325,7 @@ export const TransactionsPage = () => {
               disabled={page >= totalPages || loading}
               onClick={() => setPage(totalPages)}
               title={t('transactions.pagination.last')}
-              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+              className="p-2 rounded-full bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               <ChevronsRight className="w-4 h-4" />
             </button>

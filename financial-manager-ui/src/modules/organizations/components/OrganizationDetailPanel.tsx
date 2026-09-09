@@ -111,7 +111,7 @@ export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }
   };
 
   return (
-    <div className="bg-app-surface-2 border border-app-border rounded-3xl p-6 space-y-8">
+    <div className="bg-app-surface-2 border border-app-border rounded-2xl p-6 space-y-8">
       <div>
         <h3 className="text-app-ink font-bold mb-4">Membros</h3>
         <div className="space-y-2">
@@ -119,20 +119,24 @@ export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }
             <div key={member.id} className="flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-3">
               <div>
                 <p className="text-app-ink text-sm font-medium">{member.user.email}</p>
-                <span className="text-[10px] uppercase tracking-widest font-bold text-app-muted">{member.role === 'owner' ? 'Dono' : 'Membro'}</span>
+                <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full inline-block ${
+                  member.role === 'owner'
+                    ? 'bg-app-accent-soft text-app-accent'
+                    : 'bg-app-muted/10 text-app-muted'
+                }`}>{member.role === 'owner' ? 'Dono' : 'Membro'}</span>
               </div>
               {isOwner && member.role !== 'owner' && (
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleTransferOwnership(member)}
                     title="Transferir titularidade para este membro"
-                    className="p-2 text-app-muted hover:text-amber-400 transition-colors"
+                    className="p-2 text-app-muted hover:text-app-danger/70 transition-colors"
                   >
                     <Crown className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleRemoveMember(member.userId)}
-                    className="p-2 text-app-muted hover:text-red-400 transition-colors"
+                    className="p-2 text-app-muted hover:text-app-danger transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -208,7 +212,7 @@ export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }
                   <p className="text-[10px] text-app-muted mt-1">
                     {invite.usesCount}/{invite.maxUses ?? 1} usos · expira em {new Date(invite.expiresAt).toLocaleDateString('pt-BR')}
                     {' · '}
-                    <span className={isInviteActive(invite) ? 'text-emerald-400' : 'text-red-400'}>
+                    <span className={isInviteActive(invite) ? 'text-app-success' : 'text-app-danger'}>
                       {isInviteActive(invite) ? 'ativo' : 'inativo'}
                     </span>
                   </p>
@@ -217,7 +221,7 @@ export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }
                   {isInviteActive(invite) && (
                     <button
                       onClick={() => handleRevokeInvite(invite.id)}
-                      className="p-2 text-app-muted hover:text-amber-400 transition-colors"
+                      className="p-2 text-app-muted hover:text-app-danger/70 transition-colors"
                       title="Revogar convite"
                     >
                       <Ban className="w-4 h-4" />
@@ -225,7 +229,7 @@ export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }
                   )}
                   <button
                     onClick={() => handleDeleteInvite(invite.id)}
-                    className="p-2 text-app-muted hover:text-red-400 transition-colors"
+                    className="p-2 text-app-muted hover:text-app-danger transition-colors"
                     title="Excluir convite"
                   >
                     <Trash2 className="w-4 h-4" />

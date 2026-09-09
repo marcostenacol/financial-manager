@@ -83,7 +83,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-app-ink">{t('categories.new')}</h2>
@@ -114,8 +114,8 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
               <button
                 type="button"
                 onClick={() => setType('income')}
-                className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${
-                  type === 'income' ? 'bg-emerald-600/20 border-emerald-600 text-app-ink' : 'bg-app-surface-2 border-app-border text-app-muted'
+                className={`p-3 rounded-full border flex flex-col items-center gap-2 transition-all ${
+                  type === 'income' ? 'bg-app-success/20 border-app-success text-app-ink' : 'bg-app-surface-2 border-app-border text-app-muted'
                 }`}
               >
                 <ArrowUpCircle className="w-5 h-5" />
@@ -124,8 +124,8 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
               <button
                 type="button"
                 onClick={() => setType('expense')}
-                className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${
-                  type === 'expense' ? 'bg-red-600/20 border-red-600 text-app-ink' : 'bg-app-surface-2 border-app-border text-app-muted'
+                className={`p-3 rounded-full border flex flex-col items-center gap-2 transition-all ${
+                  type === 'expense' ? 'bg-app-danger/20 border-app-danger text-app-ink' : 'bg-app-surface-2 border-app-border text-app-muted'
                 }`}
               >
                 <ArrowDownCircle className="w-5 h-5" />
@@ -134,7 +134,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
               <button
                 type="button"
                 onClick={() => setType('both')}
-                className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${
+                className={`p-3 rounded-full border flex flex-col items-center gap-2 transition-all ${
                   type === 'both' ? 'bg-app-accent/20 border-app-accent text-app-ink' : 'bg-app-surface-2 border-app-border text-app-muted'
                 }`}
               >
@@ -171,7 +171,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
                   key={c}
                   type="button"
                   onClick={() => setColor(c)}
-                  className={`w-10 h-10 rounded-full border-4 transition-all ${
+                  className={`w-10 h-10 rounded-lg border-4 transition-all ${
                     color === c ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:scale-105'
                   }`}
                   style={{ backgroundColor: c }}

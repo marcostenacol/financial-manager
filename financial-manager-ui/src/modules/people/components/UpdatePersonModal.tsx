@@ -104,7 +104,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-app-ink">{t('people.form.editTitle')}</h2>
@@ -241,7 +241,7 @@ export const UpdatePersonModal = ({ isOpen, onClose, onSuccess, person }: Update
               type="button"
               onClick={handleDelete}
               disabled={deleting}
-              className="p-4 rounded-2xl border border-app-border text-app-muted hover:text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-50"
+              className="p-4 rounded-2xl border border-app-border text-app-muted hover:text-app-danger hover:bg-app-danger/10 transition-all disabled:opacity-50"
             >
               <Trash2 className="w-5 h-5" />
             </button>

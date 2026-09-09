@@ -22,8 +22,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const colorMap: Record<ToastType, string> = {
-    error: 'bg-red-600',
-    success: 'bg-green-600',
+    error: 'bg-app-danger',
+    success: 'bg-app-success',
     info: 'bg-app-accent',
   };
 
@@ -34,7 +34,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`${colorMap[toast.type]} text-app-ink text-sm px-4 py-3 rounded shadow-lg max-w-xs`}
+            className={`${colorMap[toast.type]} text-app-ink text-sm px-4 py-3 rounded-full shadow-app-card max-w-xs`}
           >
             {toast.message}
           </div>
