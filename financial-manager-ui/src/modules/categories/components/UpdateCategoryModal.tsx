@@ -170,7 +170,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                   <button
                     type="button"
                     onClick={() => setType('both')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all ${
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-all ${
                       type === 'both' ? 'bg-app-accent text-app-ink shadow-lg' : 'text-app-muted'
                     }`}
                   >

@@ -134,7 +134,7 @@ export const CreateCategoryModal = ({ isOpen, onClose, onSuccess }: CreateCatego
               <button
                 type="button"
                 onClick={() => setType('both')}
-                className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${
+                className={`p-3 rounded-full border flex flex-col items-center gap-2 transition-all ${
                   type === 'both' ? 'bg-app-accent/20 border-app-accent text-app-ink' : 'bg-app-surface-2 border-app-border text-app-muted'
                 }`}
               >
