@@ -3,17 +3,24 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/useAuth';
 import { useProfile } from '../hooks/useProfile';
-import { User, Mail, Shield, Save, UserCircle, Camera, KeyRound, Sun, Moon, Languages } from 'lucide-react';
+import { User, Mail, Shield, Save, UserCircle, Camera, KeyRound, Sun, Moon, Languages, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../../hooks/useTheme';
-import { SUPPORTED_LANGUAGES } from '../../../i18n';
+import { SUPPORTED_LANGUAGES, type SupportedLanguage } from '../../../i18n';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 import { ChangePasswordModal } from '../components/ChangePasswordModal';
 
+const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
+  pt: 'Português',
+  en: 'English',
+  es: 'Español',
+};
+
 export const ProfilePage = () => {
   const { t, i18n } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { getProfile, updateProfile, changeProfileType, updateAvatar } = useProfile();
@@ -254,28 +261,54 @@ export const ProfilePage = () => {
           </div>
         </form>
 
-        <div className="mt-6 bg-app-surface border border-app-border rounded-2xl shadow-app-card p-8">
-          <h2 className="text-sm font-medium text-app-muted mb-4">{t('profile.preferences.title')}</h2>
-
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="flex items-center gap-3 w-full px-4 py-3 text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
-          >
-            {theme === 'dark' ? <Sun className="w-5 h-5 text-app-muted" /> : <Moon className="w-5 h-5 text-app-muted" />}
-            <span className="font-medium flex-1 text-left">{t('profile.preferences.theme')}</span>
-            <span className="text-sm text-app-muted">{theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}</span>
-          </button>
+        <div className="mt-6 bg-app-surface border border-app-border rounded-2xl shadow-app-card p-8 space-y-2">
+          <h2 className="text-sm font-medium text-app-muted mb-2">{t('profile.preferences.title')}</h2>
 
           <div className="relative">
             <button
               type="button"
-              onClick={() => setLangMenuOpen((prev) => !prev)}
+              onClick={() => { setThemeMenuOpen((prev) => !prev); setLangMenuOpen(false); }}
+              className="flex items-center gap-3 w-full px-4 py-3 text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
+            >
+              {theme === 'dark' ? <Moon className="w-5 h-5 text-app-muted" /> : <Sun className="w-5 h-5 text-app-muted" />}
+              <span className="font-medium flex-1 text-left">{t('profile.preferences.theme')}</span>
+              <span className="text-sm text-app-muted">{theme === 'dark' ? t('nav.themeDark') : t('nav.themeLight')}</span>
+              <ChevronDown className={`w-4 h-4 text-app-muted transition-transform ${themeMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {themeMenuOpen && (
+              <div className="mt-1 bg-app-surface-2 border border-app-border rounded-xl overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => { setTheme('dark'); setThemeMenuOpen(false); }}
+                  className={`flex items-center w-full px-4 py-2 text-sm font-medium transition-all ${
+                    theme === 'dark' ? 'text-app-accent' : 'text-app-muted hover:text-app-ink hover:bg-app-surface'
+                  }`}
+                >
+                  {t('nav.themeDark')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setTheme('light'); setThemeMenuOpen(false); }}
+                  className={`flex items-center w-full px-4 py-2 text-sm font-medium transition-all ${
+                    theme === 'light' ? 'text-app-accent' : 'text-app-muted hover:text-app-ink hover:bg-app-surface'
+                  }`}
+                >
+                  {t('nav.themeLight')}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => { setLangMenuOpen((prev) => !prev); setThemeMenuOpen(false); }}
               className="flex items-center gap-3 w-full px-4 py-3 text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
             >
               <Languages className="w-5 h-5 text-app-muted" />
               <span className="font-medium flex-1 text-left">{t('profile.preferences.language')}</span>
-              <span className="text-sm text-app-muted uppercase">{i18n.resolvedLanguage}</span>
+              <span className="text-sm text-app-muted">{LANGUAGE_NAMES[i18n.resolvedLanguage as SupportedLanguage] ?? i18n.resolvedLanguage}</span>
+              <ChevronDown className={`w-4 h-4 text-app-muted transition-transform ${langMenuOpen ? 'rotate-180' : ''}`} />
             </button>
             {langMenuOpen && (
               <div className="mt-1 bg-app-surface-2 border border-app-border rounded-xl overflow-hidden">
@@ -284,11 +317,11 @@ export const ProfilePage = () => {
                     key={lang}
                     type="button"
                     onClick={() => { i18n.changeLanguage(lang); setLangMenuOpen(false); }}
-                    className={`flex items-center w-full px-4 py-2 text-sm uppercase font-medium transition-all ${
+                    className={`flex items-center w-full px-4 py-2 text-sm font-medium transition-all ${
                       i18n.resolvedLanguage === lang ? 'text-app-accent' : 'text-app-muted hover:text-app-ink hover:bg-app-surface'
                     }`}
                   >
-                    {lang}
+                    {LANGUAGE_NAMES[lang]}
                   </button>
                 ))}
               </div>
@@ -299,7 +332,7 @@ export const ProfilePage = () => {
         <div className="mt-8 flex justify-center">
           <button
             onClick={signOut}
-            className="text-app-muted hover:text-app-danger font-medium transition-colors p-2 rounded-full"
+            className="flex items-center gap-2 px-6 py-3 rounded-full border border-app-border text-app-muted hover:border-app-danger hover:text-app-danger hover:bg-app-danger/10 font-medium transition-all"
           >
             {t('profile.signOut')}
           </button>
