@@ -230,7 +230,7 @@ export const TransactionsPage = () => {
             placeholder={t('transactions.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-app-surface border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
+            className="w-full bg-app-surface border border-app-border rounded-lg py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
           />
         </div>
         <button

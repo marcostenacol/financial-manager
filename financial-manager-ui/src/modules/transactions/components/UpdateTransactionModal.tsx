@@ -173,7 +173,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
               <button
                 onClick={handleCancel}
                 disabled={cancelling || deleting}
-                className="p-2 hover:bg-app-accent/10 rounded-xl transition-colors text-app-accent disabled:opacity-50"
+                className="p-2 hover:bg-app-danger/10 rounded-xl transition-colors text-app-danger/70 disabled:opacity-50"
                 title="Cancelar transação (reverte o saldo, mantém o histórico)"
               >
                 <Ban className="w-5 h-5" />
