@@ -81,7 +81,7 @@ export const SavingsGoalsPage = () => {
           </button>
           <button
             onClick={() => setIsClearAllModalOpen(true)}
-            className="bg-app-surface-2 hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95"
+            className="bg-app-surface-2 hover:bg-app-danger/10 text-app-ink hover:text-app-danger p-3 rounded-2xl border border-app-border transition-all active:scale-95"
             title="Limpar todas as metas"
           >
             <Trash2 className="w-5 h-5" />
@@ -92,7 +92,7 @@ export const SavingsGoalsPage = () => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-64 bg-app-surface-2 border border-app-border rounded-3xl animate-pulse" />
+            <div key={i} className="h-64 bg-app-surface-2 border border-app-border rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : (
@@ -105,7 +105,7 @@ export const SavingsGoalsPage = () => {
                   key={goal.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-app-surface-2 backdrop-blur-xl border border-app-border p-6 rounded-3xl hover:bg-white/[0.07] transition-all group"
+                  className="bg-app-surface-2 backdrop-blur-xl border border-app-border p-6 rounded-2xl hover:bg-white/[0.07] transition-all group"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div 
@@ -124,7 +124,7 @@ export const SavingsGoalsPage = () => {
                       <button
                         onClick={() => handleDelete(goal.id)}
                         disabled={pendingIds.has(goal.id)}
-                        className="p-2 text-app-muted hover:text-red-400 transition-colors disabled:opacity-50"
+                        className="p-2 text-app-muted hover:text-app-danger transition-colors disabled:opacity-50"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
