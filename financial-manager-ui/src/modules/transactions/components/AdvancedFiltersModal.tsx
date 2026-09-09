@@ -99,9 +99,9 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-[#0f172a] border border-app-border rounded-3xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-md bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-hidden"
           >
-            <div className="p-6 border-b border-app-border flex items-center justify-between bg-white/[0.02]">
+            <div className="p-6 border-b border-app-border flex items-center justify-between bg-app-surface-2">
               <div className="flex items-center gap-2">
                 <Filter className="w-5 h-5 text-app-accent" />
                 <h2 className="text-xl font-bold text-app-ink">Filtros Avançados</h2>
@@ -196,7 +196,7 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
               </div>
             </div>
 
-            <div className="p-6 bg-white/[0.02] border-t border-app-border flex gap-3">
+            <div className="p-6 bg-app-surface-2 border-t border-app-border flex gap-3">
               <button
                 onClick={handleClear}
                 className="flex-1 py-4 px-6 rounded-2xl border border-app-border text-app-muted font-bold hover:bg-app-surface-2 transition-all"

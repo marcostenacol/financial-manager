@@ -171,22 +171,22 @@ export const TransactionsPage = () => {
 
         <div className="flex flex-wrap items-center gap-3">
           {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
-          <div className="bg-app-surface border border-app-border rounded-2xl p-1 flex items-center">
+          <div className="bg-app-surface border border-app-border rounded-full p-1 flex items-center">
             <button
               onClick={() => setFilterType('all')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'all' ? 'bg-app-accent text-app-accent-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterType === 'all' ? 'bg-app-accent text-app-accent-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               {t('transactions.filters.all')}
             </button>
             <button
               onClick={() => setFilterType('income')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'income' ? 'bg-app-success text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterType === 'income' ? 'bg-app-success text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               {t('transactions.filters.income')}
             </button>
             <button
               onClick={() => setFilterType('expense')}
-              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-app-danger text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${filterType === 'expense' ? 'bg-app-danger text-app-ink shadow-lg' : 'text-app-muted hover:text-app-ink'}`}
             >
               {t('transactions.filters.expense')}
             </button>
@@ -194,7 +194,7 @@ export const TransactionsPage = () => {
 
           <button
             onClick={handleExport}
-            className="bg-app-surface hover:bg-app-surface-2 text-app-ink p-3 rounded-2xl border border-app-border transition-all active:scale-95"
+            className="bg-app-surface hover:bg-app-surface-2 text-app-ink p-3 rounded-full border border-app-border transition-all active:scale-95"
             title={t('transactions.exportCsv')}
           >
             <Download className="w-6 h-6 text-app-accent" />
@@ -203,7 +203,7 @@ export const TransactionsPage = () => {
           <button
             onClick={() => setIsClearAllModalOpen(true)}
             disabled={!canClearAll}
-            className="bg-app-surface hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface disabled:hover:text-app-ink"
+            className="bg-app-surface hover:bg-app-danger/10 text-app-ink hover:text-app-danger p-3 rounded-full border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface disabled:hover:text-app-ink"
             title={canClearAll ? t('transactions.clearAll.tooltip') : t('transactions.clearAll.tooltipDisabled')}
           >
             <Trash2 className="w-6 h-6" />
@@ -214,7 +214,7 @@ export const TransactionsPage = () => {
               setDuplicateData(null);
               setIsModalOpen(true);
             }}
-            className="bg-app-accent hover:bg-app-accent/90 text-app-accent-ink p-3 rounded-2xl transition-all active:scale-95 shadow-lg shadow-app-card"
+            className="bg-app-accent hover:bg-app-accent/90 text-app-accent-ink p-3 rounded-full transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-6 h-6" />
           </button>
@@ -260,7 +260,7 @@ export const TransactionsPage = () => {
             <button
               disabled={page === 1 || loading}
               onClick={() => setPage(page - 1)}
-              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+              className="p-2 rounded-full bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               {t('transactions.pagination.previous')}
             </button>
@@ -270,7 +270,7 @@ export const TransactionsPage = () => {
             <button
               disabled={page * perPage >= total || loading}
               onClick={() => setPage(page + 1)}
-              className="p-2 rounded-xl bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
+              className="p-2 rounded-full bg-app-surface border border-app-border text-app-ink disabled:opacity-30 disabled:cursor-not-allowed hover:bg-app-surface-2 transition-all"
             >
               {t('transactions.pagination.next')}
             </button>

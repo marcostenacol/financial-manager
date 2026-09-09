@@ -40,7 +40,7 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDu
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-app-ink">Detalhes da Transação</h2>
@@ -62,7 +62,7 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDu
             <button
               onClick={onDelete}
               disabled={deleting}
-              className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-red-400 disabled:opacity-50"
+              className="p-2 hover:bg-app-danger/10 rounded-xl transition-colors text-app-danger disabled:opacity-50"
               title="Excluir Transação"
             >
               <Trash2 className="w-5 h-5" />
@@ -75,11 +75,11 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDu
 
         <div className="p-8 space-y-6">
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-2xl ${isIncome ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+            <div className={`p-3 rounded-2xl ${isIncome ? 'bg-app-success/10' : 'bg-app-danger/10'}`}>
               {isIncome ? (
-                <ArrowUpCircle className="w-8 h-8 text-emerald-400" />
+                <ArrowUpCircle className="w-8 h-8 text-app-success" />
               ) : (
-                <ArrowDownCircle className="w-8 h-8 text-red-400" />
+                <ArrowDownCircle className="w-8 h-8 text-app-danger" />
               )}
             </div>
             <div>

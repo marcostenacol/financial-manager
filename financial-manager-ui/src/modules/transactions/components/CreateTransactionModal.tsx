@@ -132,7 +132,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-xl bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-xl bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-app-ink">{initialData ? 'Duplicar Transação' : 'Nova Transação'}</h2>
@@ -148,7 +148,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
               type="button"
               onClick={() => setType('income')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                type === 'income' ? 'bg-emerald-600 text-app-ink shadow-lg shadow-emerald-600/20' : 'text-app-muted'
+                type === 'income' ? 'bg-app-success text-app-ink shadow-lg shadow-app-success/20' : 'text-app-muted'
               }`}
             >
               <ArrowUpCircle className="w-5 h-5" />
@@ -158,7 +158,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
               type="button"
               onClick={() => setType('expense')}
               className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition-all ${
-                type === 'expense' ? 'bg-red-600 text-app-ink shadow-lg shadow-red-600/20' : 'text-app-muted'
+                type === 'expense' ? 'bg-app-danger text-app-ink shadow-lg shadow-app-danger/20' : 'text-app-muted'
               }`}
             >
               <ArrowDownCircle className="w-5 h-5" />
