@@ -338,24 +338,34 @@ export const TransactionsPage = () => {
           </div>
         ) : (
           <div>
-            <table className="w-full border-collapse">
-              <thead>
-                <tr>
-                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.description')}</th>
-                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.wallet')}</th>
-                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.category')}</th>
-                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.date')}</th>
-                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.status')}</th>
-                  <th className="text-right text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.amount')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((transaction) => (
-                  <tr
-                    key={transaction.id}
-                    onClick={() => handleShowDetail(transaction)}
-                    className="ledger-item group hover:bg-app-accent-soft transition-colors cursor-pointer border-t border-app-border"
-                  >
+            {transactions.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.description')}</th>
+                      <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.wallet')}</th>
+                      <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.category')}</th>
+                      <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.date')}</th>
+                      <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.status')}</th>
+                      <th className="text-right text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.amount')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactions.map((transaction) => (
+                      <tr
+                        key={transaction.id}
+                        onClick={() => handleShowDetail(transaction)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleShowDetail(transaction);
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        className="ledger-item group hover:bg-app-accent-soft transition-colors cursor-pointer border-t border-app-border focus:outline-none focus-visible:ring-2 focus-visible:ring-app-accent/50 focus-visible:bg-app-accent-soft"
+                      >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <div className={`p-2 rounded-sm border shrink-0 ${transaction.type === 'income' ? 'border-app-success/40 bg-app-success/10 text-app-success' : 'border-app-danger/40 bg-app-danger/10 text-app-danger'}`}>
@@ -410,12 +420,12 @@ export const TransactionsPage = () => {
                     <td className={`px-6 py-4 text-right font-mono font-semibold ledger-figure ${transaction.type === 'income' ? 'text-app-success' : 'text-app-danger'}`}>
                       {transaction.type === 'income' ? '+' : '−'} {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(transaction.amount)}
                     </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {transactions.length === 0 && !loading && (
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
               <div className="p-20 flex flex-col items-center justify-center text-center">
                 <div className="p-4 bg-app-surface rounded-full mb-4">
                   <ArrowUpCircle className="w-12 h-12 text-app-muted" />
