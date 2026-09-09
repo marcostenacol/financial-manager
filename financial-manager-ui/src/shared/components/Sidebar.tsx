@@ -75,8 +75,8 @@ export const Sidebar = () => {
         <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-app-surface-2 rounded-2xl border border-app-border">
           <button
             onClick={() => setScope('personal')}
-            className={`flex items-center justify-center gap-1 px-1 py-2 rounded-xl text-[11px] font-bold uppercase transition-all ${
-              scope === 'personal' ? 'bg-app-accent text-app-accent-ink shadow-app-card' : 'text-app-muted hover:text-app-ink'
+            className={`flex items-center justify-center gap-1 px-1 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${
+              scope === 'personal' ? 'bg-app-accent-soft text-app-accent ring-1 ring-app-accent' : 'text-app-muted hover:text-app-ink'
             }`}
           >
             <User className="w-3.5 h-3.5 shrink-0" />
@@ -84,8 +84,8 @@ export const Sidebar = () => {
           </button>
           <button
             onClick={() => setScope('business')}
-            className={`flex items-center justify-center gap-1 px-1 py-2 rounded-xl text-[11px] font-bold uppercase transition-all ${
-              scope === 'business' ? 'bg-app-accent text-app-accent-ink shadow-app-card' : 'text-app-muted hover:text-app-ink'
+            className={`flex items-center justify-center gap-1 px-1 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${
+              scope === 'business' ? 'bg-app-biz-soft text-app-biz ring-1 ring-app-biz' : 'text-app-muted hover:text-app-ink'
             }`}
           >
             <Briefcase className="w-3.5 h-3.5 shrink-0" />
@@ -106,7 +106,7 @@ export const Sidebar = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-full transition-all duration-200 group ${
                   isActive
                     ? 'bg-app-accent text-app-accent-ink shadow-app-card'
                     : 'text-app-muted hover:bg-app-surface-2 hover:text-app-ink'
