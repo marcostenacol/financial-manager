@@ -1,22 +1,18 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Sun, Moon, Languages, Users, CreditCard } from 'lucide-react';
+import { LayoutDashboard, UserCircle, Wallet, History, LogOut, Tag, RefreshCw, Target, Menu, X, Briefcase, User, Building2, Users, CreditCard } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
 import { useScope } from '../../contexts/useScope';
 import { getAvatarUrl } from '../lib/getAvatarUrl';
-import { useTheme } from '../../hooks/useTheme';
-import { SUPPORTED_LANGUAGES } from '../../i18n';
 import { motion } from 'framer-motion';
 
 export const Sidebar = () => {
   const { signOut, user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-  const { scope, setScope } = useScope();
-  const { t, i18n } = useTranslation();
+  const { scope, setScope, canUseBusinessScope } = useScope();
+  const { t } = useTranslation();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [langMenuOpen, setLangMenuOpen] = useState(false);
 
   const menuItems = [
     { icon: LayoutDashboard, label: t('nav.dashboard'), path: '/' },
@@ -73,26 +69,28 @@ export const Sidebar = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-app-surface-2 rounded-2xl border border-app-border">
-          <button
-            onClick={() => setScope('personal')}
-            className={`flex items-center justify-center gap-1 px-1 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${
-              scope === 'personal' ? 'bg-app-accent-soft text-app-accent ring-1 ring-app-accent' : 'text-app-muted hover:text-app-ink'
-            }`}
-          >
-            <User className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{t('nav.personal')}</span>
-          </button>
-          <button
-            onClick={() => setScope('business')}
-            className={`flex items-center justify-center gap-1 px-1 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${
-              scope === 'business' ? 'bg-app-biz-soft text-app-biz ring-1 ring-app-biz' : 'text-app-muted hover:text-app-ink'
-            }`}
-          >
-            <Briefcase className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{t('nav.business')}</span>
-          </button>
-        </div>
+        {canUseBusinessScope && (
+          <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-app-surface-2 rounded-2xl border border-app-border">
+            <button
+              onClick={() => setScope('personal')}
+              className={`flex items-center justify-center gap-1 px-1 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${
+                scope === 'personal' ? 'bg-app-accent-soft text-app-accent ring-1 ring-app-accent' : 'text-app-muted hover:text-app-ink'
+              }`}
+            >
+              <User className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{t('nav.personal')}</span>
+            </button>
+            <button
+              onClick={() => setScope('business')}
+              className={`flex items-center justify-center gap-1 px-1 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${
+                scope === 'business' ? 'bg-app-biz-soft text-app-biz ring-1 ring-app-biz' : 'text-app-muted hover:text-app-ink'
+              }`}
+            >
+              <Briefcase className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{t('nav.business')}</span>
+            </button>
+          </div>
+        )}
 
         <div className="flex items-center gap-2 mb-3 px-1">
           <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-app-muted">{t('shared.sidebar.entriesSection')}</span>
@@ -140,39 +138,6 @@ export const Sidebar = () => {
             <span className="text-app-ink font-medium text-sm truncate">{user?.name}</span>
             <span className="text-app-muted text-xs truncate">{user?.email}</span>
           </div>
-        </div>
-
-        <button
-          onClick={toggleTheme}
-          className="flex items-center gap-3 w-full px-4 py-3 text-app-muted hover:text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
-        >
-          {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          <span className="font-medium">{theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}</span>
-        </button>
-
-        <div className="relative">
-          <button
-            onClick={() => setLangMenuOpen((prev) => !prev)}
-            className="flex items-center gap-3 w-full px-4 py-3 text-app-muted hover:text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
-          >
-            <Languages className="w-5 h-5" />
-            <span className="font-medium uppercase">{i18n.resolvedLanguage}</span>
-          </button>
-          {langMenuOpen && (
-            <div className="absolute bottom-full left-0 mb-1 w-full bg-app-surface border border-app-border rounded-xl shadow-app-card overflow-hidden">
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => { i18n.changeLanguage(lang); setLangMenuOpen(false); }}
-                  className={`flex items-center w-full px-4 py-2 text-sm uppercase font-medium transition-all ${
-                    i18n.resolvedLanguage === lang ? 'text-app-accent' : 'text-app-muted hover:text-app-ink hover:bg-app-surface-2'
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         <button

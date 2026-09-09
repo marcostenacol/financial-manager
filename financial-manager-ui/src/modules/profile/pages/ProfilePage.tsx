@@ -3,14 +3,18 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../../contexts/useAuth';
 import { useProfile } from '../hooks/useProfile';
-import { User, Mail, Shield, Save, UserCircle, Camera, KeyRound } from 'lucide-react';
+import { User, Mail, Shield, Save, UserCircle, Camera, KeyRound, Sun, Moon, Languages } from 'lucide-react';
+import { useTheme } from '../../../hooks/useTheme';
+import { SUPPORTED_LANGUAGES } from '../../../i18n';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { getAvatarUrl } from '../../../shared/lib/getAvatarUrl';
 import { ChangePasswordModal } from '../components/ChangePasswordModal';
 
 export const ProfilePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { getProfile, updateProfile, changeProfileType, updateAvatar } = useProfile();
   const { showToast } = useToast();
@@ -249,6 +253,48 @@ export const ProfilePage = () => {
             </button>
           </div>
         </form>
+
+        <div className="mt-6 bg-app-surface border border-app-border rounded-2xl shadow-app-card p-8">
+          <h2 className="text-sm font-medium text-app-muted mb-4">{t('profile.preferences.title')}</h2>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex items-center gap-3 w-full px-4 py-3 text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5 text-app-muted" /> : <Moon className="w-5 h-5 text-app-muted" />}
+            <span className="font-medium flex-1 text-left">{t('profile.preferences.theme')}</span>
+            <span className="text-sm text-app-muted">{theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}</span>
+          </button>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setLangMenuOpen((prev) => !prev)}
+              className="flex items-center gap-3 w-full px-4 py-3 text-app-ink hover:bg-app-surface-2 rounded-xl transition-all"
+            >
+              <Languages className="w-5 h-5 text-app-muted" />
+              <span className="font-medium flex-1 text-left">{t('profile.preferences.language')}</span>
+              <span className="text-sm text-app-muted uppercase">{i18n.resolvedLanguage}</span>
+            </button>
+            {langMenuOpen && (
+              <div className="mt-1 bg-app-surface-2 border border-app-border rounded-xl overflow-hidden">
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() => { i18n.changeLanguage(lang); setLangMenuOpen(false); }}
+                    className={`flex items-center w-full px-4 py-2 text-sm uppercase font-medium transition-all ${
+                      i18n.resolvedLanguage === lang ? 'text-app-accent' : 'text-app-muted hover:text-app-ink hover:bg-app-surface'
+                    }`}
+                  >
+                    {lang}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="mt-8 flex justify-center">
           <button

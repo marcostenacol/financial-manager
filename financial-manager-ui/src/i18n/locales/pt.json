@@ -389,6 +389,11 @@
       "bioPlaceholder": "Conte um pouco sobre você...",
       "accountType": "Tipo de conta"
     },
+    "preferences": {
+      "title": "Preferências",
+      "theme": "Tema",
+      "language": "Idioma"
+    },
     "changePassword": {
       "title": "Alterar senha",
       "currentPassword": "Senha atual",
