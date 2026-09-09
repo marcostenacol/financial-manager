@@ -213,16 +213,16 @@ export const DashboardPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-app-accent to-app-accent p-6 rounded-2xl shadow-app-card relative overflow-hidden group"
+          className="bg-app-accent-soft p-5 rounded-2xl shadow-app-card"
         >
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-            <Wallet className="w-24 h-24" />
+          <div className="flex items-center gap-2 mb-1">
+            <Wallet className="w-4 h-4 text-app-accent" />
+            <p className="text-app-accent text-xs uppercase tracking-widest font-bold">{t('dashboard.cards.totalBalance')}</p>
           </div>
-          <p className="text-app-accent-ink font-medium mb-1">{t('dashboard.cards.totalBalance')}</p>
-          <h2 className="ledger-figure text-4xl text-app-ink">
+          <h2 className="ledger-figure text-5xl font-bold text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.total_balance || 0)}
           </h2>
-          <div className="mt-4 flex items-center gap-2 text-app-accent-ink/80 text-sm">
+          <div className="mt-3 flex items-center gap-2 text-app-muted text-sm">
             <Activity className="w-4 h-4" />
             <span>{t('dashboard.cards.updatedNow')}</span>
           </div>
@@ -233,7 +233,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-app-surface border border-app-border shadow-app-card p-6 rounded-2xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-5 rounded-2xl"
         >
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-app-success/20 rounded-2xl text-app-success">
@@ -248,8 +248,8 @@ export const DashboardPage = () => {
               </span>
             )}
           </div>
-          <p className="text-app-muted font-medium mb-1">{t('dashboard.cards.monthlyIncome')}</p>
-          <h2 className="ledger-figure text-3xl text-app-ink">
+          <p className="text-app-muted text-xs uppercase tracking-widest font-bold mb-1">{t('dashboard.cards.monthlyIncome')}</p>
+          <h2 className="ledger-figure text-4xl font-bold text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.monthly_income || 0)}
           </h2>
         </motion.div>
@@ -259,7 +259,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-app-surface border border-app-border shadow-app-card p-6 rounded-2xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-5 rounded-2xl"
         >
           <div className="flex justify-between items-start mb-4">
             <div className="p-3 bg-app-danger/20 rounded-2xl text-app-danger">
@@ -274,14 +274,90 @@ export const DashboardPage = () => {
               </span>
             )}
           </div>
-          <p className="text-app-muted font-medium mb-1">{t('dashboard.cards.monthlyExpense')}</p>
-          <h2 className="ledger-figure text-3xl text-app-ink">
+          <p className="text-app-muted text-xs uppercase tracking-widest font-bold mb-1">{t('dashboard.cards.monthlyExpense')}</p>
+          <h2 className="ledger-figure text-4xl font-bold text-app-ink">
             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(overview?.monthly_expense || 0)}
           </h2>
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8">
+        {/* Evolução Mensal */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-2xl"
+        >
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-app-accent" />
+              {t('dashboard.charts.monthlyEvolution')}
+            </h3>
+          </div>
+
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={evolution}>
+                <defs>
+                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={CHART_COLORS.income} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={CHART_COLORS.income} stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={CHART_COLORS.expense} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={CHART_COLORS.expense} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} vertical={false} />
+                <XAxis
+                  dataKey="month_name"
+                  stroke={CHART_COLORS.axis}
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke={CHART_COLORS.axis}
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `R$${value}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: CHART_COLORS.tooltipBg,
+                    border: `1px solid ${CHART_COLORS.grid}`,
+                    borderRadius: '16px',
+                    color: '#fff'
+                  }}
+                  itemStyle={{ color: '#fff' }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="income"
+                  stroke={CHART_COLORS.income}
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorIncome)"
+                  name={t('common.income')}
+                  isAnimationActive={false}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="expense"
+                  stroke={CHART_COLORS.expense}
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorExpense)"
+                  name={t('common.expense')}
+                  isAnimationActive={false}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
         {/* Gastos por Categoria */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -323,82 +399,6 @@ export const DashboardPage = () => {
                 {t('dashboard.empty.noExpenses')}
               </div>
             )}
-          </div>
-        </motion.div>
-
-        {/* Evolução Mensal */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-2xl"
-        >
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-app-accent" />
-              {t('dashboard.charts.monthlyEvolution')}
-            </h3>
-          </div>
-
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={evolution}>
-                <defs>
-                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={CHART_COLORS.income} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={CHART_COLORS.income} stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={CHART_COLORS.expense} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={CHART_COLORS.expense} stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} vertical={false} />
-                <XAxis 
-                  dataKey="month_name" 
-                  stroke={CHART_COLORS.axis} 
-                  fontSize={12} 
-                  tickLine={false} 
-                  axisLine={false}
-                />
-                <YAxis 
-                  stroke={CHART_COLORS.axis} 
-                  fontSize={12} 
-                  tickLine={false} 
-                  axisLine={false}
-                  tickFormatter={(value) => `R$${value}`}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: CHART_COLORS.tooltipBg, 
-                    border: `1px solid ${CHART_COLORS.grid}`,
-                    borderRadius: '16px',
-                    color: '#fff'
-                  }}
-                  itemStyle={{ color: '#fff' }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="income"
-                  stroke={CHART_COLORS.income}
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#colorIncome)"
-                  name={t('common.income')}
-                  isAnimationActive={false}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="expense"
-                  stroke={CHART_COLORS.expense}
-                  strokeWidth={3}
-                  fillOpacity={1}
-                  fill="url(#colorExpense)"
-                  name={t('common.expense')}
-                  isAnimationActive={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
           </div>
         </motion.div>
       </div>
