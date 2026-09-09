@@ -154,13 +154,13 @@ export const WalletsPage = () => {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(240px,1fr))]">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-48 bg-app-surface border border-app-border rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid gap-6 [grid-template-columns:repeat(auto-fill,minmax(240px,1fr))]">
           <AnimatePresence>
             {visibleWallets.map((wallet) => (
               <motion.div
