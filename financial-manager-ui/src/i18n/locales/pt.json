@@ -33,6 +33,10 @@
     "personal": "Pessoal",
     "business": "Empresarial"
   },
+  "scope": {
+    "bannerPersonal": "Modo Pessoal — dados e carteiras individuais",
+    "bannerBusiness": "Modo Empresarial — dados compartilhados da organização ativa"
+  },
   "shared": {
     "sidebar": {
       "ledgerSubtitle": "Livro-caixa",

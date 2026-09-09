@@ -105,14 +105,14 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
           
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-xl bg-[#1e293b] border border-app-border rounded-[32px] shadow-2xl overflow-y-auto max-h-[90vh]"
+            className="relative w-full max-w-xl bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <div className="p-8 border-b border-app-border flex justify-between items-center bg-gradient-to-r from-app-accent/10 to-transparent">
               <div className="flex items-center gap-3">
@@ -134,7 +134,7 @@ export const CreateTransferModal: React.FC<CreateTransferModalProps> = ({ isOpen
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3 text-red-400 text-sm"
+                  className="bg-app-danger/10 border border-app-danger/20 p-4 rounded-2xl flex items-center gap-3 text-app-danger text-sm"
                 >
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
                   {error}

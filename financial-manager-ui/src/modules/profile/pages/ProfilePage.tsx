@@ -111,7 +111,7 @@ export const ProfilePage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-3xl p-8 shadow-2xl">
+          <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-2xl p-8 shadow-2xl">
             {/* Avatar Section */}
             <div className="flex flex-col items-center mb-10">
               <div className="relative group">
@@ -121,15 +121,15 @@ export const ProfilePage = () => {
                   ) : (
                     <User className="w-12 h-12 text-app-muted" />
                   )}
-                  
+
                   <label className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                     <Camera className="w-6 h-6 text-app-ink mb-1" />
                     <span className="text-[10px] text-app-ink font-bold uppercase tracking-wider">{t('profile.avatar.change')}</span>
                     <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
                   </label>
                 </div>
-                
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-app-accent rounded-full flex items-center justify-center border-4 border-[#0f172a] shadow-lg">
+
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-app-accent rounded-full flex items-center justify-center border-4 border-app-surface-2 shadow-lg">
                   <Camera className="w-3.5 h-3.5 text-app-ink" />
                 </div>
               </div>
@@ -190,7 +190,7 @@ export const ProfilePage = () => {
                     onClick={() => setType('personal')}
                     className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                       type === 'personal'
-                        ? 'bg-app-accent/20 border-app-accent text-app-ink shadow-[0_0_20px_rgba(59,130,246,0.2)]'
+                        ? 'bg-app-accent-soft border-app-accent text-app-ink'
                         : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                     }`}
                   >
@@ -203,7 +203,7 @@ export const ProfilePage = () => {
                     onClick={() => setType('business')}
                     className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                       type === 'business'
-                        ? 'bg-app-accent/20 border-app-accent text-app-ink shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                        ? 'bg-app-biz-soft border-app-biz text-app-ink'
                         : 'bg-app-surface-2 border-app-border text-app-muted hover:bg-app-surface-2'
                     }`}
                   >
@@ -216,7 +216,7 @@ export const ProfilePage = () => {
               <button
                 type="button"
                 onClick={() => setIsChangePasswordOpen(true)}
-                className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl border border-app-border text-app-ink/80 hover:bg-app-surface-2 transition-all font-medium"
+                className="w-full flex items-center justify-center gap-2 p-4 rounded-full border border-app-border text-app-ink/80 hover:bg-app-surface-2 transition-all font-medium"
               >
                 <KeyRound className="w-5 h-5" />
                 {t('profile.changePassword.title')}
@@ -227,7 +227,7 @@ export const ProfilePage = () => {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="mt-6 p-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-2xl text-center font-medium"
+                className="mt-6 p-4 bg-app-success-soft border border-app-success/30 text-app-success rounded-2xl text-center font-medium"
               >
                 {t('profile.updateSuccess')}
               </motion.div>
@@ -236,7 +236,7 @@ export const ProfilePage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-8 bg-gradient-to-r from-app-accent to-app-accent hover:from-app-accent hover:to-app-accent text-app-ink font-bold py-4 rounded-2xl shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+              className="w-full mt-8 bg-app-accent hover:opacity-90 text-app-ink font-bold py-4 rounded-full shadow-lg shadow-app-card flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
             >
               {loading ? (
                 <div className="w-6 h-6 border-2 border-app-accent/40 border-t-white rounded-full animate-spin" />
@@ -253,7 +253,7 @@ export const ProfilePage = () => {
         <div className="mt-8 flex justify-center">
           <button
             onClick={signOut}
-            className="text-app-muted hover:text-red-400 font-medium transition-colors p-2"
+            className="text-app-muted hover:text-app-danger font-medium transition-colors p-2 rounded-full"
           >
             {t('profile.signOut')}
           </button>

@@ -33,6 +33,10 @@
     "personal": "Personal",
     "business": "Business"
   },
+  "scope": {
+    "bannerPersonal": "Personal Mode — your individual wallets and data",
+    "bannerBusiness": "Business Mode — shared data for the active organization"
+  },
   "shared": {
     "sidebar": {
       "ledgerSubtitle": "Ledger",

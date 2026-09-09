@@ -33,6 +33,10 @@
     "personal": "Personal",
     "business": "Empresarial"
   },
+  "scope": {
+    "bannerPersonal": "Modo Personal — tus carteras y datos individuales",
+    "bannerBusiness": "Modo Empresarial — datos compartidos de la organización activa"
+  },
   "shared": {
     "sidebar": {
       "ledgerSubtitle": "Libro contable",

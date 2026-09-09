@@ -178,21 +178,21 @@ export const RecurrencesPage = () => {
               type="checkbox"
               checked={showCancelled}
               onChange={(e) => setShowCancelled(e.target.checked)}
-              className="accent-blue-600"
+              className="accent-app-accent"
             />
             {t('recurrences.showCancelled')}
           </label>
           <button
             onClick={() => setIsClearAllModalOpen(true)}
             disabled={!canClearAll}
-            className="bg-app-surface-2 hover:bg-red-500/10 text-app-ink hover:text-red-400 p-3 rounded-2xl border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface-2 disabled:hover:text-app-ink"
+            className="bg-app-surface-2 hover:bg-app-danger/10 text-app-ink hover:text-app-danger h-10 w-10 rounded-full border border-app-border transition-all active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-app-surface-2 disabled:hover:text-app-ink flex items-center justify-center"
             title={canClearAll ? t('recurrences.clearAllTitle') : t('recurrences.clearAllDisabledHint')}
           >
             <Trash2 className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-app-accent hover:opacity-90 text-app-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
+            className="bg-app-accent hover:opacity-90 text-app-ink px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-5 h-5" />
             {t('recurrences.new')}
@@ -200,7 +200,7 @@ export const RecurrencesPage = () => {
         </div>
       </div>
 
-      <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-2xl">
+      <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-2xl overflow-hidden shadow-2xl">
         {loading ? (
           <div className="p-8 space-y-4">
             {[1, 2, 3].map((i) => (
@@ -218,7 +218,7 @@ export const RecurrencesPage = () => {
                   className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-2xl ${recurrence.type === 'income' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                    <div className={`p-3 rounded-2xl ${recurrence.type === 'income' ? 'bg-app-success/20 text-app-success' : 'bg-app-danger/20 text-app-danger'}`}>
                       <RefreshCw className="w-6 h-6" />
                     </div>
                     
@@ -239,15 +239,16 @@ export const RecurrencesPage = () => {
 
                   <div className="flex items-center gap-6">
                     <div className="text-right">
-                      <p className={`text-lg font-bold ${recurrence.type === 'income' ? 'text-emerald-400' : 'text-red-400'} ${isExpired(recurrence) ? 'opacity-50 line-through' : ''}`}>
+                      <p className={`text-lg font-bold ${recurrence.type === 'income' ? 'text-app-success' : 'text-app-danger'} ${isExpired(recurrence) ? 'opacity-50 line-through' : ''}`}>
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(recurrence.amount)}
                       </p>
                       {isExpired(recurrence) ? (
-                        <span className="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">{t('recurrences.ended')}</span>
+                        <span className="text-[10px] bg-app-danger/20 text-app-danger px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">{t('recurrences.ended')}</span>
                       ) : (
                         <div className="flex flex-col items-end gap-1">
                           <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">{t('recurrences.next', { date: computeNextDueDate(recurrence).toLocaleDateString('pt-BR') })}</p>
-                          <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${recurrence.isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${recurrence.isActive ? 'bg-app-success/20 text-app-success' : 'bg-app-surface-2 border border-app-border text-app-muted'}`}>
+
                             {recurrence.isActive ? t('recurrences.statusActive') : t('recurrences.statusPaused')}
                           </span>
                         </div>
@@ -258,7 +259,7 @@ export const RecurrencesPage = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleEdit(recurrence)}
-                          className="p-2 hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-xl transition-all"
+                          className="h-8 w-8 flex items-center justify-center hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-full transition-all"
                           title={t('common.edit')}
                         >
                           <Pencil className="w-5 h-5" />
@@ -266,7 +267,7 @@ export const RecurrencesPage = () => {
                         <button
                           onClick={() => handleRunNow(recurrence.id)}
                           disabled={pendingIds.has(recurrence.id) || !recurrence.isActive}
-                          className="p-2 hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="h-8 w-8 flex items-center justify-center hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                           title={recurrence.isActive ? t('recurrences.runNow') : t('recurrences.runNowDisabledHint')}
                         >
                           <Play className="w-5 h-5" />
@@ -274,7 +275,7 @@ export const RecurrencesPage = () => {
                         <button
                           onClick={() => handleToggleActive(recurrence.id)}
                           disabled={pendingIds.has(recurrence.id)}
-                          className={`p-2 rounded-xl transition-all disabled:opacity-50 ${recurrence.isActive ? 'text-amber-400 hover:bg-amber-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`}
+                          className={`h-8 w-8 flex items-center justify-center rounded-full transition-all disabled:opacity-50 ${recurrence.isActive ? 'text-app-muted hover:bg-app-surface-2' : 'text-app-success hover:bg-app-success/10'}`}
                           title={recurrence.isActive ? t('recurrences.pause') : t('recurrences.activate')}
                         >
                           <RefreshCw className={`w-5 h-5 ${!recurrence.isActive ? 'animate-pulse' : ''}`} />
@@ -282,7 +283,7 @@ export const RecurrencesPage = () => {
                         <button
                           onClick={() => handleCancel(recurrence.id)}
                           disabled={pendingIds.has(recurrence.id)}
-                          className="p-2 hover:bg-red-500/10 text-app-muted hover:text-red-400 rounded-xl transition-all disabled:opacity-50"
+                          className="h-8 w-8 flex items-center justify-center hover:bg-app-danger/10 text-app-muted hover:text-app-danger rounded-full transition-all disabled:opacity-50"
                           title={t('recurrences.cancelPermanently')}
                         >
                           <X className="w-5 h-5" />

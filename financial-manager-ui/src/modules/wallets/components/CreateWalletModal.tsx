@@ -18,10 +18,10 @@ interface CreateWalletModalProps {
 
 const WALLET_TYPES = [
   { id: 'checking', labelKey: 'wallets.types.checking', icon: WalletIcon, color: 'text-app-accent' },
-  { id: 'savings', labelKey: 'wallets.types.savings', icon: Banknote, color: 'text-emerald-400' },
-  { id: 'credit', labelKey: 'wallets.types.credit', icon: CreditCard, color: 'text-app-accent' },
-  { id: 'investment', labelKey: 'wallets.types.investment', icon: Landmark, color: 'text-amber-400' },
-  { id: 'cash', labelKey: 'wallets.types.cash', icon: Coins, color: 'text-orange-400' },
+  { id: 'savings', labelKey: 'wallets.types.savings', icon: Banknote, color: 'text-app-success' },
+  { id: 'credit', labelKey: 'wallets.types.credit', icon: CreditCard, color: 'text-app-danger' },
+  { id: 'investment', labelKey: 'wallets.types.investment', icon: Landmark, color: 'text-app-biz' },
+  { id: 'cash', labelKey: 'wallets.types.cash', icon: Coins, color: 'text-app-accent' },
 ];
 
 export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletModalProps) => {
@@ -98,7 +98,7 @@ export const CreateWalletModal = ({ isOpen, onClose, onSuccess }: CreateWalletMo
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-lg bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
           <h2 className="text-xl font-bold text-app-ink">{t('wallets.new')}</h2>

@@ -86,7 +86,7 @@ export const OrganizationsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <form onSubmit={handleCreate} className="bg-app-surface-2 border border-app-border rounded-3xl p-6 space-y-3">
+        <form onSubmit={handleCreate} className="bg-app-surface-2 border border-app-border rounded-2xl p-6 space-y-3">
           <h3 className="text-app-ink font-bold flex items-center gap-2">
             <Building2 className="w-5 h-5 text-app-accent" />
             {t('organizations.createCard.title')}
@@ -109,9 +109,9 @@ export const OrganizationsPage = () => {
           </button>
         </form>
 
-        <form onSubmit={handleRedeem} className="bg-app-surface-2 border border-app-border rounded-3xl p-6 space-y-3">
+        <form onSubmit={handleRedeem} className="bg-app-surface-2 border border-app-border rounded-2xl p-6 space-y-3">
           <h3 className="text-app-ink font-bold flex items-center gap-2">
-            <KeyRound className="w-5 h-5 text-amber-400" />
+            <KeyRound className="w-5 h-5 text-app-accent" />
             {t('organizations.joinCard.title')}
           </h3>
           <input
@@ -125,7 +125,7 @@ export const OrganizationsPage = () => {
           <button
             type="submit"
             disabled={redeeming}
-            className="bg-amber-600 hover:bg-amber-500 text-app-ink font-bold px-6 py-3 rounded-2xl flex items-center gap-2 disabled:opacity-50"
+            className="bg-app-accent hover:opacity-90 text-app-ink font-bold px-6 py-3 rounded-2xl flex items-center gap-2 disabled:opacity-50"
           >
             {t('organizations.joinCard.submit')}
           </button>
@@ -140,15 +140,27 @@ export const OrganizationsPage = () => {
         <div className="space-y-4">
           {organizations.map((organization) => (
             <div key={organization.id}>
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => toggleExpand(organization)}
-                className="w-full flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-4 hover:bg-white/[0.08] transition-all"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleExpand(organization);
+                  }
+                }}
+                className="w-full flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-4 hover:bg-white/[0.08] transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <Building2 className="w-5 h-5 text-app-accent" />
                   <div className="text-left">
                     <p className="text-app-ink font-bold">{organization.name}</p>
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-app-muted">
+                    <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-full inline-block ${
+                      organization.role === 'owner'
+                        ? 'bg-app-accent-soft text-app-accent'
+                        : 'bg-app-muted/10 text-app-muted'
+                    }`}>
                       {organization.role === 'owner' ? 'Dono' : 'Membro'}
                     </span>
                   </div>
@@ -159,14 +171,23 @@ export const OrganizationsPage = () => {
                       onClick={(e) => handleDelete(e, organization)}
                       disabled={deletingId === organization.id}
                       title="Excluir organização"
-                      className="p-2 text-app-muted hover:text-red-400 transition-colors disabled:opacity-50"
+                      className="p-2 text-app-muted hover:text-app-danger transition-colors disabled:opacity-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
-                  {expandedId === organization.id ? <ChevronDown className="w-5 h-5 text-app-muted" /> : <ChevronRight className="w-5 h-5 text-app-muted" />}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleExpand(organization);
+                    }}
+                    title={expandedId === organization.id ? 'Recolher' : 'Expandir'}
+                    className="p-2 text-app-muted hover:bg-app-surface-2 rounded-full transition-colors"
+                  >
+                    {expandedId === organization.id ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                  </button>
                 </div>
-              </button>
+              </div>
 
               {expandedId === organization.id && (
                 <div className="mt-2">
@@ -177,7 +198,7 @@ export const OrganizationsPage = () => {
           ))}
 
           {organizations.length === 0 && (
-            <div className="py-20 flex flex-col items-center justify-center text-center border-2 border-dashed border-app-border rounded-3xl">
+            <div className="py-20 flex flex-col items-center justify-center text-center border-2 border-dashed border-app-border rounded-2xl">
               <Building2 className="w-12 h-12 text-app-muted mb-4" />
               <h3 className="text-app-ink font-bold text-lg">Nenhuma organização ainda</h3>
               <p className="text-app-muted mt-1 max-w-xs">Crie uma organização para compartilhar carteiras empresariais com sua equipe, ou entre em uma existente com um código de convite.</p>

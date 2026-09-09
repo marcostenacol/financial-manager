@@ -7,6 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        sans: ['"IBM Plex Sans"', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
         display: ['var(--font-display)'],
       },
       colors: {
@@ -20,7 +21,10 @@ export default {
         'app-accent-ink': 'var(--accent-ink)',
         'app-accent-soft': 'var(--accent-soft)',
         'app-success': 'rgb(var(--success) / <alpha-value>)',
+        'app-success-soft': 'var(--success-soft)',
         'app-danger': 'rgb(var(--danger) / <alpha-value>)',
+        'app-biz': 'rgb(var(--biz) / <alpha-value>)',
+        'app-biz-soft': 'var(--biz-soft)',
       },
       boxShadow: {
         'app-card': 'var(--shadow)',
