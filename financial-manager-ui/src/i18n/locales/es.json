@@ -93,7 +93,8 @@
     },
     "goals": {
       "title": "Metas de Ahorro",
-      "viewAll": "Ver todas"
+      "viewAll": "Ver todas",
+      "remaining": "Faltan {{amount}}"
     },
     "empty": {
       "noExpenses": "No hay gastos registrados en este período.",
@@ -131,6 +132,15 @@
     "primaryBadge": "Principal",
     "organization": "Organización",
     "moveToOrganization": "Mover a organización",
+    "movePrompt": "¿Mover \"{{name}}\" a otra organización?",
+    "types": {
+      "checking": "Cuenta corriente",
+      "savings": "Ahorros",
+      "credit": "Tarjeta de crédito",
+      "investment": "Inversión",
+      "cash": "Efectivo",
+      "cashShort": "Efectivo"
+    },
     "form": {
       "nameLabel": "Nombre de la cartera",
       "namePlaceholderCreate": "Ej: Nubank, Cartera, Ahorros...",
@@ -147,6 +157,7 @@
       "personalTitle": "Vaciar todo (personal)",
       "organizationTitle": "Vaciar todo (organización)",
       "personalWarning": "Esto eliminará todas tus carteras personales y los datos vinculados. Esta acción no se puede deshacer.",
+      "organizationWarning": "Esto eliminará todas las carteras de la organización \"{{name}}\" y los datos vinculados. Esta acción no se puede deshacer.",
       "walletsDescription": "Elimina permanentemente todas las carteras (y sus transacciones).",
       "resetLabel": "Vaciar también las metas de ahorro",
       "resetPersonalDescription": "Además de las carteras, también elimina tus metas de ahorro personales.",
@@ -184,8 +195,11 @@
       "completed": "Completada"
     },
     "pagination": {
+      "first": "Primera página",
       "previous": "Anterior",
-      "next": "Siguiente"
+      "next": "Siguiente",
+      "last": "Última página",
+      "showing": "Mostrando {{shown}} de {{total}}"
     },
     "empty": {
       "title": "No se encontraron transacciones",
@@ -264,6 +278,7 @@
     "ended": "Finalizada",
     "statusActive": "Activa",
     "statusPaused": "Pausada",
+    "next": "Próxima el {{date}}",
     "showCancelled": "Mostrar finalizadas",
     "cancelPermanently": "Finalizar permanentemente",
     "confirmCancel": "¿Finalizar esta recurrencia permanentemente? Esta acción no se puede deshacer.",
@@ -326,6 +341,9 @@
       "codePlaceholder": "Código de invitación",
       "submit": "Unirse"
     },
+    "confirm": {
+      "delete": "¿Eliminar la organización \"{{name}}\"? Esta acción no se puede deshacer."
+    },
     "toasts": {
       "created": "Organización creada con éxito",
       "deleted": "Organización eliminada con éxito",
@@ -368,6 +386,72 @@
       "submit": "Cambiar Contraseña",
       "success": "Contraseña cambiada con éxito",
       "error": "Error al cambiar la contraseña"
+    }
+  },
+  "people": {
+    "title": "Personas",
+    "subtitle": "Controla quién te debe, a quién debes y el PIX de cada uno",
+    "newPerson": "Nueva Persona",
+    "frequencyMonthly": "Mensual",
+    "frequencyOneTime": "Puntual",
+    "paidThisMonth": " · pagado este mes",
+    "viewPixQrCode": "Ver código QR PIX",
+    "theyOweMeLabel": "Ella me debe",
+    "iOweThemLabel": "Yo le debo",
+    "registerReceipt": "Registrar cobro",
+    "registerPayment": "Registrar pago",
+    "emptyTitle": "Ninguna persona registrada",
+    "emptyText": "Registra quién te debe, a quién debes, y genera el PIX al instante.",
+    "confirmDelete": "¿Eliminar a \"{{name}}\"? Esta acción no se puede deshacer.",
+    "errors": {
+      "load": "Error al cargar las personas",
+      "create": "Error al crear la persona",
+      "update": "Error al actualizar la persona",
+      "delete": "Error al eliminar la persona",
+      "settle": "Error al registrar el pago",
+      "qrCode": "Error al generar el código QR"
+    },
+    "form": {
+      "createTitle": "Nueva Persona",
+      "editTitle": "Editar Persona",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "ej: Juan Pérez",
+      "theyOweMeOptional": "Ella me debe (opcional)",
+      "iOweThemOptional": "Yo le debo (opcional)",
+      "theyOweMe": "Ella me debe",
+      "iOweThem": "Yo le debo",
+      "frequencyLabel": "Frecuencia del pago",
+      "frequencyOneTimeOption": "Puntual (una vez)",
+      "frequencyMonthlyOption": "Mensual (recurrente)",
+      "pixKeyTypeLabel": "Tipo de clave PIX",
+      "pixKeyLabel": "Clave PIX",
+      "pixKeyPlaceholder": "Clave",
+      "pixCityLabel": "Ciudad de la clave PIX (opcional)",
+      "pixCityPlaceholder": "ej: Boa Vista",
+      "notesLabel": "Notas (opcional)",
+      "notesPlaceholder": "Alguna nota sobre esta deuda...",
+      "save": "Guardar Persona",
+      "saveChanges": "Guardar Cambios",
+      "pixTypeCpf": "CPF",
+      "pixTypeCnpj": "CNPJ",
+      "pixTypeEmail": "Correo electrónico",
+      "pixTypePhone": "Teléfono",
+      "pixTypeRandom": "Clave aleatoria"
+    },
+    "settle": {
+      "receiveTitle": "Registrar cobro",
+      "payTitle": "Registrar pago",
+      "walletLabel": "Billetera",
+      "selectWallet": "Seleccionar billetera",
+      "categoryLabel": "Categoría",
+      "selectCategory": "Seleccionar categoría",
+      "confirm": "Confirmar"
+    },
+    "pix": {
+      "titlePrefix": "PIX — {{name}}",
+      "genericError": "No se pudo generar el código QR.",
+      "copy": "Copiar código PIX",
+      "copied": "¡Copiado!"
     }
   }
 }

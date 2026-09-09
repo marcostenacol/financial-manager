@@ -7,7 +7,7 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
     environment:
-      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:central_password@central-db:5432/financial_db?schema=public}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set}
       REDIS_URL: ${REDIS_URL:-redis://cache:6379}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
@@ -43,7 +43,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-financial_db}
       POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
     ports:
       - "127.0.0.1:5434:5432"
     healthcheck:

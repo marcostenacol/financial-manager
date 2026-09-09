@@ -30,6 +30,7 @@ export class TransactionRepository implements TransactionRepositoryInterface {
       include: {
         category: true,
         wallet: true,
+        person: true,
       },
     });
   }
@@ -76,6 +77,7 @@ export class TransactionRepository implements TransactionRepositoryInterface {
         include: {
           category: true,
           wallet: true,
+          person: true,
         },
         orderBy: {
           occurredAt: 'desc',
@@ -105,6 +107,7 @@ export class TransactionRepository implements TransactionRepositoryInterface {
         include: {
           category: true,
           wallet: true,
+          person: true,
         },
         orderBy: {
           occurredAt: 'desc',
@@ -141,6 +144,28 @@ export class TransactionRepository implements TransactionRepositoryInterface {
     await (tx ?? prisma).transaction.updateMany({
       where: { wallet: { organizationId }, recurrenceId: { not: null } },
       data: { recurrenceId: null },
+    });
+  }
+
+  async findAllByInvoiceId(invoiceId: string): Promise<Transaction[]> {
+    return prisma.transaction.findMany({
+      where: { invoiceId },
+      include: {
+        category: true,
+        person: true,
+      },
+      orderBy: { occurredAt: 'asc' },
+    });
+  }
+
+  async findAllByInvoiceIds(invoiceIds: string[]): Promise<Transaction[]> {
+    return prisma.transaction.findMany({
+      where: { invoiceId: { in: invoiceIds } },
+      include: {
+        category: true,
+        person: true,
+      },
+      orderBy: { occurredAt: 'asc' },
     });
   }
 }

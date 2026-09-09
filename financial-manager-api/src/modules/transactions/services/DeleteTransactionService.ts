@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/shared/database/PrismaClient';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
@@ -19,6 +20,9 @@ export class DeleteTransactionService {
 
     @inject('WalletRepository')
     private walletRepository: WalletRepositoryInterface,
+
+    @inject('PersonRepository')
+    private personRepository: PersonRepositoryInterface,
 
     private cache: CacheTrait,
   ) {}
@@ -41,11 +45,19 @@ export class DeleteTransactionService {
       ? new Prisma.Decimal(transaction.amount)
       : new Prisma.Decimal(transaction.amount).negated();
 
+    const hadPersonDebt = wasCompleted && !!transaction.personId && transaction.type === TransactionTypeEnum.EXPENSE;
+
     await prisma.$transaction(async (tx) => {
       // Se estava concluída, reverte o impacto no saldo (delta invertido)
       if (wasCompleted) {
         await this.walletRepository.update(wallet.id, {
           balance: { increment: signedAmount.negated() },
+        }, tx);
+      }
+
+      if (hadPersonDebt) {
+        await this.personRepository.update(transaction.personId as string, {
+          theyOweMe: { decrement: transaction.amount },
         }, tx);
       }
 

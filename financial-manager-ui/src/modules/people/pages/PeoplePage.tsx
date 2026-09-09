@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Plus, Users, QrCode, Pencil, ArrowDownCircle, ArrowUpCircle, Repeat, Calendar } from 'lucide-react';
 import { CreatePersonModal } from '../components/CreatePersonModal';
 import { UpdatePersonModal } from '../components/UpdatePersonModal';
@@ -14,6 +15,7 @@ import { OrganizationFilterSelect } from '../../organizations/components/Organiz
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
 export const PeoplePage = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { scope } = useScope();
   const { activeOrganizationId } = useActiveOrganization();
@@ -29,7 +31,7 @@ export const PeoplePage = () => {
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
 
   useEffect(() => {
-    loadPeople().catch((err) => showToast(getErrorMessage(err, 'Erro ao carregar pessoas'), 'error'));
+    loadPeople().catch((err) => showToast(getErrorMessage(err, t('people.errors.load')), 'error'));
     loadOrganizations().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
@@ -55,8 +57,8 @@ export const PeoplePage = () => {
     <div className="p-4 md:p-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="ledger-title text-4xl text-app-ink">Pessoas</h1>
-          <p className="text-app-muted">Controle quem te deve, quem você deve e o PIX de cada um</p>
+          <h1 className="ledger-title text-4xl text-app-ink">{t('people.title')}</h1>
+          <p className="text-app-muted">{t('people.subtitle')}</p>
         </div>
         <div className="flex items-center gap-4">
           {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
@@ -65,7 +67,7 @@ export const PeoplePage = () => {
             className="bg-app-accent hover:opacity-90 text-app-ink px-6 py-3 rounded-2xl font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-app-card"
           >
             <Plus className="w-5 h-5" />
-            Nova Pessoa
+            {t('people.newPerson')}
           </button>
         </div>
       </div>
@@ -98,14 +100,14 @@ export const PeoplePage = () => {
                       <h3 className="text-app-ink font-bold text-lg">{person.name}</h3>
                       <span className="ledger-stamp mt-1 inline-flex items-center gap-1 text-app-accent">
                         {person.paymentFrequency === 'MONTHLY' ? <Repeat className="w-3 h-3" /> : <Calendar className="w-3 h-3" />}
-                        {person.paymentFrequency === 'MONTHLY' ? 'Mensal' : 'Avulsa'}
-                        {paidThisPeriod && person.paymentFrequency === 'MONTHLY' && ' · pago este mês'}
+                        {person.paymentFrequency === 'MONTHLY' ? t('people.frequencyMonthly') : t('people.frequencyOneTime')}
+                        {paidThisPeriod && person.paymentFrequency === 'MONTHLY' && t('people.paidThisMonth')}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={(e) => handleShowQrCode(e, person)}
-                        title="Ver QR Code PIX"
+                        title={t('people.viewPixQrCode')}
                         className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted hover:text-app-accent"
                       >
                         <QrCode className="w-5 h-5" />
@@ -123,7 +125,7 @@ export const PeoplePage = () => {
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 text-app-success">
                         <ArrowDownCircle className="w-4 h-4 shrink-0" />
-                        <span className="text-xs text-app-muted">Ela me deve</span>
+                        <span className="text-xs text-app-muted">{t('people.theyOweMeLabel')}</span>
                       </div>
                       <span className="ledger-figure text-app-ink">
                         {theyOweMe.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
@@ -134,14 +136,14 @@ export const PeoplePage = () => {
                         onClick={(e) => handleSettle(e, person, 'they_owe_me')}
                         className="w-full py-2 rounded-xl font-bold text-xs uppercase tracking-wide bg-app-success-soft text-app-success hover:opacity-80 transition-all"
                       >
-                        Registrar recebimento
+                        {t('people.registerReceipt')}
                       </button>
                     )}
 
                     <div className="flex items-center justify-between gap-3 pt-2 border-t border-app-border">
                       <div className="flex items-center gap-2 text-app-danger">
                         <ArrowUpCircle className="w-4 h-4 shrink-0" />
-                        <span className="text-xs text-app-muted">Eu devo a ela</span>
+                        <span className="text-xs text-app-muted">{t('people.iOweThemLabel')}</span>
                       </div>
                       <span className="ledger-figure text-app-ink">
                         {iOweThem.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
@@ -152,7 +154,7 @@ export const PeoplePage = () => {
                         onClick={(e) => handleSettle(e, person, 'i_owe_them')}
                         className="w-full py-2 rounded-xl font-bold text-xs uppercase tracking-wide bg-app-surface-2 text-app-muted hover:text-app-ink transition-all"
                       >
-                        Registrar pagamento
+                        {t('people.registerPayment')}
                       </button>
                     )}
                   </div>
@@ -166,8 +168,8 @@ export const PeoplePage = () => {
               <div className="p-4 bg-app-surface-2 rounded-full mb-4">
                 <Users className="w-12 h-12 text-app-muted" />
               </div>
-              <h3 className="text-app-ink font-bold text-lg">Nenhuma pessoa cadastrada</h3>
-              <p className="text-app-muted mt-1">Cadastre quem te deve, quem você deve, e gere o PIX na hora.</p>
+              <h3 className="text-app-ink font-bold text-lg">{t('people.emptyTitle')}</h3>
+              <p className="text-app-muted mt-1">{t('people.emptyText')}</p>
             </div>
           )}
         </div>

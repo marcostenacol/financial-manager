@@ -32,6 +32,8 @@ export class UpdateWalletService {
       ...(data.scope !== undefined && { scope: wallet!.organizationId ? 'business' : data.scope }),
       ...(data.currency !== undefined && { currency: data.currency }),
       ...(data.balance !== undefined && { balance: new Prisma.Decimal(data.balance) }),
+      ...(data.closing_day !== undefined && { closingDay: data.closing_day }),
+      ...(data.due_day !== undefined && { dueDay: data.due_day }),
     };
 
     const updated_wallet = await this.wallet_repository.update(id, update_payload);

@@ -12,6 +12,7 @@ import { SavingsGoalsPage } from '../modules/savings-goals/pages/SavingsGoalsPag
 import { CostCentersPage } from '../modules/cost-centers/pages/CostCentersPage';
 import { OrganizationsPage } from '../modules/organizations/pages/OrganizationsPage';
 import { PeoplePage } from '../modules/people/pages/PeoplePage';
+import { CreditCardsPage } from '../modules/credit-cards/pages/CreditCardsPage';
 import { DefaultLayout } from '../shared/components/Layout/DefaultLayout';
 
 // Pages (Placeholders por enquanto)
@@ -117,6 +118,15 @@ export const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <PeoplePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/credit-cards"
+        element={
+          <ProtectedRoute>
+            <CreditCardsPage />
           </ProtectedRoute>
         }
       />

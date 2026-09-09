@@ -17,7 +17,7 @@ export class RegisterService {
     const user_exists = await this.auth_repository.findByEmail(data.email);
 
     if (user_exists) {
-      throw new AppError('Este e-mail já está em uso', 400);
+      throw new AppError('Não foi possível concluir o cadastro', 400);
     }
 
     const role = await this.auth_repository.findRoleBySlug(RoleEnum.USER);

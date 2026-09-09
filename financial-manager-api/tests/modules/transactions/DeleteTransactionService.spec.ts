@@ -11,6 +11,7 @@ import { Prisma } from '@prisma/client';
 import { DeleteTransactionService } from '@/modules/transactions/services/DeleteTransactionService';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
 import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
@@ -19,6 +20,7 @@ import { AppError } from '@/shared/errors/AppError';
 describe('DeleteTransactionService', () => {
   let transactionRepository: TransactionRepositoryInterface;
   let walletRepository: WalletRepositoryInterface;
+  let personRepository: PersonRepositoryInterface;
   let cacheTrait: CacheTrait;
   let deleteTransactionService: DeleteTransactionService;
 
@@ -33,12 +35,17 @@ describe('DeleteTransactionService', () => {
       update: vi.fn(),
     } as any;
 
+    personRepository = {
+      findById: vi.fn(),
+      update: vi.fn(),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
     } as any;
 
-    deleteTransactionService = new DeleteTransactionService(transactionRepository, walletRepository, cacheTrait);
+    deleteTransactionService = new DeleteTransactionService(transactionRepository, walletRepository, personRepository, cacheTrait);
   });
 
   it('should revert the wallet balance when deleting a completed expense', async () => {
@@ -106,6 +113,30 @@ describe('DeleteTransactionService', () => {
 
     expect(walletRepository.update).not.toHaveBeenCalled();
     expect(transactionRepository.delete).toHaveBeenCalledWith('tx-1', expect.anything());
+  });
+
+  it('should decrease the linked person theyOweMe when deleting a completed expense with person_id', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const transaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.COMPLETED,
+      amount: 150,
+      personId: 'person-1',
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(transaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 400 } as any);
+
+    await deleteTransactionService.execute('tx-1', userId);
+
+    expect(personRepository.update).toHaveBeenCalledWith(
+      'person-1',
+      { theyOweMe: { decrement: 150 } },
+      expect.anything(),
+    );
   });
 
   it('should throw when the wallet does not belong to the authenticated user', async () => {

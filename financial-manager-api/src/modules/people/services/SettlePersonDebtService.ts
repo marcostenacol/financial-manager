@@ -5,6 +5,8 @@ import { PersonRepositoryInterface } from '../repositories/contracts/PersonRepos
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
+import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
 import { SettlePersonDebtDTOType } from '../dtos/SettlePersonDebtDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { assertOwnership, isOwnedByActor } from '@/shared/authorization/ownership';
@@ -22,6 +24,7 @@ export class SettlePersonDebtService {
     @inject('TransactionRepository') private transactionRepository: TransactionRepositoryInterface,
     @inject('WalletRepository') private walletRepository: WalletRepositoryInterface,
     @inject('CategoryRepository') private categoryRepository: CategoryRepositoryInterface,
+    @inject('InvoiceRepository') private invoiceRepository: InvoiceRepositoryInterface,
     private cache: CacheTrait,
   ) {}
 
@@ -59,6 +62,9 @@ export class SettlePersonDebtService {
     const isOneTime = person!.paymentFrequency === 'ONE_TIME';
 
     const { transaction, updatedPerson } = await prisma.$transaction(async (tx) => {
+      const occurredAt = new Date();
+      const invoiceId = await resolveInvoiceId(wallet, occurredAt, this.invoiceRepository, tx);
+
       const createdTransaction = await this.transactionRepository.create({
         walletId: data.wallet_id,
         categoryId: data.category_id,
@@ -66,7 +72,8 @@ export class SettlePersonDebtService {
         amount: decimalAmount,
         description,
         status: TransactionStatusEnum.COMPLETED,
-        occurredAt: new Date(),
+        occurredAt,
+        invoiceId,
       }, tx);
 
       await this.walletRepository.update(wallet.id, {

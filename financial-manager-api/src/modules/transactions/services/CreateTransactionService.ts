@@ -5,6 +5,10 @@ import { TransactionRepositoryInterface } from '../repositories/contracts/Transa
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
+import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
+import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
+import { addMonthsClamped } from '@/modules/credit-cards/utils/computeInvoicePeriod';
 import { CreateTransactionDTOType } from '../dtos/CreateTransactionDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
@@ -29,10 +33,16 @@ export class CreateTransactionService {
     @inject('CostCenterRepository')
     private costCenterRepository: CostCenterRepositoryInterface,
 
+    @inject('PersonRepository')
+    private personRepository: PersonRepositoryInterface,
+
+    @inject('InvoiceRepository')
+    private invoiceRepository: InvoiceRepositoryInterface,
+
     private cache: CacheTrait,
   ) {}
 
-  async execute(data: CreateTransactionDTOType, userId: string, organizationIds: string[] = []): Promise<Transaction> {
+  async execute(data: CreateTransactionDTOType, userId: string, organizationIds: string[] = []): Promise<Transaction | Transaction[]> {
     const wallet = await this.walletRepository.findById(data.wallet_id);
 
     if (!wallet || !isOwnedByActor(wallet, userId, organizationIds)) {
@@ -61,30 +71,94 @@ export class CreateTransactionService {
       }
     }
 
-    const amount = new Prisma.Decimal(data.amount);
-    const isCompleted = data.status === TransactionStatusEnum.COMPLETED;
-    const balanceDelta = data.type === TransactionTypeEnum.INCOME ? amount : amount.negated();
+    if (data.person_id && data.type !== TransactionTypeEnum.EXPENSE) {
+      throw new AppError('Só é possível vincular uma pessoa a uma despesa', 422);
+    }
 
-    const transaction = await prisma.$transaction(async (tx) => {
-      const createdTransaction = await this.transactionRepository.create({
-        walletId: data.wallet_id,
-        categoryId: data.category_id,
-        type: data.type,
-        amount,
-        description: data.description,
-        status: data.status,
-        occurredAt: new Date(data.occurred_at),
-        costCenterId: data.cost_center_id,
-      }, tx);
+    if (data.person_id) {
+      const person = await this.personRepository.findById(data.person_id);
 
-      if (isCompleted) {
-        await this.walletRepository.update(wallet.id, {
-          balance: { increment: balanceDelta },
-        }, tx);
+      if (!person || !isOwnedByActor(person, userId, organizationIds)) {
+        throw new AppError('Pessoa não encontrada', 404);
       }
 
-      return createdTransaction;
+      if (person.scope !== wallet.scope) {
+        throw new AppError('Esta pessoa não é compatível com o escopo da carteira', 422);
+      }
+    }
+
+    const installmentCount = data.installments ?? 1;
+
+    // Divide o valor total em N parcelas iguais, absorvendo o resto do arredondamento
+    // na última parcela para que a soma bata exatamente com o valor total da compra.
+    const installmentAmounts: Prisma.Decimal[] = [];
+    if (installmentCount > 1) {
+      const totalCents = new Prisma.Decimal(data.amount).times(100).round();
+      const baseCents = totalCents.dividedBy(installmentCount).floor();
+      const remainderCents = totalCents.minus(baseCents.times(installmentCount));
+      for (let i = 0; i < installmentCount; i++) {
+        const cents = i === installmentCount - 1 ? baseCents.plus(remainderCents) : baseCents;
+        installmentAmounts.push(cents.dividedBy(100));
+      }
+    } else {
+      installmentAmounts.push(new Prisma.Decimal(data.amount));
+    }
+
+    const baseOccurredAt = new Date(data.occurred_at);
+
+    const transaction = await prisma.$transaction(async (tx) => {
+      const createdTransactions: Transaction[] = [];
+
+      for (let i = 0; i < installmentAmounts.length; i++) {
+        const installmentAmount = installmentAmounts[i] as Prisma.Decimal;
+        // Só a primeira parcela é o status pedido (normalmente "efetivada", já que a compra
+        // já aconteceu); as parcelas futuras entram como "pendente" — ainda não saíram do
+        // bolso, só vão virar cobrança de fato quando a fatura daquele mês chegar.
+        const status = i === 0 ? data.status : TransactionStatusEnum.PENDING;
+        const isCompleted = status === TransactionStatusEnum.COMPLETED;
+        const balanceDelta = data.type === TransactionTypeEnum.INCOME ? installmentAmount : installmentAmount.negated();
+        const affectsPersonDebt = isCompleted && !!data.person_id;
+
+        const occurredAt = addMonthsClamped(baseOccurredAt, i);
+
+        const description = installmentCount > 1
+          ? `${data.description ?? 'Compra parcelada'} (${i + 1}/${installmentCount})`
+          : data.description;
+
+        const invoiceId = await resolveInvoiceId(wallet, occurredAt, this.invoiceRepository, tx);
+
+        const createdTransaction = await this.transactionRepository.create({
+          walletId: data.wallet_id,
+          categoryId: data.category_id,
+          type: data.type,
+          amount: installmentAmount,
+          description,
+          status,
+          occurredAt,
+          costCenterId: data.cost_center_id,
+          personId: data.person_id,
+          invoiceId,
+        }, tx);
+
+        if (isCompleted) {
+          await this.walletRepository.update(wallet.id, {
+            balance: { increment: balanceDelta },
+          }, tx);
+        }
+
+        if (affectsPersonDebt) {
+          await this.personRepository.update(data.person_id as string, {
+            theyOweMe: { increment: installmentAmount },
+          }, tx);
+        }
+
+        createdTransactions.push(createdTransaction);
+      }
+
+      return createdTransactions;
     });
+
+    const isCompleted = transaction[0]?.status === TransactionStatusEnum.COMPLETED;
 
     if (isCompleted) {
       // Invalida cache da carteira e lista de carteiras
@@ -104,6 +178,6 @@ export class CreateTransactionService {
     await this.cache.delPattern(CacheKeys.reports.expensesByCategoryPattern(userId));
     await this.cache.delPattern(CacheKeys.reports.cashFlowByCostCenterPattern(userId));
 
-    return transaction;
+    return installmentCount > 1 ? transaction : (transaction[0] as Transaction);
   }
 }

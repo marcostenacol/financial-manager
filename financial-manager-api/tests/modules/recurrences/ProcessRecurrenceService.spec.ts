@@ -12,12 +12,14 @@ import { ProcessRecurrenceService } from '@/modules/recurrences/services/Process
 import { RecurrenceRepositoryInterface } from '@/modules/recurrences/repositories/contracts/RecurrenceRepositoryInterface';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 
 describe('ProcessRecurrenceService', () => {
   let recurrenceRepository: RecurrenceRepositoryInterface;
   let transactionRepository: TransactionRepositoryInterface;
   let walletRepository: WalletRepositoryInterface;
+  let invoiceRepository: InvoiceRepositoryInterface;
   let cacheTrait: CacheTrait;
   let processRecurrenceService: ProcessRecurrenceService;
 
@@ -36,6 +38,10 @@ describe('ProcessRecurrenceService', () => {
       update: vi.fn(),
     } as any;
 
+    invoiceRepository = {
+      findOrCreate: vi.fn().mockResolvedValue({ id: 'invoice-1' }),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
@@ -45,6 +51,7 @@ describe('ProcessRecurrenceService', () => {
       recurrenceRepository,
       transactionRepository,
       walletRepository,
+      invoiceRepository,
       cacheTrait
     );
   });
@@ -81,6 +88,36 @@ describe('ProcessRecurrenceService', () => {
     expect(recurrenceRepository.update).toHaveBeenCalledWith('rec-1', expect.objectContaining({
       lastProcessedAt: expect.any(Date)
     }), expect.anything());
+  });
+
+  it('should assign an invoiceId when the wallet is a credit card', async () => {
+    const startsAt = new Date();
+    startsAt.setDate(startsAt.getDate() - 31);
+
+    const recurrence = {
+      id: 'rec-1',
+      description: 'Netflix',
+      amount: 50,
+      type: 'expense',
+      period: 'monthly',
+      startsAt,
+      lastProcessedAt: null,
+      walletId: 'wallet-1',
+      categoryId: 'cat-1',
+    };
+
+    const wallet = { id: 'wallet-1', userId: 'user-1', balance: 1000, type: 'credit', closingDay: 5, dueDay: 15 };
+
+    vi.spyOn(recurrenceRepository, 'findAllActive').mockResolvedValue([recurrence as any]);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue(wallet as any);
+
+    await processRecurrenceService.execute();
+
+    expect(invoiceRepository.findOrCreate).toHaveBeenCalled();
+    expect(transactionRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ invoiceId: 'invoice-1' }),
+      expect.anything(),
+    );
   });
 
   it('should not process a recurrence that was recently processed', async () => {
