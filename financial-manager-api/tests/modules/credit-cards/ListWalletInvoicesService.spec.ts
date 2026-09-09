@@ -52,6 +52,26 @@ describe('ListWalletInvoicesService', () => {
     expect(invoicePaymentRepository.findAllByInvoiceIds).toHaveBeenCalledWith(['invoice-1']);
   });
 
+  it('excludes cancelled transactions but keeps pending ones in totalAmount', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, type: 'credit' } as any);
+    vi.spyOn(invoiceRepository, 'findAllByWalletId').mockResolvedValue([
+      { id: 'invoice-1', referenceMonth: '2026-08', closingDate: new Date('2026-08-05'), dueDate: new Date('2026-08-15') },
+    ] as any);
+    vi.spyOn(transactionRepository, 'findAllByInvoiceIds').mockResolvedValue([
+      { invoiceId: 'invoice-1', amount: new Prisma.Decimal(100), type: TransactionTypeEnum.EXPENSE, status: 'completed' },
+      { invoiceId: 'invoice-1', amount: new Prisma.Decimal(50), type: TransactionTypeEnum.EXPENSE, status: 'cancelled' },
+      { invoiceId: 'invoice-1', amount: new Prisma.Decimal(30), type: TransactionTypeEnum.EXPENSE, status: 'pending' },
+    ] as any);
+    vi.spyOn(invoicePaymentRepository, 'findAllByInvoiceIds').mockResolvedValue([]);
+
+    const result = await service.execute(walletId, userId);
+
+    expect(result[0].totalAmount).toBe(130);
+  });
+
   it('rejects a non-credit wallet', async () => {
     const userId = 'user-1';
     const walletId = 'wallet-1';

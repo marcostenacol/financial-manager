@@ -8,7 +8,7 @@ export function computeInvoiceStatus(
   closingDate: Date,
   now: Date = new Date(),
 ): InvoiceStatus {
-  if (totalAmount.gt(0) && paidAmount.gte(totalAmount)) return 'paid';
+  if (paidAmount.gte(totalAmount) && (totalAmount.gt(0) || paidAmount.gt(0))) return 'paid';
   if (paidAmount.gt(0)) return 'partially_paid';
   return now >= closingDate ? 'closed' : 'open';
 }

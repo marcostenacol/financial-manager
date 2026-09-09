@@ -5,6 +5,7 @@ import { InvoiceRepositoryInterface } from '../repositories/contracts/InvoiceRep
 import { InvoicePaymentRepositoryInterface } from '../repositories/contracts/InvoicePaymentRepositoryInterface';
 import { TransactionRepositoryInterface } from '@/modules/transactions/repositories/contracts/TransactionRepositoryInterface';
 import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTypeEnum';
+import { TransactionStatusEnum } from '@/modules/transactions/enums/TransactionStatusEnum';
 import { computeInvoiceStatus, InvoiceStatus } from '../utils/computeInvoiceStatus';
 import { AppError } from '@/shared/errors/AppError';
 import { isOwnedByActor } from '@/shared/authorization/ownership';
@@ -56,10 +57,12 @@ export class GetInvoiceDetailService {
       this.invoicePaymentRepository.findAllByInvoiceId(invoice.id),
     ]);
 
-    const totalAmount = transactions.reduce((sum, t) => {
-      const amount = new Prisma.Decimal(t.amount);
-      return t.type === TransactionTypeEnum.INCOME ? sum.minus(amount) : sum.plus(amount);
-    }, new Prisma.Decimal(0));
+    const totalAmount = transactions
+      .filter((t) => t.status !== TransactionStatusEnum.CANCELLED)
+      .reduce((sum, t) => {
+        const amount = new Prisma.Decimal(t.amount);
+        return t.type === TransactionTypeEnum.INCOME ? sum.minus(amount) : sum.plus(amount);
+      }, new Prisma.Decimal(0));
 
     const paidAmount = payments.reduce((sum, p) => sum.plus(new Prisma.Decimal(p.amount)), new Prisma.Decimal(0));
 

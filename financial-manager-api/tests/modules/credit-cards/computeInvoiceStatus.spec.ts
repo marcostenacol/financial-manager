@@ -25,4 +25,16 @@ describe('computeInvoiceStatus', () => {
     expect(computeInvoiceStatus(new Prisma.Decimal(100), new Prisma.Decimal(100), closingDate, now)).toBe('paid');
     expect(computeInvoiceStatus(new Prisma.Decimal(100), new Prisma.Decimal(120), closingDate, now)).toBe('paid');
   });
+
+  it('is paid when there is nothing left to pay and a payment was already registered (totalAmount = 0)', () => {
+    const now = new Date('2026-08-10T00:00:00.000Z');
+    expect(computeInvoiceStatus(new Prisma.Decimal(0), new Prisma.Decimal(50), closingDate, now)).toBe('paid');
+  });
+
+  it('falls through to open/closed when there is nothing owed and nothing paid (fresh empty invoice)', () => {
+    const openNow = new Date('2026-08-01T00:00:00.000Z');
+    const closedNow = new Date('2026-08-10T00:00:00.000Z');
+    expect(computeInvoiceStatus(new Prisma.Decimal(0), new Prisma.Decimal(0), closingDate, openNow)).toBe('open');
+    expect(computeInvoiceStatus(new Prisma.Decimal(0), new Prisma.Decimal(0), closingDate, closedNow)).toBe('closed');
+  });
 });

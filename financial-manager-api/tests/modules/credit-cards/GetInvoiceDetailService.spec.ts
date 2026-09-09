@@ -39,6 +39,26 @@ describe('GetInvoiceDetailService', () => {
     expect(result.payments).toEqual([]);
   });
 
+  it('excludes cancelled transactions but keeps pending ones in totalAmount', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+
+    walletRepository.findById.mockResolvedValue({ id: walletId, userId, type: 'credit' });
+    invoiceRepository.findById.mockResolvedValue({
+      id: 'invoice-1', walletId, referenceMonth: '2026-08', closingDate: new Date('2026-08-05'), dueDate: new Date('2026-08-15'),
+    });
+    transactionRepository.findAllByInvoiceId.mockResolvedValue([
+      { id: 'tx-1', amount: new Prisma.Decimal(100), type: TransactionTypeEnum.EXPENSE, status: 'completed' },
+      { id: 'tx-2', amount: new Prisma.Decimal(50), type: TransactionTypeEnum.EXPENSE, status: 'cancelled' },
+      { id: 'tx-3', amount: new Prisma.Decimal(30), type: TransactionTypeEnum.EXPENSE, status: 'pending' },
+    ]);
+    invoicePaymentRepository.findAllByInvoiceId.mockResolvedValue([]);
+
+    const result = await service.execute(walletId, 'invoice-1', userId);
+
+    expect(result.totalAmount).toBe(130);
+  });
+
   it('throws when the invoice does not belong to the wallet', async () => {
     const userId = 'user-1';
     const walletId = 'wallet-1';
