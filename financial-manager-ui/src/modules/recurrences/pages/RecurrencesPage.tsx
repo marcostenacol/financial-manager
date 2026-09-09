@@ -170,7 +170,7 @@ export const RecurrencesPage = () => {
         </div>
       </div>
 
-      <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-2xl">
+      <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-2xl overflow-hidden shadow-2xl">
         {loading ? (
           <div className="p-8 space-y-4">
             {[1, 2, 3].map((i) => (

@@ -65,7 +65,7 @@ export const CategoriesPage = () => {
         </div>
       </div>
 
-      <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-2xl">
+      <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-2xl overflow-hidden shadow-2xl">
         {loading ? (
           <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (

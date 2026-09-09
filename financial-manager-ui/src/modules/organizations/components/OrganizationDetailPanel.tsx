@@ -111,7 +111,7 @@ export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }
   };
 
   return (
-    <div className="bg-app-surface-2 border border-app-border rounded-3xl p-6 space-y-8">
+    <div className="bg-app-surface-2 border border-app-border rounded-2xl p-6 space-y-8">
       <div>
         <h3 className="text-app-ink font-bold mb-4">Membros</h3>
         <div className="space-y-2">
@@ -130,7 +130,7 @@ export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }
                   <button
                     onClick={() => handleTransferOwnership(member)}
                     title="Transferir titularidade para este membro"
-                    className="p-2 text-app-muted hover:text-app-accent transition-colors"
+                    className="p-2 text-app-muted hover:text-app-danger/70 transition-colors"
                   >
                     <Crown className="w-4 h-4" />
                   </button>
@@ -221,7 +221,7 @@ export const OrganizationDetailPanel = ({ organization, onOwnershipTransferred }
                   {isInviteActive(invite) && (
                     <button
                       onClick={() => handleRevokeInvite(invite.id)}
-                      className="p-2 text-app-muted hover:text-app-accent transition-colors"
+                      className="p-2 text-app-muted hover:text-app-danger/70 transition-colors"
                       title="Revogar convite"
                     >
                       <Ban className="w-4 h-4" />

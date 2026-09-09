@@ -251,7 +251,7 @@ export const TransactionsPage = () => {
         </button>
       </div>
 
-      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-3xl overflow-hidden shadow-app-card">
+      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl overflow-hidden shadow-app-card">
         <div className="px-6 py-4 border-b border-app-border flex items-center justify-between bg-app-surface-2">
           <span className="text-xs font-bold text-app-muted uppercase tracking-widest">
             {t('transactions.pagination.showing', { shown: transactions.length, total })}

@@ -135,9 +135,17 @@ export const OrganizationsPage = () => {
         <div className="space-y-4">
           {organizations.map((organization) => (
             <div key={organization.id}>
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => toggleExpand(organization)}
-                className="w-full flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-4 hover:bg-white/[0.08] transition-all"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleExpand(organization);
+                  }
+                }}
+                className="w-full flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-4 hover:bg-white/[0.08] transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <Building2 className="w-5 h-5 text-app-accent" />
@@ -174,7 +182,7 @@ export const OrganizationsPage = () => {
                     {expandedId === organization.id ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
                   </button>
                 </div>
-              </button>
+              </div>
 
               {expandedId === organization.id && (
                 <div className="mt-2">
@@ -185,7 +193,7 @@ export const OrganizationsPage = () => {
           ))}
 
           {organizations.length === 0 && (
-            <div className="py-20 flex flex-col items-center justify-center text-center border-2 border-dashed border-app-border rounded-3xl">
+            <div className="py-20 flex flex-col items-center justify-center text-center border-2 border-dashed border-app-border rounded-2xl">
               <Building2 className="w-12 h-12 text-app-muted mb-4" />
               <h3 className="text-app-ink font-bold text-lg">Nenhuma organização ainda</h3>
               <p className="text-app-muted mt-1 max-w-xs">Crie uma organização para compartilhar carteiras empresariais com sua equipe, ou entre em uma existente com um código de convite.</p>

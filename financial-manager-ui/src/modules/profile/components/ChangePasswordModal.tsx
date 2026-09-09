@@ -64,7 +64,7 @@ export const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProp
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative w-full max-w-md bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          className="relative w-full max-w-md bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
           <div className="p-6 border-b border-app-border flex justify-between items-center">
             <h2 className="text-xl font-bold text-app-ink">{t('profile.changePassword.title')}</h2>

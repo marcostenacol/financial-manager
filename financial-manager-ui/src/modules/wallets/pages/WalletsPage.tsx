@@ -173,7 +173,7 @@ export const WalletsPage = () => {
               >
                 <div className="relative h-full flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="p-3 bg-black/15 rounded-2xl text-app-accent-ink">
+                    <div className="p-3 bg-app-surface-2 rounded-2xl text-app-ink">
                       {getWalletIcon(wallet.type)}
                     </div>
                     <div className="flex items-center gap-1">
@@ -221,7 +221,7 @@ export const WalletsPage = () => {
                   {movingWalletId === wallet.id && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute inset-0 bg-black/70 rounded-3xl flex flex-col items-center justify-center gap-3 p-4 z-10"
+                      className="absolute inset-0 bg-black/70 rounded-2xl flex flex-col items-center justify-center gap-3 p-4 z-10"
                     >
                       <p className="text-app-ink text-sm font-medium text-center">{t('wallets.movePrompt', { name: wallet.name })}</p>
                       <div className="flex flex-wrap gap-2 justify-center">
@@ -250,7 +250,7 @@ export const WalletsPage = () => {
           </AnimatePresence>
 
           {visibleWallets.length === 0 && !loading && (
-            <div className="col-span-full py-20 flex flex-col items-center justify-center border-2 border-dashed border-app-border rounded-3xl">
+            <div className="col-span-full py-20 flex flex-col items-center justify-center border-2 border-dashed border-app-border rounded-2xl">
               <div className="p-4 bg-app-surface-2 rounded-full mb-4">
                 <WalletIcon className="w-12 h-12 text-app-muted" />
               </div>

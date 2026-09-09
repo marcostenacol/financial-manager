@@ -87,7 +87,7 @@ export const CostCentersPage = () => {
       </div>
 
       {isFormOpen && (
-        <form onSubmit={handleSubmit} className="bg-app-surface border border-app-border rounded-3xl p-6 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-app-surface border border-app-border rounded-2xl p-6 mb-6 space-y-4">
           <input
             type="text"
             required
@@ -129,7 +129,7 @@ export const CostCentersPage = () => {
         </form>
       )}
 
-      <div className="bg-app-surface border border-app-border rounded-3xl overflow-hidden shadow-2xl">
+      <div className="bg-app-surface border border-app-border rounded-2xl overflow-hidden shadow-2xl">
         {loading ? (
           <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (

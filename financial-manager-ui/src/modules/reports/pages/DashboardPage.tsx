@@ -125,9 +125,9 @@ export const DashboardPage = () => {
     return (
       <div className="p-8 space-y-8 animate-pulse">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-app-surface rounded-3xl" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-app-surface rounded-2xl" />)}
         </div>
-        <div className="h-64 bg-app-surface rounded-3xl" />
+        <div className="h-64 bg-app-surface rounded-2xl" />
       </div>
     );
   }
@@ -287,7 +287,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="ledger-rules bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="ledger-rules bg-app-surface border border-app-border shadow-app-card p-8 rounded-2xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
@@ -331,7 +331,7 @@ export const DashboardPage = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-3xl"
+          className="bg-app-surface border border-app-border shadow-app-card p-8 rounded-2xl"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
@@ -461,7 +461,7 @@ export const DashboardPage = () => {
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="ledger-title text-2xl text-app-ink flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-app-danger/70" />
+              <Briefcase className="w-5 h-5 text-app-biz" />
               {t('dashboard.costCenters.title')}
             </h3>
             <Link to="/cost-centers" className="text-app-accent hover:opacity-80 text-sm font-medium transition-colors">

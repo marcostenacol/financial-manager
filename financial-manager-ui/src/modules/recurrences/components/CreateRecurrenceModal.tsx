@@ -101,7 +101,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-2xl bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-2xl bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center bg-app-surface sticky top-0 z-10">
           <h2 className="text-xl font-bold text-app-ink flex items-center gap-2">
