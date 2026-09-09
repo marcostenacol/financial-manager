@@ -16,6 +16,7 @@
   --accent-ink: #0a0d12;
   --accent-soft: rgba(91, 141, 239, 0.15);
   --success: 52 199 123;
+  --success-soft: rgba(52, 199, 123, 0.15);
   --danger: 239 83 80;
   --biz: 45 212 191;
   --biz-soft: rgba(45, 212, 191, 0.15);
@@ -45,6 +46,7 @@
   --accent-ink: #ffffff;
   --accent-soft: rgba(61, 108, 214, 0.1);
   --success: 22 140 84;
+  --success-soft: rgba(22, 140, 84, 0.1);
   --danger: 200 52 48;
   --biz: 13 148 136;
   --biz-soft: rgba(13, 148, 136, 0.1);
