@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "wallets": "Carteiras",
+    "creditCards": "Cartões",
     "transactions": "Transações",
     "categories": "Categorias",
     "savingsGoals": "Metas",
@@ -451,6 +452,60 @@
       "genericError": "Não foi possível gerar o QR Code.",
       "copy": "Copiar código PIX",
       "copied": "Copiado!"
+    }
+  },
+  "creditCards": {
+    "title": "Cartões",
+    "subtitle": "Faturas, parcelas e pagamentos dos seus cartões de crédito",
+    "emptyTitle": "Nenhum cartão cadastrado",
+    "emptyText": "Crie uma carteira do tipo \"Cartão de crédito\" na aba Carteiras para vê-la aqui.",
+    "invoiceLabel": "Fatura {{month}}",
+    "prevInvoice": "Fatura anterior",
+    "nextInvoice": "Próxima fatura",
+    "noInvoices": "Nenhuma fatura ainda.",
+    "viewInvoice": "Ver fatura →",
+    "newPurchase": "Nova compra",
+    "status": {
+      "open": "Em aberto",
+      "closed": "Fechada",
+      "partiallyPaid": "Parcialmente paga",
+      "paid": "Paga"
+    },
+    "errors": {
+      "loadCards": "Erro ao carregar cartões",
+      "loadInvoice": "Erro ao carregar fatura",
+      "registerPayment": "Erro ao registrar pagamento",
+      "deletePayment": "Erro ao remover pagamento",
+      "loadPurchaseData": "Erro ao carregar dados da compra",
+      "createPurchase": "Erro ao lançar compra"
+    },
+    "invoice": {
+      "total": "Total",
+      "paid": "Pago",
+      "remaining": "Falta",
+      "transactionsTitle": "Transações",
+      "noTransactions": "Nenhuma transação nesta fatura.",
+      "paymentsTitle": "Pagamentos",
+      "noPayments": "Nenhum pagamento registrado ainda.",
+      "confirmDeletePayment": "Remover este pagamento?",
+      "registerPaymentLabel": "Registrar pagamento (total ou parcial)",
+      "registerButton": "Registrar"
+    },
+    "form": {
+      "title": "Nova compra",
+      "amountLabel": "Valor",
+      "dateLabel": "Data da compra",
+      "futureDateHint": "Data futura — a compra fica pendente até a data chegar.",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Ex: Supermercado, Assinatura...",
+      "categoryLabel": "Categoria",
+      "selectCategory": "Selecionar categoria",
+      "installmentsLabel": "Parcelas",
+      "installmentsHint": "{{count}}x de {{amount}} — uma parcela por fatura seguinte.",
+      "personLabel": "Gasto de outra pessoa (opcional)",
+      "selfSpent": "Foi você quem gastou",
+      "personDebtHint": "Esse valor vai somar em \"ela me deve\" na aba Pessoas, só quando a compra estiver efetivada.",
+      "submit": "Lançar compra"
     }
   }
 }

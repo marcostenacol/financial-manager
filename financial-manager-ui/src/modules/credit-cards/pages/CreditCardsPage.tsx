@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CreditCard as CreditCardIcon, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useCreditCards, type CreditCard, type CreditCardInvoice } from '../hooks/useCreditCards';
 import { useToast } from '../../../shared/components/useToast';
@@ -6,12 +7,12 @@ import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { InvoiceDetailModal } from '../components/InvoiceDetailModal';
 import { CreateCardPurchaseModal } from '../components/CreateCardPurchaseModal';
 
-function statusLabel(status: CreditCardInvoice['status']): string {
+function statusLabel(status: CreditCardInvoice['status'], t: (key: string) => string): string {
   switch (status) {
-    case 'open': return 'Em aberto';
-    case 'closed': return 'Fechada';
-    case 'partially_paid': return 'Parcialmente paga';
-    case 'paid': return 'Paga';
+    case 'open': return t('creditCards.status.open');
+    case 'closed': return t('creditCards.status.closed');
+    case 'partially_paid': return t('creditCards.status.partiallyPaid');
+    case 'paid': return t('creditCards.status.paid');
   }
 }
 
@@ -31,6 +32,7 @@ function defaultInvoiceIndex(invoices: CreditCardInvoice[]): number {
 }
 
 export const CreditCardsPage = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { cards, loading, loadCards, loadInvoices } = useCreditCards();
   const [invoicesByCard, setInvoicesByCard] = useState<Record<string, CreditCardInvoice[]>>({});
@@ -56,7 +58,7 @@ export const CreditCardsPage = () => {
         return next;
       });
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao carregar cartões'), 'error');
+      showToast(getErrorMessage(err, t('creditCards.errors.loadCards')), 'error');
     }
   };
 
@@ -79,15 +81,15 @@ export const CreditCardsPage = () => {
   return (
     <div className="p-4 md:p-8">
       <div className="mb-8">
-        <h1 className="ledger-title text-4xl text-app-ink">Cartões</h1>
-        <p className="text-app-muted">Faturas, parcelas e pagamentos dos seus cartões de crédito</p>
+        <h1 className="ledger-title text-4xl text-app-ink">{t('creditCards.title')}</h1>
+        <p className="text-app-muted">{t('creditCards.subtitle')}</p>
       </div>
 
       {cards.length === 0 && (
         <div className="bg-app-surface border border-app-border rounded-3xl p-12 flex flex-col items-center text-center">
           <CreditCardIcon className="w-12 h-12 text-app-muted mb-4" />
-          <h3 className="text-app-ink font-bold text-lg">Nenhum cartão cadastrado</h3>
-          <p className="text-app-muted mt-1 max-w-xs">Crie uma carteira do tipo "Cartão de crédito" na aba Carteiras para vê-la aqui.</p>
+          <h3 className="text-app-ink font-bold text-lg">{t('creditCards.emptyTitle')}</h3>
+          <p className="text-app-muted mt-1 max-w-xs">{t('creditCards.emptyText')}</p>
         </div>
       )}
 
@@ -108,13 +110,13 @@ export const CreditCardsPage = () => {
               {current ? (
                 <>
                   <div className="flex items-center gap-1">
-                    <p className="text-app-muted text-xs uppercase tracking-widest">Fatura {current.referenceMonth}</p>
+                    <p className="text-app-muted text-xs uppercase tracking-widest">{t('creditCards.invoiceLabel', { month: current.referenceMonth })}</p>
                     <div className="flex items-center gap-0.5 ml-auto">
                       <button
                         type="button"
                         onClick={() => goTo(idx - 1)}
                         disabled={idx <= 0}
-                        aria-label="Fatura anterior"
+                        aria-label={t('creditCards.prevInvoice')}
                         className="p-1 rounded-lg text-app-muted hover:text-app-ink disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >
                         <ChevronLeft className="w-3.5 h-3.5" />
@@ -123,7 +125,7 @@ export const CreditCardsPage = () => {
                         type="button"
                         onClick={() => goTo(idx + 1)}
                         disabled={idx >= invoices.length - 1}
-                        aria-label="Próxima fatura"
+                        aria-label={t('creditCards.nextInvoice')}
                         className="p-1 rounded-lg text-app-muted hover:text-app-ink disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       >
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -133,25 +135,25 @@ export const CreditCardsPage = () => {
                   <p className="ledger-figure text-2xl text-app-ink mt-2">
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(current.totalAmount)}
                   </p>
-                  <span className={`ledger-stamp mt-2 ${statusColor(current.status)}`}>{statusLabel(current.status)}</span>
+                  <span className={`ledger-stamp mt-2 ${statusColor(current.status)}`}>{statusLabel(current.status, t)}</span>
                   <div className="mt-4 flex items-center gap-4">
                     <button
                       onClick={() => setSelected({ walletId: card.id, invoiceId: current.id })}
                       className="text-sm font-bold text-app-accent hover:underline"
                     >
-                      Ver fatura →
+                      {t('creditCards.viewInvoice')}
                     </button>
                   </div>
                 </>
               ) : (
-                <p className="text-app-muted text-sm mt-2">Nenhuma fatura ainda.</p>
+                <p className="text-app-muted text-sm mt-2">{t('creditCards.noInvoices')}</p>
               )}
               <button
                 onClick={() => setPurchaseCard(card)}
                 className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-dashed border-app-border text-app-muted hover:text-app-ink hover:border-app-accent transition-colors text-sm font-bold"
               >
                 <Plus className="w-4 h-4" />
-                Nova compra
+                {t('creditCards.newPurchase')}
               </button>
             </div>
           );

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { X, User, Trash2 } from 'lucide-react';
 import { useCreditCards, type InvoiceDetail } from '../hooks/useCreditCards';
@@ -18,6 +19,7 @@ const formatCurrency = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onChanged }: InvoiceDetailModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { loadInvoiceDetail, registerPayment, deletePayment } = useCreditCards();
   const [invoice, setInvoice] = useState<InvoiceDetail | null>(null);
@@ -30,7 +32,7 @@ export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onCha
       const data = await loadInvoiceDetail(walletId, invoiceId);
       setInvoice(data);
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao carregar fatura'), 'error');
+      showToast(getErrorMessage(err, t('creditCards.errors.loadInvoice')), 'error');
     }
   };
 
@@ -53,20 +55,20 @@ export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onCha
       await fetchDetail();
       onChanged();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao registrar pagamento'), 'error');
+      showToast(getErrorMessage(err, t('creditCards.errors.registerPayment')), 'error');
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDeletePayment = async (paymentId: string) => {
-    if (!walletId || !invoiceId || !window.confirm('Remover este pagamento?')) return;
+    if (!walletId || !invoiceId || !window.confirm(t('creditCards.invoice.confirmDeletePayment'))) return;
     try {
       await deletePayment(walletId, invoiceId, paymentId);
       await fetchDetail();
       onChanged();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao remover pagamento'), 'error');
+      showToast(getErrorMessage(err, t('creditCards.errors.deletePayment')), 'error');
     }
   };
 
@@ -88,7 +90,7 @@ export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onCha
         className="relative w-full max-w-2xl bg-app-surface border border-app-border rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
-          <h2 className="text-xl font-bold text-app-ink">Fatura {invoice?.referenceMonth ?? ''}</h2>
+          <h2 className="text-xl font-bold text-app-ink">{t('creditCards.invoiceLabel', { month: invoice?.referenceMonth ?? '' })}</h2>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
             <X className="w-5 h-5" />
           </button>
@@ -98,21 +100,21 @@ export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onCha
           <div className="p-8 space-y-6">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-app-muted text-xs uppercase">Total</p>
+                <p className="text-app-muted text-xs uppercase">{t('creditCards.invoice.total')}</p>
                 <p className="ledger-figure text-lg text-app-ink">{formatCurrency(invoice.totalAmount)}</p>
               </div>
               <div>
-                <p className="text-app-muted text-xs uppercase">Pago</p>
+                <p className="text-app-muted text-xs uppercase">{t('creditCards.invoice.paid')}</p>
                 <p className="ledger-figure text-lg text-app-success">{formatCurrency(invoice.paidAmount)}</p>
               </div>
               <div>
-                <p className="text-app-muted text-xs uppercase">Falta</p>
+                <p className="text-app-muted text-xs uppercase">{t('creditCards.invoice.remaining')}</p>
                 <p className="ledger-figure text-lg text-app-danger">{formatCurrency(invoice.remainingAmount)}</p>
               </div>
             </div>
 
             <div>
-              <h3 className="text-app-ink font-bold mb-2">Transações</h3>
+              <h3 className="text-app-ink font-bold mb-2">{t('creditCards.invoice.transactionsTitle')}</h3>
               <div className="space-y-2">
                 {invoice.transactions.map((t) => (
                   <div key={t.id} className="flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-3">
@@ -130,13 +132,13 @@ export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onCha
                   </div>
                 ))}
                 {invoice.transactions.length === 0 && (
-                  <p className="text-app-muted text-sm">Nenhuma transação nesta fatura.</p>
+                  <p className="text-app-muted text-sm">{t('creditCards.invoice.noTransactions')}</p>
                 )}
               </div>
             </div>
 
             <div>
-              <h3 className="text-app-ink font-bold mb-2">Pagamentos</h3>
+              <h3 className="text-app-ink font-bold mb-2">{t('creditCards.invoice.paymentsTitle')}</h3>
               <div className="space-y-2">
                 {invoice.payments.map((p) => (
                   <div key={p.id} className="flex items-center justify-between bg-app-surface-2 border border-app-border rounded-2xl p-3">
@@ -150,7 +152,7 @@ export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onCha
                   </div>
                 ))}
                 {invoice.payments.length === 0 && (
-                  <p className="text-app-muted text-sm">Nenhum pagamento registrado ainda.</p>
+                  <p className="text-app-muted text-sm">{t('creditCards.invoice.noPayments')}</p>
                 )}
               </div>
             </div>
@@ -158,7 +160,7 @@ export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onCha
             {invoice.remainingAmount > 0 && (
               <form onSubmit={handleRegisterPayment} className="flex items-end gap-3">
                 <div className="flex-1 space-y-2">
-                  <label className="text-sm font-medium text-app-muted ml-1">Registrar pagamento (total ou parcial)</label>
+                  <label className="text-sm font-medium text-app-muted ml-1">{t('creditCards.invoice.registerPaymentLabel')}</label>
                   <CurrencyInput
                     value={paymentAmount}
                     onChange={setPaymentAmount}
@@ -170,7 +172,7 @@ export const InvoiceDetailModal = ({ isOpen, walletId, invoiceId, onClose, onCha
                   disabled={submitting || paymentAmount <= 0}
                   className="bg-app-accent hover:opacity-90 text-app-ink font-bold py-3 px-6 rounded-2xl disabled:opacity-50"
                 >
-                  Registrar
+                  {t('creditCards.invoice.registerButton')}
                 </button>
               </form>
             )}

@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "wallets": "Carteras",
+    "creditCards": "Tarjetas",
     "transactions": "Transacciones",
     "categories": "Categorías",
     "savingsGoals": "Metas",
@@ -451,6 +452,60 @@
       "genericError": "No se pudo generar el código QR.",
       "copy": "Copiar código PIX",
       "copied": "¡Copiado!"
+    }
+  },
+  "creditCards": {
+    "title": "Tarjetas",
+    "subtitle": "Facturas, cuotas y pagos de tus tarjetas de crédito",
+    "emptyTitle": "Ninguna tarjeta registrada",
+    "emptyText": "Crea una billetera del tipo \"Tarjeta de crédito\" en la pestaña Billeteras para verla aquí.",
+    "invoiceLabel": "Factura {{month}}",
+    "prevInvoice": "Factura anterior",
+    "nextInvoice": "Factura siguiente",
+    "noInvoices": "Todavía no hay facturas.",
+    "viewInvoice": "Ver factura →",
+    "newPurchase": "Nueva compra",
+    "status": {
+      "open": "Abierta",
+      "closed": "Cerrada",
+      "partiallyPaid": "Parcialmente pagada",
+      "paid": "Pagada"
+    },
+    "errors": {
+      "loadCards": "Error al cargar las tarjetas",
+      "loadInvoice": "Error al cargar la factura",
+      "registerPayment": "Error al registrar el pago",
+      "deletePayment": "Error al eliminar el pago",
+      "loadPurchaseData": "Error al cargar los datos de la compra",
+      "createPurchase": "Error al registrar la compra"
+    },
+    "invoice": {
+      "total": "Total",
+      "paid": "Pagado",
+      "remaining": "Falta",
+      "transactionsTitle": "Transacciones",
+      "noTransactions": "Ninguna transacción en esta factura.",
+      "paymentsTitle": "Pagos",
+      "noPayments": "Todavía no hay pagos registrados.",
+      "confirmDeletePayment": "¿Eliminar este pago?",
+      "registerPaymentLabel": "Registrar pago (total o parcial)",
+      "registerButton": "Registrar"
+    },
+    "form": {
+      "title": "Nueva compra",
+      "amountLabel": "Valor",
+      "dateLabel": "Fecha de la compra",
+      "futureDateHint": "Fecha futura — la compra queda pendiente hasta que llegue la fecha.",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "ej: Supermercado, Suscripción...",
+      "categoryLabel": "Categoría",
+      "selectCategory": "Seleccionar categoría",
+      "installmentsLabel": "Cuotas",
+      "installmentsHint": "{{count}}x de {{amount}} — una cuota por cada factura siguiente.",
+      "personLabel": "Gasto de otra persona (opcional)",
+      "selfSpent": "Fuiste tú quien gastó",
+      "personDebtHint": "Este valor se sumará a \"ella me debe\" en la pestaña Personas, solo cuando la compra esté efectuada.",
+      "submit": "Registrar compra"
     }
   }
 }

@@ -2,6 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "wallets": "Wallets",
+    "creditCards": "Credit Cards",
     "transactions": "Transactions",
     "categories": "Categories",
     "savingsGoals": "Goals",
@@ -451,6 +452,60 @@
       "genericError": "Could not generate the QR Code.",
       "copy": "Copy PIX code",
       "copied": "Copied!"
+    }
+  },
+  "creditCards": {
+    "title": "Credit Cards",
+    "subtitle": "Invoices, installments and payments for your credit cards",
+    "emptyTitle": "No credit cards registered",
+    "emptyText": "Create a wallet of type \"Credit card\" in the Wallets tab to see it here.",
+    "invoiceLabel": "Invoice {{month}}",
+    "prevInvoice": "Previous invoice",
+    "nextInvoice": "Next invoice",
+    "noInvoices": "No invoices yet.",
+    "viewInvoice": "View invoice →",
+    "newPurchase": "New purchase",
+    "status": {
+      "open": "Open",
+      "closed": "Closed",
+      "partiallyPaid": "Partially paid",
+      "paid": "Paid"
+    },
+    "errors": {
+      "loadCards": "Could not load credit cards",
+      "loadInvoice": "Could not load invoice",
+      "registerPayment": "Could not register payment",
+      "deletePayment": "Could not remove payment",
+      "loadPurchaseData": "Could not load purchase data",
+      "createPurchase": "Could not create purchase"
+    },
+    "invoice": {
+      "total": "Total",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "transactionsTitle": "Transactions",
+      "noTransactions": "No transactions on this invoice.",
+      "paymentsTitle": "Payments",
+      "noPayments": "No payments registered yet.",
+      "confirmDeletePayment": "Remove this payment?",
+      "registerPaymentLabel": "Register payment (full or partial)",
+      "registerButton": "Register"
+    },
+    "form": {
+      "title": "New purchase",
+      "amountLabel": "Amount",
+      "dateLabel": "Purchase date",
+      "futureDateHint": "Future date — the purchase stays pending until the date arrives.",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "e.g. Groceries, Subscription...",
+      "categoryLabel": "Category",
+      "selectCategory": "Select category",
+      "installmentsLabel": "Installments",
+      "installmentsHint": "{{count}}x of {{amount}} — one installment per following invoice.",
+      "personLabel": "Someone else's expense (optional)",
+      "selfSpent": "You made this purchase",
+      "personDebtHint": "This amount will be added to \"they owe me\" in the People tab, only once the purchase is completed.",
+      "submit": "Add purchase"
     }
   }
 }

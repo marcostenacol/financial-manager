@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { X, Save, FileText, Tag, Calendar, User, Layers } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
@@ -19,6 +20,7 @@ interface CreateCardPurchaseModalProps {
 }
 
 export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: CreateCardPurchaseModalProps) => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { createTransaction } = useTransactions();
   const { scope } = useScope();
@@ -55,7 +57,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
         setPeople(peopleData);
         if (expenseCategories.length > 0) setCategoryId(expenseCategories[0].id);
       } catch (err) {
-        showToast(getErrorMessage(err, 'Erro ao carregar dados da compra'), 'error');
+        showToast(getErrorMessage(err, t('creditCards.errors.loadPurchaseData')), 'error');
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,7 +85,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
       onClose();
       resetForm();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao lançar compra'), 'error');
+      showToast(getErrorMessage(err, t('creditCards.errors.createPurchase')), 'error');
     } finally {
       setLoading(false);
     }
@@ -108,7 +110,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-bold text-app-ink">Nova compra</h2>
+            <h2 className="text-xl font-bold text-app-ink">{t('creditCards.form.title')}</h2>
             <p className="text-sm text-app-muted">{card.name}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
@@ -119,7 +121,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Valor</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('creditCards.form.amountLabel')}</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-app-muted font-bold">R$</span>
                 <CurrencyInput
@@ -132,7 +134,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Data da compra</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('creditCards.form.dateLabel')}</label>
               <div className="relative">
                 <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -144,13 +146,13 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
                 />
               </div>
               {isFutureDate(occurredAt) && (
-                <p className="text-xs text-app-muted ml-1">Data futura — a compra fica pendente até a data chegar.</p>
+                <p className="text-xs text-app-muted ml-1">{t('creditCards.form.futureDateHint')}</p>
               )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-app-muted ml-1">Descrição</label>
+            <label className="text-sm font-medium text-app-muted ml-1">{t('creditCards.form.descriptionLabel')}</label>
             <div className="relative">
               <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
               <input
@@ -158,7 +160,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Ex: Supermercado, Assinatura..."
+                placeholder={t('creditCards.form.descriptionPlaceholder')}
                 className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all"
               />
             </div>
@@ -166,7 +168,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Categoria</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('creditCards.form.categoryLabel')}</label>
               <div className="relative">
                 <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <select
@@ -175,7 +177,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
-                  <option value="" disabled className="bg-app-surface">Selecionar categoria</option>
+                  <option value="" disabled className="bg-app-surface">{t('creditCards.form.selectCategory')}</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id} className="bg-app-surface">{category.name}</option>
                   ))}
@@ -184,7 +186,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Parcelas</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('creditCards.form.installmentsLabel')}</label>
               <div className="relative">
                 <Layers className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <input
@@ -199,7 +201,10 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
               </div>
               {installments > 1 && (
                 <p className="text-xs text-app-muted ml-1">
-                  {installments}x de {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount / installments)} — uma parcela por fatura seguinte.
+                  {t('creditCards.form.installmentsHint', {
+                    count: installments,
+                    amount: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(amount / installments),
+                  })}
                 </p>
               )}
             </div>
@@ -207,7 +212,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
 
           {people.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-app-muted ml-1">Gasto de outra pessoa (opcional)</label>
+              <label className="text-sm font-medium text-app-muted ml-1">{t('creditCards.form.personLabel')}</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                 <select
@@ -215,14 +220,14 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
                   onChange={(e) => setPersonId(e.target.value)}
                   className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
                 >
-                  <option value="" className="bg-app-surface">Foi você quem gastou</option>
+                  <option value="" className="bg-app-surface">{t('creditCards.form.selfSpent')}</option>
                   {people.map((person) => (
                     <option key={person.id} value={person.id} className="bg-app-surface">{person.name}</option>
                   ))}
                 </select>
               </div>
               {personId && (
-                <p className="text-xs text-app-muted ml-1">Esse valor vai somar em "ela me deve" na aba Pessoas, só quando a compra estiver efetivada.</p>
+                <p className="text-xs text-app-muted ml-1">{t('creditCards.form.personDebtHint')}</p>
               )}
             </div>
           )}
@@ -237,7 +242,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                Lançar compra
+                {t('creditCards.form.submit')}
               </>
             )}
           </button>

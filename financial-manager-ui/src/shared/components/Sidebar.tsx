@@ -21,7 +21,7 @@ export const Sidebar = () => {
   const menuItems = [
     { icon: LayoutDashboard, label: t('nav.dashboard'), path: '/' },
     { icon: Wallet, label: t('nav.wallets'), path: '/wallets' },
-    { icon: CreditCard, label: 'Cartões', path: '/credit-cards' },
+    { icon: CreditCard, label: t('nav.creditCards'), path: '/credit-cards' },
     { icon: History, label: t('nav.transactions'), path: '/transactions' },
     { icon: Tag, label: t('nav.categories'), path: '/categories' },
     ...(scope === 'personal' ? [{ icon: Target, label: t('nav.savingsGoals'), path: '/savings-goals' }] : []),
