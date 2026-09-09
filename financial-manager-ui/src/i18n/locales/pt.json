@@ -186,6 +186,14 @@
     "searchPlaceholder": "Buscar por descrição...",
     "recurringBadge": "Recorrente",
     "confirmDelete": "Tem certeza que deseja excluir esta transação?",
+    "table": {
+      "description": "Descrição",
+      "wallet": "Carteira",
+      "category": "Categoria",
+      "date": "Data",
+      "status": "Status",
+      "amount": "Valor"
+    },
     "filters": {
       "all": "Todas",
       "income": "Receitas",

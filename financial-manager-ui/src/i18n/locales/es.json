@@ -186,6 +186,14 @@
     "searchPlaceholder": "Buscar por descripción...",
     "recurringBadge": "Recurrente",
     "confirmDelete": "¿Estás seguro de que deseas eliminar esta transacción?",
+    "table": {
+      "description": "Descripción",
+      "wallet": "Billetera",
+      "category": "Categoría",
+      "date": "Fecha",
+      "status": "Estado",
+      "amount": "Monto"
+    },
     "filters": {
       "all": "Todas",
       "income": "Ingresos",

@@ -186,6 +186,14 @@
     "searchPlaceholder": "Search by description...",
     "recurringBadge": "Recurring",
     "confirmDelete": "Are you sure you want to delete this transaction?",
+    "table": {
+      "description": "Description",
+      "wallet": "Wallet",
+      "category": "Category",
+      "date": "Date",
+      "status": "Status",
+      "amount": "Amount"
+    },
     "filters": {
       "all": "All",
       "income": "Income",

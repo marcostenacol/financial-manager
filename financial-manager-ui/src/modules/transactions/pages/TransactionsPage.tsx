@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { 
   Plus, 
@@ -269,7 +268,7 @@ export const TransactionsPage = () => {
         </button>
       </div>
 
-      <div className="bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl overflow-hidden shadow-app-card">
+      <div className="bg-app-surface border border-app-border rounded-2xl overflow-hidden shadow-app-card">
         <div className="px-6 py-4 border-b border-app-border flex items-center justify-between bg-app-surface-2">
           <span className="text-xs font-bold text-app-muted uppercase tracking-widest">
             {t('transactions.pagination.showing', { shown: transactions.length, total })}
@@ -339,68 +338,82 @@ export const TransactionsPage = () => {
           </div>
         ) : (
           <div>
-            <AnimatePresence>
-              {transactions.map((transaction) => (
-                <motion.div
-                  key={transaction.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  onClick={() => handleShowDetail(transaction)}
-                  className="ledger-item px-6 py-4 flex items-center justify-between group hover:bg-app-accent-soft transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-2.5 rounded-sm border ${transaction.type === 'income' ? 'border-app-success/40 bg-app-success/10 text-app-success' : 'border-app-danger/40 bg-app-danger/10 text-app-danger'}`}>
-                      {transaction.type === 'income' ? <ArrowUpCircle className="w-6 h-6" /> : <ArrowDownCircle className="w-6 h-6" />}
-                    </div>
-                    
-                    <div>
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.description')}</th>
+                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.wallet')}</th>
+                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.category')}</th>
+                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.date')}</th>
+                  <th className="text-left text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.status')}</th>
+                  <th className="text-right text-xs uppercase tracking-wider text-app-muted font-semibold px-6 py-3">{t('transactions.table.amount')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((transaction) => (
+                  <tr
+                    key={transaction.id}
+                    onClick={() => handleShowDetail(transaction)}
+                    className="ledger-item group hover:bg-app-accent-soft transition-colors cursor-pointer border-t border-app-border"
+                  >
+                    <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
+                        <div className={`p-2 rounded-sm border shrink-0 ${transaction.type === 'income' ? 'border-app-success/40 bg-app-success/10 text-app-success' : 'border-app-danger/40 bg-app-danger/10 text-app-danger'}`}>
+                          {transaction.type === 'income' ? <ArrowUpCircle className="w-5 h-5" /> : <ArrowDownCircle className="w-5 h-5" />}
+                        </div>
                         <h3 className="text-app-ink font-bold group-hover:text-app-accent transition-colors">{transaction.description}</h3>
                         {transaction.recurrenceId && (
                           <span title={t('transactions.recurringBadge')}>
                             <RefreshCw className="w-3 h-3 text-app-accent" />
                           </span>
                         )}
-                      </div>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="flex items-center gap-1 text-xs text-app-muted uppercase tracking-wider">
-                          <Calendar className="w-3 h-3" />
-                          {formatDate(transaction.occurredAt)}
-                        </span>
-                        <span className="w-px h-3 bg-app-border" />
-                        <span className="flex items-center gap-1 text-xs text-app-muted uppercase tracking-wider">
-                          <WalletIcon className="w-3 h-3" />
-                          {transaction.wallet?.name || t('common.wallet')}
-                        </span>
                         {transaction.person && (
-                          <>
-                            <span className="w-px h-3 bg-app-border" />
-                            <span className="flex items-center gap-1 text-xs text-app-accent uppercase tracking-wider" title={`Gasto de ${transaction.person.name}`}>
-                              <User className="w-3 h-3" />
-                              {transaction.person.name}
-                            </span>
-                          </>
+                          <span className="flex items-center gap-1 text-xs text-app-accent uppercase tracking-wider" title={`Gasto de ${transaction.person.name}`}>
+                            <User className="w-3 h-3" />
+                            {transaction.person.name}
+                          </span>
                         )}
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-6 text-right">
-                    <div>
-                      <p className={`ledger-figure text-xl ${transaction.type === 'income' ? 'text-app-success' : 'text-app-danger'}`}>
-                        {transaction.type === 'income' ? '+' : '−'} {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(transaction.amount)}
-                      </p>
-                      <span className={`ledger-stamp mt-1 ${
+                    </td>
+                    <td className="px-6 py-4 text-app-muted text-sm">
+                      <span className="flex items-center gap-1">
+                        <WalletIcon className="w-3 h-3" />
+                        {transaction.wallet?.name || t('common.wallet')}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-app-muted text-sm">
+                      {transaction.category ? (
+                        <span className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: transaction.category.color }}
+                          />
+                          {transaction.category.name}
+                        </span>
+                      ) : (
+                        <span className="text-app-muted">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-app-muted text-sm">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {formatDate(transaction.occurredAt)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`ledger-stamp ${
                         transaction.status === 'completed' ? 'text-app-success' : 'text-app-accent'
                       }`}>
                         {transaction.status === 'completed' ? t('transactions.status.completed') : t('transactions.status.pending')}
                       </span>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-app-muted group-hover:text-app-ink transition-colors" />
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                    </td>
+                    <td className={`px-6 py-4 text-right font-mono font-semibold ledger-figure ${transaction.type === 'income' ? 'text-app-success' : 'text-app-danger'}`}>
+                      {transaction.type === 'income' ? '+' : '−'} {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(transaction.amount)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
             {transactions.length === 0 && !loading && (
               <div className="p-20 flex flex-col items-center justify-center text-center">
