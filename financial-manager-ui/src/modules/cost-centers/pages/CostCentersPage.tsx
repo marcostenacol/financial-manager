@@ -122,7 +122,7 @@ export const CostCentersPage = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-app-accent hover:opacity-90 text-app-ink font-bold px-6 py-3 rounded-2xl disabled:opacity-50"
+            className="bg-app-accent hover:opacity-90 text-app-ink font-bold px-6 py-3 rounded-full disabled:opacity-50"
           >
             {submitting ? 'Salvando...' : 'Salvar'}
           </button>
@@ -159,7 +159,7 @@ export const CostCentersPage = () => {
                     <button
                       onClick={() => handleDelete(costCenter.id)}
                       disabled={pendingIds.has(costCenter.id)}
-                      className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-app-muted hover:text-red-400 disabled:opacity-50"
+                      className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-app-muted hover:text-app-danger disabled:opacity-50"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
