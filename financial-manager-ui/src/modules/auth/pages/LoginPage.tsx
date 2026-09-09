@@ -100,7 +100,7 @@ export const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex w-full items-center justify-center rounded-sm bg-app-accent py-3 text-sm font-bold uppercase tracking-wide text-app-accent-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center rounded-full bg-app-accent py-3 text-sm font-bold uppercase tracking-wide text-app-accent-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? <Loader2 className="animate-spin" size={20} /> : t('auth.login.submit')}
             </button>
