@@ -8,9 +8,9 @@ interface DefaultLayoutProps {
 
 export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   return (
-    <div className="flex min-h-screen gap-4 bg-app-bg p-4">
+    <div className="flex min-h-screen bg-app-bg">
       <Sidebar />
-      <main className="ledger-spine flex-1 min-w-0 overflow-y-auto rounded-2xl bg-app-surface shadow-app-card pt-16 md:pt-0">
+      <main className="ledger-spine flex-1 min-w-0 overflow-y-auto bg-app-surface pt-16 md:pt-0">
         <ScopeBanner />
         {children}
       </main>

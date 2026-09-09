@@ -50,8 +50,8 @@ export const Sidebar = () => {
       )}
 
       <aside
-        className={`w-64 bg-app-surface backdrop-blur-xl border border-app-border rounded-2xl shadow-app-card flex flex-col h-[calc(100vh-2rem)] fixed md:sticky top-4 left-4 md:left-auto z-50 transition-transform duration-200 ${
-          mobileOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)] md:translate-x-0'
+        className={`w-64 bg-app-surface border-r border-app-border flex flex-col h-screen fixed md:sticky top-0 left-0 z-50 transition-transform duration-200 ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         <button
