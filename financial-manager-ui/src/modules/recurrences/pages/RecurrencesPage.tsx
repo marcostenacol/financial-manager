@@ -200,116 +200,128 @@ export const RecurrencesPage = () => {
         </div>
       </div>
 
-      <div className="bg-app-surface-2 backdrop-blur-xl border border-app-border rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-app-surface-2 border border-app-border rounded-2xl overflow-hidden shadow-app-card">
         {loading ? (
           <div className="p-8 space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-24 bg-app-surface-2 rounded-2xl animate-pulse" />
             ))}
           </div>
-        ) : (
-          <div className="divide-y divide-app-border">
-            <AnimatePresence>
-              {visibleRecurrences.map((recurrence) => (
-                <motion.div
-                  key={recurrence.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-2xl ${recurrence.type === 'income' ? 'bg-app-success/20 text-app-success' : 'bg-app-danger/20 text-app-danger'}`}>
-                      <RefreshCw className="w-6 h-6" />
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-app-ink font-bold">{recurrence.description}</h3>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="flex items-center gap-1 text-xs text-app-muted font-medium bg-app-surface-2 px-2 py-1 rounded-lg">
+        ) : visibleRecurrences.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-app-border">
+                  <th className="text-left p-4 text-xs text-app-muted font-bold uppercase tracking-wider">{t('transactions.table.description')}</th>
+                  <th className="text-left p-4 text-xs text-app-muted font-bold uppercase tracking-wider"></th>
+                  <th className="text-left p-4 text-xs text-app-muted font-bold uppercase tracking-wider">{t('transactions.table.wallet')}</th>
+                  <th className="text-right p-4 text-xs text-app-muted font-bold uppercase tracking-wider">{t('transactions.table.amount')}</th>
+                  <th className="p-4"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-app-border">
+                <AnimatePresence>
+                  {visibleRecurrences.map((recurrence) => (
+                    <motion.tr
+                      key={recurrence.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="hover:bg-white/[0.02] transition-colors"
+                    >
+                      <td className="p-4">
+                        <div className="flex items-center gap-4">
+                          <div className={`p-3 rounded-2xl ${recurrence.type === 'income' ? 'bg-app-success/20 text-app-success' : 'bg-app-danger/20 text-app-danger'}`}>
+                            <RefreshCw className="w-6 h-6" />
+                          </div>
+                          <h3 className="text-app-ink font-bold">{recurrence.description}</h3>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="flex items-center gap-1 w-fit text-xs text-app-muted font-medium bg-app-surface-2 px-2 py-1 rounded-lg">
                           <Clock className="w-3 h-3" />
                           {getPeriodLabel(recurrence.period)}
                         </span>
-                        <span className="flex items-center gap-1 text-xs text-app-muted font-medium bg-app-surface-2 px-2 py-1 rounded-lg">
+                      </td>
+                      <td className="p-4">
+                        <span className="flex items-center gap-1 w-fit text-xs text-app-muted font-medium bg-app-surface-2 px-2 py-1 rounded-lg">
                           <WalletIcon className="w-3 h-3" />
                           {recurrence.wallet?.name}
                         </span>
-                      </div>
-                    </div>
-                  </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-right">
+                          <p className={`text-lg font-bold ${recurrence.type === 'income' ? 'text-app-success' : 'text-app-danger'} ${isExpired(recurrence) ? 'opacity-50 line-through' : ''}`}>
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(recurrence.amount)}
+                          </p>
+                          {isExpired(recurrence) ? (
+                            <span className="text-[10px] bg-app-danger/20 text-app-danger px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">{t('recurrences.ended')}</span>
+                          ) : (
+                            <div className="flex flex-col items-end gap-1">
+                              <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">{t('recurrences.next', { date: computeNextDueDate(recurrence).toLocaleDateString('pt-BR') })}</p>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${recurrence.isActive ? 'bg-app-success/20 text-app-success' : 'bg-app-surface-2 border border-app-border text-app-muted'}`}>
 
-                  <div className="flex items-center gap-6">
-                    <div className="text-right">
-                      <p className={`text-lg font-bold ${recurrence.type === 'income' ? 'text-app-success' : 'text-app-danger'} ${isExpired(recurrence) ? 'opacity-50 line-through' : ''}`}>
-                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(recurrence.amount)}
-                      </p>
-                      {isExpired(recurrence) ? (
-                        <span className="text-[10px] bg-app-danger/20 text-app-danger px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">{t('recurrences.ended')}</span>
-                      ) : (
-                        <div className="flex flex-col items-end gap-1">
-                          <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">{t('recurrences.next', { date: computeNextDueDate(recurrence).toLocaleDateString('pt-BR') })}</p>
-                          <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${recurrence.isActive ? 'bg-app-success/20 text-app-success' : 'bg-app-surface-2 border border-app-border text-app-muted'}`}>
-
-                            {recurrence.isActive ? t('recurrences.statusActive') : t('recurrences.statusPaused')}
-                          </span>
+                                {recurrence.isActive ? t('recurrences.statusActive') : t('recurrences.statusPaused')}
+                              </span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    
-                    {!isExpired(recurrence) && (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleEdit(recurrence)}
-                          className="h-8 w-8 flex items-center justify-center hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-full transition-all"
-                          title={t('common.edit')}
-                        >
-                          <Pencil className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleRunNow(recurrence.id)}
-                          disabled={pendingIds.has(recurrence.id) || !recurrence.isActive}
-                          className="h-8 w-8 flex items-center justify-center hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                          title={recurrence.isActive ? t('recurrences.runNow') : t('recurrences.runNowDisabledHint')}
-                        >
-                          <Play className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleToggleActive(recurrence.id)}
-                          disabled={pendingIds.has(recurrence.id)}
-                          className={`h-8 w-8 flex items-center justify-center rounded-full transition-all disabled:opacity-50 ${recurrence.isActive ? 'text-app-muted hover:bg-app-surface-2' : 'text-app-success hover:bg-app-success/10'}`}
-                          title={recurrence.isActive ? t('recurrences.pause') : t('recurrences.activate')}
-                        >
-                          <RefreshCw className={`w-5 h-5 ${!recurrence.isActive ? 'animate-pulse' : ''}`} />
-                        </button>
-                        <button
-                          onClick={() => handleCancel(recurrence.id)}
-                          disabled={pendingIds.has(recurrence.id)}
-                          className="h-8 w-8 flex items-center justify-center hover:bg-app-danger/10 text-app-muted hover:text-app-danger rounded-full transition-all disabled:opacity-50"
-                          title={t('recurrences.cancelPermanently')}
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-
-            {visibleRecurrences.length === 0 && !loading && (
-              <div className="p-20 flex flex-col items-center justify-center text-center">
-                <div className="p-4 bg-app-surface-2 rounded-full mb-4">
-                  <RefreshCw className="w-12 h-12 text-app-muted" />
-                </div>
-                <h3 className="text-app-ink font-bold text-lg">
-                  {recurrences.length === 0 ? t('recurrences.empty.title') : t('recurrences.empty.noneActiveTitle')}
-                </h3>
-                <p className="text-app-muted mt-1">
-                  {recurrences.length === 0
-                    ? t('recurrences.empty.description')
-                    : t('recurrences.empty.noneActiveDescription')}
-                </p>
-              </div>
-            )}
+                      </td>
+                      <td className="p-4">
+                        {!isExpired(recurrence) && (
+                          <div className="flex items-center gap-2 justify-end">
+                            <button
+                              onClick={() => handleEdit(recurrence)}
+                              className="h-8 w-8 flex items-center justify-center hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-full transition-all"
+                              title={t('common.edit')}
+                            >
+                              <Pencil className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => handleRunNow(recurrence.id)}
+                              disabled={pendingIds.has(recurrence.id) || !recurrence.isActive}
+                              className="h-8 w-8 flex items-center justify-center hover:bg-app-accent-soft text-app-muted hover:text-app-accent rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                              title={recurrence.isActive ? t('recurrences.runNow') : t('recurrences.runNowDisabledHint')}
+                            >
+                              <Play className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleActive(recurrence.id)}
+                              disabled={pendingIds.has(recurrence.id)}
+                              className={`h-8 w-8 flex items-center justify-center rounded-full transition-all disabled:opacity-50 ${recurrence.isActive ? 'text-app-muted hover:bg-app-surface-2' : 'text-app-success hover:bg-app-success/10'}`}
+                              title={recurrence.isActive ? t('recurrences.pause') : t('recurrences.activate')}
+                            >
+                              <RefreshCw className={`w-5 h-5 ${!recurrence.isActive ? 'animate-pulse' : ''}`} />
+                            </button>
+                            <button
+                              onClick={() => handleCancel(recurrence.id)}
+                              disabled={pendingIds.has(recurrence.id)}
+                              className="h-8 w-8 flex items-center justify-center hover:bg-app-danger/10 text-app-muted hover:text-app-danger rounded-full transition-all disabled:opacity-50"
+                              title={t('recurrences.cancelPermanently')}
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="p-20 flex flex-col items-center justify-center text-center">
+            <div className="p-4 bg-app-surface-2 rounded-full mb-4">
+              <RefreshCw className="w-12 h-12 text-app-muted" />
+            </div>
+            <h3 className="text-app-ink font-bold text-lg">
+              {recurrences.length === 0 ? t('recurrences.empty.title') : t('recurrences.empty.noneActiveTitle')}
+            </h3>
+            <p className="text-app-muted mt-1">
+              {recurrences.length === 0
+                ? t('recurrences.empty.description')
+                : t('recurrences.empty.noneActiveDescription')}
+            </p>
           </div>
         )}
       </div>
