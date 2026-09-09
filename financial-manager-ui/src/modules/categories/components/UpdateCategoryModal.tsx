@@ -99,10 +99,10 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
             <h2 className="text-xl font-bold text-app-ink">{t('categories.edit.title')}</h2>
             <div className="flex items-center gap-2">
               {!isSystemCategory && (
-                <button 
+                <button
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="p-2 hover:bg-red-500/10 rounded-xl transition-colors text-red-400 disabled:opacity-50"
+                  className="p-2 hover:bg-app-danger/10 rounded-xl transition-colors text-app-danger/70 disabled:opacity-50"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -152,8 +152,8 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                   <button
                     type="button"
                     onClick={() => setType('income')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all ${
-                      type === 'income' ? 'bg-emerald-600 text-app-ink shadow-lg' : 'text-app-muted'
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-all ${
+                      type === 'income' ? 'bg-app-success text-app-ink shadow-lg' : 'text-app-muted'
                     }`}
                   >
                     {t('categories.type.incomePlural')}
@@ -161,8 +161,8 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                   <button
                     type="button"
                     onClick={() => setType('expense')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all ${
-                      type === 'expense' ? 'bg-red-600 text-app-ink shadow-lg' : 'text-app-muted'
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-all ${
+                      type === 'expense' ? 'bg-app-danger text-app-ink shadow-lg' : 'text-app-muted'
                     }`}
                   >
                     {t('categories.type.expensePlural')}
@@ -190,7 +190,7 @@ export const UpdateCategoryModal = ({ isOpen, onClose, onSuccess, category }: Up
                       key={presetColor}
                       type="button"
                       onClick={() => setColor(presetColor)}
-                      className={`w-full aspect-square rounded-xl transition-all ${
+                      className={`w-full aspect-square rounded-lg transition-all ${
                         color === presetColor ? 'ring-2 ring-white ring-offset-4 ring-offset-app-surface scale-90' : 'hover:scale-110'
                       }`}
                       style={{ backgroundColor: presetColor }}
