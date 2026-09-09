@@ -213,7 +213,7 @@ export const RecurrencesPage = () => {
               <thead>
                 <tr className="border-b border-app-border">
                   <th className="text-left p-4 text-xs text-app-muted font-bold uppercase tracking-wider">{t('transactions.table.description')}</th>
-                  <th className="text-left p-4 text-xs text-app-muted font-bold uppercase tracking-wider"></th>
+                  <th className="text-left p-4 text-xs text-app-muted font-bold uppercase tracking-wider">{t('recurrences.table.period')}</th>
                   <th className="text-left p-4 text-xs text-app-muted font-bold uppercase tracking-wider">{t('transactions.table.wallet')}</th>
                   <th className="text-right p-4 text-xs text-app-muted font-bold uppercase tracking-wider">{t('transactions.table.amount')}</th>
                   <th className="p-4"></th>
@@ -226,7 +226,7 @@ export const RecurrencesPage = () => {
                       key={recurrence.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="hover:bg-white/[0.02] transition-colors"
+                      className="hover:bg-app-surface-2 transition-colors"
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-4">

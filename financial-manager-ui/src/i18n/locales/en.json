@@ -299,6 +299,9 @@
       "monthly": "Monthly",
       "yearly": "Yearly"
     },
+    "table": {
+      "period": "Periodicity"
+    },
     "form": {
       "descriptionPlaceholder": "E.g.: Rent, Subscription...",
       "frequency": "Frequency",

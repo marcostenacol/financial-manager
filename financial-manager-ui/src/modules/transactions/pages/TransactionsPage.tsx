@@ -362,8 +362,8 @@ export const TransactionsPage = () => {
                             handleShowDetail(transaction);
                           }
                         }}
-                        role="button"
                         tabIndex={0}
+                        aria-label={`Ver detalhes de ${transaction.description}`}
                         className="ledger-item group hover:bg-app-accent-soft transition-colors cursor-pointer border-t border-app-border focus:outline-none focus-visible:ring-2 focus-visible:ring-app-accent/50 focus-visible:bg-app-accent-soft"
                       >
                     <td className="px-6 py-4">
