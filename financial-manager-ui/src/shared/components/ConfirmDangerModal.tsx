@@ -64,14 +64,14 @@ export const ConfirmDangerModal = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative w-full max-w-lg bg-app-surface border border-red-500/20 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          className="relative w-full max-w-lg bg-app-surface border border-app-danger/20 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
         >
           <div className="p-6 border-b border-app-border flex justify-between items-center">
             <h2 className="text-xl font-bold text-app-ink flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-400" />
+              <AlertTriangle className="w-5 h-5 text-app-danger" />
               {title}
             </h2>
-            <button onClick={handleClose} className="p-2 hover:bg-app-surface-2 rounded-xl transition-colors text-app-muted">
+            <button onClick={handleClose} className="p-2 hover:bg-app-surface-2 rounded-full transition-colors text-app-muted">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -86,9 +86,9 @@ export const ConfirmDangerModal = ({
                   type="button"
                   disabled={!isConfirmed || runningIndex !== null}
                   onClick={() => handleAction(action, index)}
-                  className="w-full text-left p-4 rounded-2xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full text-left p-4 rounded-full border border-app-danger/20 bg-app-danger/5 hover:bg-app-danger/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <p className="font-bold text-red-400">
+                  <p className="font-bold text-app-danger">
                     {runningIndex === index ? 'Executando...' : action.label}
                   </p>
                   <p className="text-xs text-app-muted mt-1">{action.description}</p>
@@ -98,14 +98,14 @@ export const ConfirmDangerModal = ({
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-app-muted ml-1">
-                Digite <span className="font-mono text-red-400">{confirmWord}</span> para habilitar
+                Digite <span className="font-mono text-app-danger">{confirmWord}</span> para habilitar
               </label>
               <input
                 type="text"
                 value={typedWord}
                 onChange={(e) => setTypedWord(e.target.value)}
                 placeholder={confirmWord}
-                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all font-mono"
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-danger/50 transition-all font-mono"
               />
             </div>
           </div>
