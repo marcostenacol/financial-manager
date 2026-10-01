@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Filter, Calendar, Tag, Wallet as WalletIcon, CheckCircle } from 'lucide-react';
+import { X, Filter, Calendar, Tag, Wallet as WalletIcon, CheckCircle, User } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { usePeople } from '../../people/hooks/usePeople';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 
@@ -17,9 +18,15 @@ interface Wallet {
   name: string;
 }
 
+interface Person {
+  id: string;
+  name: string;
+}
+
 interface Filters {
   wallet_id?: string;
   category_id?: string;
+  person_id?: string;
   start_date?: string;
   end_date?: string;
   status?: string;
@@ -37,18 +44,22 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
   const { scope } = useScope();
   const { loadWallets } = useWallets(scope);
   const { loadCategories } = useCategories(scope);
+  const { loadPeople } = usePeople(scope);
   const [categories, setCategories] = useState<Category[]>([]);
   const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [people, setPeople] = useState<Person[]>([]);
   const [filters, setFilters] = useState<Filters>(currentFilters);
 
   const loadData = async () => {
     try {
-      const [categoriesData, walletsData] = await Promise.all([
+      const [categoriesData, walletsData, peopleData] = await Promise.all([
         loadCategories(),
         loadWallets(),
+        loadPeople(),
       ]);
       setCategories(categoriesData);
       setWallets(walletsData);
+      setPeople(peopleData);
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao carregar dados de filtro'), 'error');
     }
@@ -142,6 +153,23 @@ export const AdvancedFiltersModal = ({ isOpen, onClose, onApply, currentFilters 
                   <option value="" className="bg-app-surface">Todas as categorias</option>
                   {categories.map(c => (
                     <option key={c.id} value={c.id} className="bg-app-surface">{c.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Pessoa */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-app-muted uppercase tracking-widest flex items-center gap-2">
+                  <User className="w-3.5 h-3.5" /> Pessoa
+                </label>
+                <select
+                  value={filters.person_id || ''}
+                  onChange={(e) => setFilters({ ...filters, person_id: e.target.value || undefined })}
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl p-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 appearance-none"
+                >
+                  <option value="" className="bg-app-surface">Todas as pessoas</option>
+                  {people.map(p => (
+                    <option key={p.id} value={p.id} className="bg-app-surface">{p.name}</option>
                   ))}
                 </select>
               </div>

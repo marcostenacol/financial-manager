@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { X, Pencil, Trash2, Copy, ArrowUpCircle, ArrowDownCircle, Calendar, Tag, Wallet as WalletIcon, User } from 'lucide-react';
+import { formatDate } from '../../../shared/lib/formatDate';
 
 interface Transaction {
   id: string;
@@ -95,7 +96,7 @@ export const TransactionDetailModal = ({ isOpen, onClose, onEdit, onDelete, onDu
             <div className="flex items-center gap-3 bg-app-surface-2 border border-app-border rounded-2xl p-4">
               <Calendar className="w-5 h-5 text-app-muted" />
               <span className="text-app-ink">
-                {new Date(transaction.occurredAt).toLocaleDateString('pt-BR')}
+                {formatDate(transaction.occurredAt)}
               </span>
             </div>
 

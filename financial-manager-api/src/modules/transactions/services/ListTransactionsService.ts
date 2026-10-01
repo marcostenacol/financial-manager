@@ -25,6 +25,7 @@ export class ListTransactionsService {
 
     if (filters.category_id) prismaFilters.categoryId = filters.category_id;
     if (filters.wallet_id) prismaFilters.walletId = filters.wallet_id;
+    if (filters.person_id) prismaFilters.personId = filters.person_id;
     if (filters.type) prismaFilters.type = filters.type;
     if (filters.status) prismaFilters.status = filters.status;
     if (filters.search) prismaFilters.description = { contains: filters.search, mode: 'insensitive' };

@@ -29,6 +29,7 @@ import { OrganizationFilterSelect } from '../../organizations/components/Organiz
 import { useScope } from '../../../contexts/useScope';
 import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { formatDate } from '../../../shared/lib/formatDate';
 
 export const TransactionsPage = () => {
   const { t } = useTranslation();
@@ -169,13 +170,6 @@ export const TransactionsPage = () => {
       result.push(p);
     });
     return result;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-    });
   };
 
   return (
@@ -407,7 +401,7 @@ export const TransactionsPage = () => {
                     <td className="px-6 py-4 text-app-muted text-sm">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        {formatDate(transaction.occurredAt)}
+                        {formatDate(transaction.occurredAt, { day: '2-digit', month: 'short' })}
                       </span>
                     </td>
                     <td className="px-6 py-4">
