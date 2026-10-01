@@ -7,6 +7,7 @@ import { GetMonthlyEvolutionService } from '../services/GetMonthlyEvolutionServi
 import { GetCashFlowByCostCenterService } from '../services/GetCashFlowByCostCenterService';
 import { ExportReportService } from '../services/ExportReportService';
 import { AppError } from '@/shared/errors/AppError';
+import { ReportDateRangeDTO } from '../dtos/ReportDateRangeDTO';
 
 @injectable()
 export class ReportController extends BaseController {
@@ -27,6 +28,7 @@ export class ReportController extends BaseController {
       start_date?: string;
       end_date?: string;
     };
+    ReportDateRangeDTO.parse({ start_date, end_date });
 
     const buffer = await this.exportReport.execute(userId, { format, start_date, end_date });
 
@@ -50,6 +52,7 @@ export class ReportController extends BaseController {
     const userId = request.user.sub;
     const { start_date, end_date, scope, organization_id } = request.query as { start_date?: string; end_date?: string; scope?: string; organization_id?: string };
     this.assertOrganizationAccess(request, organization_id);
+    ReportDateRangeDTO.parse({ start_date, end_date });
     const data = await this.getOverview.execute(userId, { start_date, end_date }, scope, organization_id);
     return this.success(reply, data);
   }
@@ -64,6 +67,7 @@ export class ReportController extends BaseController {
       end_date?: string;
     };
     this.assertOrganizationAccess(request, organization_id);
+    ReportDateRangeDTO.parse({ start_date, end_date });
 
     const now = new Date();
     const targetMonth = month ? Number(month) : now.getMonth() + 1;
@@ -83,6 +87,7 @@ export class ReportController extends BaseController {
       end_date?: string;
     };
     this.assertOrganizationAccess(request, organization_id);
+    ReportDateRangeDTO.parse({ start_date, end_date });
 
     const now = new Date();
     const targetMonth = month ? Number(month) : now.getMonth() + 1;
@@ -96,6 +101,7 @@ export class ReportController extends BaseController {
     const userId = request.user.sub;
     const { organization_id, start_date, end_date } = request.query as { organization_id?: string; start_date?: string; end_date?: string };
     this.assertOrganizationAccess(request, organization_id);
+    ReportDateRangeDTO.parse({ start_date, end_date });
     const data = await this.getEvolution.execute(userId, organization_id, { start_date, end_date });
     return this.success(reply, data);
   }

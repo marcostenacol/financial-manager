@@ -157,17 +157,22 @@ export class ReportRepository implements ReportRepositoryInterface {
      const rangeStart = range?.start_date ? new Date(range.start_date) : new Date(rangeEnd.getFullYear(), rangeEnd.getMonth() - 5, 1);
      const filterEnd = new Date(rangeEnd.getTime() + 24 * 60 * 60 * 1000);
 
+     const rangeDays = (rangeEnd.getTime() - rangeStart.getTime()) / (24 * 60 * 60 * 1000);
+     const isDailyGranularity = rangeDays <= 31;
+     const bucketUnit = isDailyGranularity ? 'day' : 'month';
+     const labelFormat = isDailyGranularity ? 'DD/MM' : 'Mon/YY';
+
      const results = await prisma.$queryRawUnsafe<any[]>(`
-       WITH RECURSIVE months AS (
-         SELECT date_trunc('month', $2::timestamp) as month
+       WITH RECURSIVE buckets AS (
+         SELECT date_trunc('${bucketUnit}', $2::timestamp) as bucket
          UNION ALL
-         SELECT month + interval '1 month'
-         FROM months
-         WHERE month + interval '1 month' <= date_trunc('month', $3::timestamp)
+         SELECT bucket + interval '1 ${bucketUnit}'
+         FROM buckets
+         WHERE bucket + interval '1 ${bucketUnit}' <= date_trunc('${bucketUnit}', $3::timestamp)
        ),
-       monthly_stats AS (
+       bucket_stats AS (
          SELECT
-           date_trunc('month', t.occurred_at) as month,
+           date_trunc('${bucketUnit}', t.occurred_at) as bucket,
            COALESCE(SUM(CASE WHEN t.type = 'income' THEN t.amount ELSE 0 END), 0) as income,
            COALESCE(SUM(CASE WHEN t.type = 'expense' THEN t.amount ELSE 0 END), 0) as expense
          FROM transactions t
@@ -179,15 +184,15 @@ export class ReportRepository implements ReportRepositoryInterface {
          GROUP BY 1
        )
        SELECT
-         to_char(m.month, 'Mon') as month_name,
-         COALESCE(ms.income, 0) as income,
-         COALESCE(ms.expense, 0) as expense,
-         (COALESCE(ms.income, 0) - COALESCE(ms.expense, 0)) as balance
-       FROM months m
-       LEFT JOIN monthly_stats ms ON m.month = ms.month
-       ORDER BY m.month ASC
+         to_char(b.bucket, '${labelFormat}') as month_name,
+         COALESCE(bs.income, 0) as income,
+         COALESCE(bs.expense, 0) as expense,
+         (COALESCE(bs.income, 0) - COALESCE(bs.expense, 0)) as balance
+       FROM buckets b
+       LEFT JOIN bucket_stats bs ON b.bucket = bs.bucket
+       ORDER BY b.bucket ASC
      `, ownerValue, rangeStart, rangeEnd, filterEnd);
- 
+
      return results.map(row => ({
        month_name: row.month_name,
        income: Number(row.income),
