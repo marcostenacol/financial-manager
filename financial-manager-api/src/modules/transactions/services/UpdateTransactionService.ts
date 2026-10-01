@@ -3,6 +3,7 @@ import { Transaction, Prisma, ProfileScope } from '@prisma/client';
 import { prisma } from '@/shared/database/PrismaClient';
 import { TransactionRepositoryInterface } from '../repositories/contracts/TransactionRepositoryInterface';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
+import { WalletTypeEnum } from '@/modules/wallets/enums/WalletTypeEnum';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { CostCenterRepositoryInterface } from '@/modules/cost-centers/repositories/contracts/CostCenterRepositoryInterface';
 import { PersonRepositoryInterface } from '@/modules/people/repositories/contracts/PersonRepositoryInterface';
@@ -120,10 +121,23 @@ export class UpdateTransactionService {
       ? newAmount
       : new Prisma.Decimal(0);
 
+    if (data.invoice_id) {
+      if (wallet.type !== WalletTypeEnum.CREDIT) {
+        throw new AppError('Fatura só pode ser definida em carteira do tipo cartão de crédito', 422);
+      }
+
+      const invoice = await this.invoiceRepository.findById(data.invoice_id);
+
+      if (!invoice || invoice.walletId !== wallet.id) {
+        throw new AppError('Fatura não encontrada', 404);
+      }
+    }
+
     const updatedTransaction = await prisma.$transaction(async (tx) => {
       const effectiveOccurredAt = data.occurred_at ? new Date(data.occurred_at) : transaction.occurredAt;
 
-      const invoiceId = await resolveInvoiceId(wallet, effectiveOccurredAt, this.invoiceRepository, tx);
+      const invoiceId = data.invoice_id
+        ?? await resolveInvoiceId(wallet, effectiveOccurredAt, this.invoiceRepository, tx);
 
       const updated = await this.transactionRepository.update(id, {
         description: data.description,

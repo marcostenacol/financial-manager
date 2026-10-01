@@ -10,11 +10,12 @@ export interface Transaction {
   occurredAt: string;
   createdAt: string;
   category?: { name: string; color: string };
-  wallet?: { name: string };
+  wallet?: { name: string; type?: string };
   person?: { id: string; name: string } | null;
   walletId: string;
   categoryId?: string;
   personId?: string | null;
+  invoiceId?: string | null;
   recurrenceId?: string | null;
   recurrence?: {
     period: string;
@@ -49,6 +50,7 @@ export interface UpdateTransactionInput {
   status?: string;
   occurred_at?: string;
   person_id?: string | null;
+  invoice_id?: string;
 }
 
 export interface TransferInput {

@@ -11,6 +11,7 @@ export const UpdateTransactionDTO = z.object({
   occurred_at: z.string().datetime().or(z.date()).optional(),
   cost_center_id: z.string().uuid('ID do centro de custo inválido').nullable().optional(),
   person_id: z.string().uuid('ID da pessoa inválido').nullable().optional(),
+  invoice_id: z.string().uuid('ID da fatura inválido').optional(),
 });
 
 export type UpdateTransactionDTOType = z.infer<typeof UpdateTransactionDTO>;

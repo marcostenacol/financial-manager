@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2, Ban, User, Check } from 'lucide-react';
+import { X, Save, ArrowUpCircle, ArrowDownCircle, Wallet as WalletIcon, Calendar, Tag, FileText, Trash2, User, CreditCard } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { useTransactions } from '../hooks/useTransactions';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
 import { usePeople } from '../../people/hooks/usePeople';
+import { useCreditCards, type CreditCardInvoice } from '../../credit-cards/hooks/useCreditCards';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { isFutureDate } from '../../../shared/lib/isFutureDate';
@@ -14,7 +15,14 @@ import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 interface Wallet {
   id: string;
   name: string;
+  type?: string;
 }
+
+const STATUS_OPTIONS: { value: 'pending' | 'completed' | 'cancelled'; label: string }[] = [
+  { value: 'pending', label: 'Pendente' },
+  { value: 'completed', label: 'Concluída' },
+  { value: 'cancelled', label: 'Cancelada' },
+];
 
 interface Category {
   id: string;
@@ -36,6 +44,7 @@ interface Transaction {
   walletId: string;
   categoryId?: string;
   personId?: string | null;
+  invoiceId?: string | null;
 }
 
 interface UpdateTransactionModalProps {
@@ -52,6 +61,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
   const { loadWallets } = useWallets(scope);
   const { loadCategories } = useCategories(scope);
   const { loadPeople } = usePeople(scope);
+  const { loadInvoices } = useCreditCards();
   const [type, setType] = useState<'income' | 'expense'>('expense');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState(0);
@@ -59,14 +69,19 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
   const [categoryId, setCategoryId] = useState('');
   const [personId, setPersonId] = useState('');
   const [occurredAt, setOccurredAt] = useState('');
+  const [status, setStatus] = useState<'pending' | 'completed' | 'cancelled'>('pending');
+  const [invoiceId, setInvoiceId] = useState('');
 
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
+  const [invoices, setInvoices] = useState<CreditCardInvoice[]>([]);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
-  const [completing, setCompleting] = useState(false);
+  const [changingStatus, setChangingStatus] = useState(false);
+
+  const wallet = wallets.find((w) => w.id === walletId);
+  const isCreditWallet = wallet?.type === 'credit';
 
   const loadData = async () => {
     try {
@@ -78,6 +93,13 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       setWallets(walletsData);
       setCategories(categoriesData);
       setPeople(peopleData);
+
+      const walletData = walletsData.find((w: Wallet) => w.id === transaction?.walletId);
+      if (walletData?.type === 'credit') {
+        setInvoices(await loadInvoices(walletData.id));
+      } else {
+        setInvoices([]);
+      }
     } catch (err) {
       showToast(getErrorMessage(err, 'Erro ao carregar dados para transação'), 'error');
     }
@@ -93,6 +115,8 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
       setCategoryId(transaction.categoryId || '');
       setPersonId(transaction.personId || '');
       setOccurredAt(new Date(transaction.occurredAt).toISOString().split('T')[0]);
+      setStatus(transaction.status);
+      setInvoiceId(transaction.invoiceId || '');
       loadData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,13 +129,9 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
 
     // Regra de futuro força pendente: uma transação com data futura nunca pode
     // ficar completed/cancelled indevidamente. Só forçamos na direção
-    // "data futura -> pending"; nunca mexemos numa transação já cancelada,
-    // nem revertemos manualmente um status existente quando a data não é futura.
-    const effectiveStatus = transaction.status === 'cancelled'
-      ? transaction.status
-      : isFutureDate(occurredAt)
-        ? 'pending'
-        : transaction.status;
+    // "data futura -> pending"; nunca sobrepõe uma escolha explícita de status
+    // quando a data não é futura.
+    const effectiveStatus = isFutureDate(occurredAt) ? 'pending' : status;
 
     try {
       await updateTransaction(transaction.id, {
@@ -122,6 +142,7 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
         occurred_at: new Date(occurredAt).toISOString(),
         status: effectiveStatus,
         person_id: type === 'expense' ? (personId || null) : null,
+        invoice_id: isCreditWallet && invoiceId ? invoiceId : undefined,
       });
 
       onSuccess();
@@ -133,47 +154,31 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
     }
   };
 
-  const handleComplete = async () => {
-    if (!transaction) return;
-    setCompleting(true);
-
-    try {
-      await updateTransaction(transaction.id, {
-        description: transaction.description,
-        amount: transaction.amount,
-        type: transaction.type === 'transfer' ? undefined : transaction.type,
-        category_id: transaction.categoryId || undefined,
-        occurred_at: transaction.occurredAt,
-        status: 'completed',
-      });
-      onSuccess();
-      onClose();
-    } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao concluir transação'), 'error');
-    } finally {
-      setCompleting(false);
+  const handleChangeStatus = async (newStatus: 'pending' | 'completed' | 'cancelled') => {
+    if (!transaction || newStatus === status) return;
+    if (
+      newStatus === 'cancelled' &&
+      !window.confirm('Cancelar esta transação? Se ela já estava concluída, o saldo da carteira volta ao que era antes.')
+    ) {
+      return;
     }
-  };
 
-  const handleCancel = async () => {
-    if (!transaction || !window.confirm('Cancelar esta transação? Se ela já estava concluída, o saldo da carteira volta ao que era antes.')) return;
-    setCancelling(true);
-
+    setChangingStatus(true);
     try {
       await updateTransaction(transaction.id, {
         description: transaction.description,
-        amount: transaction.amount,
+        amount: Number(transaction.amount),
         type: transaction.type === 'transfer' ? undefined : transaction.type,
         category_id: transaction.categoryId || undefined,
         occurred_at: transaction.occurredAt,
-        status: 'cancelled',
+        status: newStatus,
       });
+      setStatus(newStatus);
       onSuccess();
-      onClose();
     } catch (err) {
-      showToast(getErrorMessage(err, 'Erro ao cancelar transação'), 'error');
+      showToast(getErrorMessage(err, 'Erro ao alterar status da transação'), 'error');
     } finally {
-      setCancelling(false);
+      setChangingStatus(false);
     }
   };
 
@@ -210,36 +215,8 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
         className="relative w-full max-w-xl bg-app-surface border border-app-border rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
       >
         <div className="p-6 border-b border-app-border flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-app-ink">Editar Transação</h2>
-            {transaction.status === 'cancelled' && (
-              <span className="ledger-stamp text-app-danger">Cancelada</span>
-            )}
-            {transaction.status === 'pending' && (
-              <span className="ledger-stamp text-amber-400">Pendente</span>
-            )}
-          </div>
+          <h2 className="text-xl font-bold text-app-ink">Editar Transação</h2>
           <div className="flex items-center gap-2">
-            {transaction.status === 'pending' && (
-              <button
-                onClick={handleComplete}
-                disabled={completing || deleting}
-                className="p-2 hover:bg-emerald-500/10 rounded-xl transition-colors text-emerald-400 disabled:opacity-50"
-                title="Marcar como concluída (efetiva no saldo agora)"
-              >
-                <Check className="w-5 h-5" />
-              </button>
-            )}
-            {transaction.status !== 'cancelled' && (
-              <button
-                onClick={handleCancel}
-                disabled={cancelling || deleting}
-                className="p-2 hover:bg-app-danger/10 rounded-xl transition-colors text-app-danger/70 disabled:opacity-50"
-                title="Cancelar transação (reverte o saldo, mantém o histórico)"
-              >
-                <Ban className="w-5 h-5" />
-              </button>
-            )}
             <button
               onClick={handleDelete}
               disabled={deleting}
@@ -255,6 +232,32 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          {/* Status */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-app-muted ml-1">Status</label>
+            <div className="flex p-1 bg-app-surface-2 border border-app-border rounded-2xl">
+              {STATUS_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  disabled={changingStatus || deleting}
+                  onClick={() => handleChangeStatus(option.value)}
+                  className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${
+                    status === option.value
+                      ? option.value === 'cancelled'
+                        ? 'bg-app-danger text-app-ink shadow-lg'
+                        : option.value === 'completed'
+                          ? 'bg-app-success text-app-ink shadow-lg'
+                          : 'bg-amber-400 text-app-ink shadow-lg'
+                      : 'text-app-muted hover:bg-app-surface'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Tipo de Transação */}
           {transaction.type !== 'transfer' && (
             <div className="flex p-1 bg-app-surface-2 border border-app-border rounded-2xl">
@@ -357,6 +360,27 @@ export const UpdateTransactionModal = ({ isOpen, onClose, onSuccess, transaction
               </div>
             </div>
           </div>
+
+          {isCreditWallet && invoices.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-app-muted ml-1">Fatura</label>
+              <div className="relative">
+                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
+                <select
+                  value={invoiceId}
+                  onChange={(e) => setInvoiceId(e.target.value)}
+                  className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-4 pl-12 pr-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 transition-all appearance-none"
+                >
+                  {invoices.map(invoice => (
+                    <option key={invoice.id} value={invoice.id} className="bg-app-surface">
+                      {invoice.referenceMonth}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-xs text-app-muted ml-1">Move a transação para outra fatura sem alterar a data do lançamento.</p>
+            </div>
+          )}
 
           {type === 'expense' && people.length > 0 && (
             <div className="space-y-2">
