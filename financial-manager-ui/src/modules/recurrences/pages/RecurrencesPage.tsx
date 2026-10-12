@@ -257,7 +257,7 @@ export const RecurrencesPage = () => {
                             <span className="text-[10px] bg-app-danger/20 text-app-danger px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">{t('recurrences.ended')}</span>
                           ) : (
                             <div className="flex flex-col items-end gap-1">
-                              <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">{t('recurrences.next', { date: computeNextDueDate(recurrence).toLocaleDateString('pt-BR') })}</p>
+                              <p className="text-[10px] text-app-muted uppercase tracking-widest font-bold">{t('recurrences.next', { date: computeNextDueDate(recurrence).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) })}</p>
                               <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${recurrence.isActive ? 'bg-app-success/20 text-app-success' : 'bg-app-surface-2 border border-app-border text-app-muted'}`}>
 
                                 {recurrence.isActive ? t('recurrences.statusActive') : t('recurrences.statusPaused')}

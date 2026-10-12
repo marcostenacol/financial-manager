@@ -8,6 +8,7 @@ import { useRecurrences } from '../hooks/useRecurrences';
 import { useScope } from '../../../contexts/useScope';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { toLocalDateInput } from '../../../shared/lib/localDate';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
 interface CreateRecurrenceModalProps {
@@ -29,7 +30,7 @@ export const CreateRecurrenceModal = ({ isOpen, onClose, onSuccess }: CreateRecu
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('monthly');
-  const [startsAt, setStartsAt] = useState(new Date().toISOString().split('T')[0]);
+  const [startsAt, setStartsAt] = useState(toLocalDateInput());
 
   const [loading, setLoading] = useState(false);
 

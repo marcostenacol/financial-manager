@@ -48,7 +48,7 @@ export class ExportReportService {
 
     for (const transaction of transactions) {
       sheet.addRow({
-        date: new Date(transaction.occurredAt).toLocaleDateString('pt-BR'),
+        date: new Date(transaction.occurredAt).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
         description: transaction.description || '',
         type: this.translateType(transaction.type),
         amount: Number(transaction.amount),
@@ -74,7 +74,7 @@ export class ExportReportService {
       doc.moveDown();
 
       for (const transaction of transactions) {
-        const date = new Date(transaction.occurredAt).toLocaleDateString('pt-BR');
+        const date = new Date(transaction.occurredAt).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
         const amount = Number(transaction.amount).toFixed(2);
         doc
           .fontSize(10)

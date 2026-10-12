@@ -9,6 +9,7 @@ import { usePeople } from '../../people/hooks/usePeople';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { isFutureDate } from '../../../shared/lib/isFutureDate';
+import { toLocalDateInput } from '../../../shared/lib/localDate';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 
 interface Wallet {
@@ -54,7 +55,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [personId, setPersonId] = useState('');
-  const [occurredAt, setOccurredAt] = useState(new Date().toISOString().split('T')[0]);
+  const [occurredAt, setOccurredAt] = useState(toLocalDateInput());
 
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -78,7 +79,7 @@ export const CreateTransactionModal = ({ isOpen, onClose, onSuccess, initialData
         setAmount(initialData.amount);
         setWalletId(initialData.walletId);
         setCategoryId(initialData.categoryId ?? '');
-        setOccurredAt(new Date().toISOString().split('T')[0]);
+        setOccurredAt(toLocalDateInput());
         return;
       }
 

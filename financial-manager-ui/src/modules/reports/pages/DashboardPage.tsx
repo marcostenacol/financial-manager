@@ -12,6 +12,7 @@ import { useScope } from '../../../contexts/useScope';
 import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { toLocalDateInput } from '../../../shared/lib/localDate';
 
 // Recharts requires literal color strings, not CSS var() — keep income/expense in sync with
 // the --accent/--danger tokens in src/index.css (currently #5B8DEF / #EF5350).
@@ -81,13 +82,13 @@ export const DashboardPage = () => {
 
     switch (preset) {
       case '7days':
-        start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        start = toLocalDateInput(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
         break;
       case '30days':
-        start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        start = toLocalDateInput(new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000));
         break;
       case 'month':
-        start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        start = toLocalDateInput(new Date(now.getFullYear(), now.getMonth(), 1));
         break;
       case 'custom':
         return; // Don't update yet

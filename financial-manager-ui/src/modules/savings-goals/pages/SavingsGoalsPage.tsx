@@ -6,6 +6,7 @@ import { CreateSavingsGoalModal } from '../components/CreateSavingsGoalModal';
 import { ConfirmDangerModal } from '../../../shared/components/ConfirmDangerModal';
 import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
+import { formatDate } from '../../../shared/lib/formatDate';
 
 export const SavingsGoalsPage = () => {
   const { showToast } = useToast();
@@ -158,7 +159,7 @@ export const SavingsGoalsPage = () => {
                     {goal.deadline && (
                       <div className="flex items-center gap-2 text-xs text-app-muted pt-2">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span>Meta para: {new Date(goal.deadline).toLocaleDateString('pt-BR')}</span>
+                        <span>Meta para: {formatDate(goal.deadline, { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                       </div>
                     )}
                   </div>

@@ -6,6 +6,7 @@ import { useToast } from '../../../shared/components/useToast';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { InvoiceDetailModal } from '../components/InvoiceDetailModal';
 import { CreateCardPurchaseModal } from '../components/CreateCardPurchaseModal';
+import { todayAsUtcMidnight } from '../../../shared/lib/localDate';
 
 function statusLabel(status: CreditCardInvoice['status'], t: (key: string) => string): string {
   switch (status) {
@@ -26,8 +27,8 @@ function statusColor(status: CreditCardInvoice['status']): string {
 }
 
 function defaultInvoiceIndex(invoices: CreditCardInvoice[]): number {
-  const now = new Date();
-  const idx = invoices.findIndex((inv) => new Date(inv.dueDate) >= now);
+  const today = todayAsUtcMidnight();
+  const idx = invoices.findIndex((inv) => new Date(inv.dueDate) >= today);
   return idx === -1 ? invoices.length - 1 : idx;
 }
 

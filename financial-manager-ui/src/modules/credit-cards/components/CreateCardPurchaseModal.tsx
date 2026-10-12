@@ -9,6 +9,7 @@ import { usePeople, type Person } from '../../people/hooks/usePeople';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { isFutureDate } from '../../../shared/lib/isFutureDate';
+import { toLocalDateInput } from '../../../shared/lib/localDate';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
 import type { CreditCard } from '../hooks/useCreditCards';
 
@@ -31,7 +32,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
   const [amount, setAmount] = useState(0);
   const [categoryId, setCategoryId] = useState('');
   const [personId, setPersonId] = useState('');
-  const [occurredAt, setOccurredAt] = useState(new Date().toISOString().split('T')[0]);
+  const [occurredAt, setOccurredAt] = useState(toLocalDateInput());
   const [installments, setInstallments] = useState(1);
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -42,7 +43,7 @@ export const CreateCardPurchaseModal = ({ isOpen, card, onClose, onSuccess }: Cr
     setDescription('');
     setAmount(0);
     setPersonId('');
-    setOccurredAt(new Date().toISOString().split('T')[0]);
+    setOccurredAt(toLocalDateInput());
     setInstallments(1);
   };
 

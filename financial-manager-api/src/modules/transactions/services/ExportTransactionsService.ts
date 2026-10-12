@@ -13,7 +13,7 @@ export class ExportTransactionsService {
 
     const header = ['Data', 'Descrição', 'Tipo', 'Valor', 'Carteira', 'Categoria'];
     const rows = transactions.map((transaction: any) => [
-      new Date(transaction.occurredAt).toLocaleDateString('pt-BR'),
+      new Date(transaction.occurredAt).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
       this.escapeCsvField(transaction.description || ''),
       transaction.type === 'income' ? 'Receita' : transaction.type === 'expense' ? 'Despesa' : 'Transferência',
       Number(transaction.amount).toFixed(2),
