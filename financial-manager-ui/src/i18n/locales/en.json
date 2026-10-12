@@ -106,6 +106,12 @@
       "startDate": "Start date",
       "endDate": "End date"
     },
+    "walletFilter": {
+      "all": "All wallets",
+      "selected": "{{count}} wallets",
+      "clear": "Clear selection",
+      "label": "Filter by wallet"
+    },
     "periods": {
       "month": "This Month",
       "7days": "7 days",

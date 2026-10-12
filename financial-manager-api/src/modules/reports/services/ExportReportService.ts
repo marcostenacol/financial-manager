@@ -8,6 +8,7 @@ interface ExportReportFilters {
   format: 'pdf' | 'excel';
   start_date?: string;
   end_date?: string;
+  wallet_ids?: string[];
 }
 
 @injectable()
@@ -26,11 +27,16 @@ export class ExportReportService {
       per_page: 1_000_000,
     });
 
+    const walletIds = filters.wallet_ids;
+    const filtered = walletIds?.length
+      ? transactions.filter((transaction: any) => walletIds.includes(transaction.walletId))
+      : transactions;
+
     if (filters.format === 'excel') {
-      return this.buildExcel(transactions);
+      return this.buildExcel(filtered);
     }
 
-    return this.buildPdf(transactions);
+    return this.buildPdf(filtered);
   }
 
   private async buildExcel(transactions: any[]): Promise<Buffer> {

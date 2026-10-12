@@ -12,9 +12,10 @@ export class GetMonthlyEvolutionService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, organizationId?: string, range?: DashboardOverviewRange): Promise<MonthlyEvolutionData[]> {
-    if (organizationId) {
-      return this.reportRepository.getMonthlyEvolution(userId, organizationId, range);
+  async execute(userId: string, organizationId?: string, range?: DashboardOverviewRange, walletIds?: string[]): Promise<MonthlyEvolutionData[]> {
+    // Resultado filtrado por carteira não é cacheado: a invalidação das escritas só conhece as chaves sem filtro
+    if (organizationId || walletIds?.length) {
+      return this.reportRepository.getMonthlyEvolution(userId, organizationId, range, walletIds);
     }
 
     const cacheKey = CacheKeys.reports.monthlyEvolution(userId, range);

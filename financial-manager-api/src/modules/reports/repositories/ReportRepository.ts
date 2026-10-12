@@ -45,18 +45,23 @@ export class ReportRepository implements ReportRepositoryInterface {
     };
   }
 
-  async getDashboardOverview(userId: string, range?: DashboardOverviewRange, scope?: string, organizationId?: string): Promise<DashboardOverviewData> {
+  async getDashboardOverview(userId: string, range?: DashboardOverviewRange, scope?: string, organizationId?: string, walletIds?: string[]): Promise<DashboardOverviewData> {
     const { periodStart, periodEnd, previousStart, previousEnd } = this.resolvePeriod(range);
     const ownerColumn = organizationId ? 'organization_id' : 'user_id';
     const ownerValue = organizationId ?? userId;
-    const scopeFilter = scope ? 'AND w.scope = $6' : '';
+    const params: unknown[] = [ownerValue, periodStart, periodEnd, previousStart, previousEnd];
+    if (scope) params.push(scope);
+    const scopeFilter = scope ? `AND w.scope = $${params.length}` : '';
+    if (walletIds?.length) params.push(walletIds);
+    const walletFilter = walletIds?.length ? `AND w.id = ANY($${params.length}::text[])` : '';
 
     const results = await prisma.$queryRawUnsafe<any[]>(`
       WITH wallet_stats AS (
         SELECT COALESCE(SUM(balance), 0) as total_balance
         FROM wallets w
         WHERE w.${ownerColumn} = $1
-          ${scope ? 'AND w.scope = $6' : ''}
+          ${scopeFilter}
+          ${walletFilter}
       ),
       period_stats AS (
         SELECT
@@ -69,6 +74,7 @@ export class ReportRepository implements ReportRepositoryInterface {
           AND t.occurred_at >= $2
           AND t.occurred_at < $3
           ${scopeFilter}
+          ${walletFilter}
       ),
       previous_period_stats AS (
         SELECT
@@ -81,6 +87,7 @@ export class ReportRepository implements ReportRepositoryInterface {
           AND t.occurred_at >= $4
           AND t.occurred_at < $5
           ${scopeFilter}
+          ${walletFilter}
       )
       SELECT
         w.total_balance,
@@ -89,7 +96,7 @@ export class ReportRepository implements ReportRepositoryInterface {
         pp.income as last_month_income,
         pp.expense as last_month_expense
       FROM wallet_stats w, period_stats p, previous_period_stats pp
-    `, ...(scope ? [ownerValue, periodStart, periodEnd, previousStart, previousEnd, scope] : [ownerValue, periodStart, periodEnd, previousStart, previousEnd]));
+    `, ...params);
 
     const data = results[0];
 
@@ -102,7 +109,7 @@ export class ReportRepository implements ReportRepositoryInterface {
     };
   }
 
-  async getExpensesByCategory(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange): Promise<ExpenseByCategoryData[]> {
+  async getExpensesByCategory(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange, walletIds?: string[]): Promise<ExpenseByCategoryData[]> {
     const startDate = range?.start_date ? new Date(range.start_date) : new Date(year, month - 1, 1);
     const endDate = range?.end_date
       ? new Date(new Date(range.end_date).getTime() + 24 * 60 * 60 * 1000)
@@ -124,6 +131,7 @@ export class ReportRepository implements ReportRepositoryInterface {
           AND t.status = 'completed'
           AND t.occurred_at >= $2
           AND t.occurred_at < $3
+          ${walletIds?.length ? 'AND w.id = ANY($4::text[])' : ''}
         GROUP BY c.name, c.color
       ),
       total_sum AS (
@@ -139,7 +147,7 @@ export class ReportRepository implements ReportRepositoryInterface {
         END as percentage
       FROM category_totals ct, total_sum ts
       ORDER BY ct.total DESC
-    `, ownerValue, startDate, endDate);
+    `, ownerValue, startDate, endDate, ...(walletIds?.length ? [walletIds] : []));
  
      return results.map(row => ({
        category_name: row.category_name,
@@ -149,7 +157,7 @@ export class ReportRepository implements ReportRepositoryInterface {
      }));
    }
  
-   async getMonthlyEvolution(userId: string, organizationId?: string, range?: DashboardOverviewRange): Promise<MonthlyEvolutionData[]> {
+   async getMonthlyEvolution(userId: string, organizationId?: string, range?: DashboardOverviewRange, walletIds?: string[]): Promise<MonthlyEvolutionData[]> {
      const ownerColumn = organizationId ? 'organization_id' : 'user_id';
      const ownerValue = organizationId ?? userId;
 
@@ -181,6 +189,7 @@ export class ReportRepository implements ReportRepositoryInterface {
            AND t.status = 'completed'
            AND t.occurred_at >= $2
            AND t.occurred_at < $4
+           ${walletIds?.length ? 'AND w.id = ANY($5::text[])' : ''}
          GROUP BY 1
        )
        SELECT
@@ -191,7 +200,7 @@ export class ReportRepository implements ReportRepositoryInterface {
        FROM buckets b
        LEFT JOIN bucket_stats bs ON b.bucket = bs.bucket
        ORDER BY b.bucket ASC
-     `, ownerValue, rangeStart, rangeEnd, filterEnd);
+     `, ownerValue, rangeStart, rangeEnd, filterEnd, ...(walletIds?.length ? [walletIds] : []));
 
      return results.map(row => ({
        month_name: row.month_name,
@@ -201,7 +210,7 @@ export class ReportRepository implements ReportRepositoryInterface {
      }));
    }
 
-   async getCashFlowByCostCenter(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange): Promise<CashFlowByCostCenterData[]> {
+   async getCashFlowByCostCenter(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange, walletIds?: string[]): Promise<CashFlowByCostCenterData[]> {
      const startDate = range?.start_date ? new Date(range.start_date) : new Date(year, month - 1, 1);
      const endDate = range?.end_date
        ? new Date(new Date(range.end_date).getTime() + 24 * 60 * 60 * 1000)
@@ -223,6 +232,7 @@ export class ReportRepository implements ReportRepositoryInterface {
            AND t.status = 'completed'
            AND t.occurred_at >= $2
            AND t.occurred_at < $3
+           ${walletIds?.length ? 'AND w.id = ANY($4::text[])' : ''}
          GROUP BY cc.name, cc.color
        ),
        total_sum AS (
@@ -238,7 +248,7 @@ export class ReportRepository implements ReportRepositoryInterface {
          END as percentage
        FROM cost_center_totals cct, total_sum ts
        ORDER BY cct.total DESC
-     `, ownerValue, startDate, endDate);
+     `, ownerValue, startDate, endDate, ...(walletIds?.length ? [walletIds] : []));
 
      return results.map(row => ({
        cost_center_name: row.cost_center_name,

@@ -12,9 +12,10 @@ export class GetCashFlowByCostCenterService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange): Promise<CashFlowByCostCenterData[]> {
-    if (organizationId) {
-      return this.reportRepository.getCashFlowByCostCenter(userId, month, year, organizationId, range);
+  async execute(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange, walletIds?: string[]): Promise<CashFlowByCostCenterData[]> {
+    // Resultado filtrado por carteira não é cacheado: a invalidação das escritas só conhece as chaves sem filtro
+    if (organizationId || walletIds?.length) {
+      return this.reportRepository.getCashFlowByCostCenter(userId, month, year, organizationId, range, walletIds);
     }
 
     const cacheKey = CacheKeys.reports.cashFlowByCostCenter(userId, month, year, range);

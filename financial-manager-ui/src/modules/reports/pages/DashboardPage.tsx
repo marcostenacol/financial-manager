@@ -7,6 +7,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useReports, type DashboardOverview, type ExpenseByCategory, type MonthlyEvolution, type CashFlowByCostCenter } from '../hooks/useReports';
 import { useSavingsGoals } from '../../savings-goals/hooks/useSavingsGoals';
 import { useOrganizations } from '../../organizations/hooks/useOrganizations';
+import { useWallets } from '../../wallets/hooks/useWallets';
+import { WalletFilterSelect } from '../components/WalletFilterSelect';
 import { OrganizationFilterSelect } from '../../organizations/components/OrganizationFilterSelect';
 import { useScope } from '../../../contexts/useScope';
 import { useActiveOrganization } from '../../../contexts/useActiveOrganization';
@@ -31,6 +33,7 @@ export const DashboardPage = () => {
   const { goals: allGoals, loadGoals } = useSavingsGoals();
   const { organizations, loadOrganizations } = useOrganizations();
   const { scope } = useScope();
+  const { wallets, loadWallets } = useWallets(scope);
   const { activeOrganizationId } = useActiveOrganization();
   const organizationId = scope === 'business' ? (activeOrganizationId ?? undefined) : undefined;
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
@@ -41,6 +44,12 @@ export const DashboardPage = () => {
   const [start_date, setStartDate] = useState<string>('');
   const [end_date, setEndDate] = useState<string>('');
   const [active_preset, setActivePreset] = useState('month');
+  const [selectedWalletIds, setSelectedWalletIds] = useState<string[]>([]);
+
+  const selectableWallets = wallets.filter((wallet) => !organizationId || wallet.organizationId === organizationId);
+  // Descarta ids de carteiras que saíram da lista (troca de escopo/organização)
+  const walletIds = selectedWalletIds.filter((id) => selectableWallets.some((wallet) => wallet.id === id));
+  const walletIdsKey = walletIds.join(',');
 
   const goals = allGoals.slice(0, 3);
 
@@ -52,10 +61,10 @@ export const DashboardPage = () => {
       };
 
       const [overviewData, expensesData, evolutionData] = await Promise.all([
-        getOverview(range, scope, organizationId),
-        getExpensesByCategory(organizationId, range),
-        getMonthlyEvolution(organizationId, range),
-        scope === 'personal' ? loadGoals() : getCashFlowByCostCenter(organizationId, range).then(setCashFlowByCostCenter),
+        getOverview(range, scope, organizationId, walletIds),
+        getExpensesByCategory(organizationId, range, walletIds),
+        getMonthlyEvolution(organizationId, range, walletIds),
+        scope === 'personal' ? loadGoals() : getCashFlowByCostCenter(organizationId, range, walletIds).then(setCashFlowByCostCenter),
       ]);
       setOverview(overviewData);
       setExpensesByCategory(expensesData);
@@ -72,7 +81,11 @@ export const DashboardPage = () => {
     loadDashboardData();
     loadOrganizations().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [start_date, end_date, scope, activeOrganizationId]);
+  }, [start_date, end_date, scope, activeOrganizationId, walletIdsKey]);
+
+  useEffect(() => {
+    loadWallets().catch(() => {});
+  }, [loadWallets]);
 
   const handlePresetChange = (preset: string) => {
     setActivePreset(preset);
@@ -103,7 +116,7 @@ export const DashboardPage = () => {
       const blob = await exportReport(format, {
         start_date: start_date || undefined,
         end_date: end_date || undefined,
-      });
+      }, walletIds);
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -142,6 +155,8 @@ export const DashboardPage = () => {
         </div>
 
         {scope === 'business' && <OrganizationFilterSelect organizations={organizations} />}
+
+        <WalletFilterSelect wallets={selectableWallets} selectedIds={walletIds} onChange={setSelectedWalletIds} />
 
         <div className="flex flex-wrap bg-app-surface p-1 rounded-full border border-app-border">
           {[

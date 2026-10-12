@@ -35,30 +35,34 @@ export interface CashFlowByCostCenter {
   percentage: number;
 }
 
+function toWalletIdsParam(walletIds?: string[]): string | undefined {
+  return walletIds?.length ? walletIds.join(',') : undefined;
+}
+
 export function useReports() {
-  const getOverview = useCallback(async (range: ReportDateRange, scope?: 'personal' | 'business', organizationId?: string) => {
-    const response = await api.get('/reports/overview', { params: { ...range, scope, organization_id: organizationId } });
+  const getOverview = useCallback(async (range: ReportDateRange, scope?: 'personal' | 'business', organizationId?: string, walletIds?: string[]) => {
+    const response = await api.get('/reports/overview', { params: { ...range, scope, organization_id: organizationId, wallet_ids: toWalletIdsParam(walletIds) } });
     return response.data.data as DashboardOverview;
   }, []);
 
-  const getCashFlowByCostCenter = useCallback(async (organizationId?: string, range?: ReportDateRange) => {
-    const response = await api.get('/reports/cash-flow-by-cost-center', { params: { organization_id: organizationId, ...range } });
+  const getCashFlowByCostCenter = useCallback(async (organizationId?: string, range?: ReportDateRange, walletIds?: string[]) => {
+    const response = await api.get('/reports/cash-flow-by-cost-center', { params: { organization_id: organizationId, ...range, wallet_ids: toWalletIdsParam(walletIds) } });
     return response.data.data as CashFlowByCostCenter[];
   }, []);
 
-  const getExpensesByCategory = useCallback(async (organizationId?: string, range?: ReportDateRange) => {
-    const response = await api.get('/reports/expenses-by-category', { params: { organization_id: organizationId, ...range } });
+  const getExpensesByCategory = useCallback(async (organizationId?: string, range?: ReportDateRange, walletIds?: string[]) => {
+    const response = await api.get('/reports/expenses-by-category', { params: { organization_id: organizationId, ...range, wallet_ids: toWalletIdsParam(walletIds) } });
     return response.data.data as ExpenseByCategory[];
   }, []);
 
-  const getMonthlyEvolution = useCallback(async (organizationId?: string, range?: ReportDateRange) => {
-    const response = await api.get('/reports/evolution', { params: { organization_id: organizationId, ...range } });
+  const getMonthlyEvolution = useCallback(async (organizationId?: string, range?: ReportDateRange, walletIds?: string[]) => {
+    const response = await api.get('/reports/evolution', { params: { organization_id: organizationId, ...range, wallet_ids: toWalletIdsParam(walletIds) } });
     return response.data.data as MonthlyEvolution[];
   }, []);
 
-  const exportReport = useCallback(async (format: 'pdf' | 'excel', range: ReportDateRange) => {
+  const exportReport = useCallback(async (format: 'pdf' | 'excel', range: ReportDateRange, walletIds?: string[]) => {
     const response = await api.get('/reports/export', {
-      params: { format, ...range },
+      params: { format, ...range, wallet_ids: toWalletIdsParam(walletIds) },
       responseType: 'blob',
     });
     return response.data as Blob;

@@ -8,6 +8,7 @@ import { GetCashFlowByCostCenterService } from '../services/GetCashFlowByCostCen
 import { ExportReportService } from '../services/ExportReportService';
 import { AppError } from '@/shared/errors/AppError';
 import { ReportDateRangeDTO } from '../dtos/ReportDateRangeDTO';
+import { ReportWalletFilterDTO } from '../dtos/ReportWalletFilterDTO';
 
 @injectable()
 export class ReportController extends BaseController {
@@ -23,14 +24,16 @@ export class ReportController extends BaseController {
 
   async export(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { format, start_date, end_date } = request.query as {
+    const { format, start_date, end_date, wallet_ids } = request.query as {
       format: 'pdf' | 'excel';
       start_date?: string;
       end_date?: string;
+      wallet_ids?: string;
     };
     ReportDateRangeDTO.parse({ start_date, end_date });
+    const walletFilter = ReportWalletFilterDTO.parse({ wallet_ids });
 
-    const buffer = await this.exportReport.execute(userId, { format, start_date, end_date });
+    const buffer = await this.exportReport.execute(userId, { format, start_date, end_date, wallet_ids: walletFilter.wallet_ids });
 
     const isExcel = format === 'excel';
     reply
@@ -50,59 +53,65 @@ export class ReportController extends BaseController {
 
   async overview(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { start_date, end_date, scope, organization_id } = request.query as { start_date?: string; end_date?: string; scope?: string; organization_id?: string };
+    const { start_date, end_date, scope, organization_id, wallet_ids } = request.query as { start_date?: string; end_date?: string; scope?: string; organization_id?: string; wallet_ids?: string };
     this.assertOrganizationAccess(request, organization_id);
     ReportDateRangeDTO.parse({ start_date, end_date });
-    const data = await this.getOverview.execute(userId, { start_date, end_date }, scope, organization_id);
+    const walletFilter = ReportWalletFilterDTO.parse({ wallet_ids });
+    const data = await this.getOverview.execute(userId, { start_date, end_date }, scope, organization_id, walletFilter.wallet_ids);
     return this.success(reply, data);
   }
 
   async cashFlowByCostCenter(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { month, year, organization_id, start_date, end_date } = request.query as {
+    const { month, year, organization_id, start_date, end_date, wallet_ids } = request.query as {
       month: string;
       year: string;
       organization_id?: string;
       start_date?: string;
       end_date?: string;
+      wallet_ids?: string;
     };
     this.assertOrganizationAccess(request, organization_id);
     ReportDateRangeDTO.parse({ start_date, end_date });
+    const walletFilter = ReportWalletFilterDTO.parse({ wallet_ids });
 
     const now = new Date();
     const targetMonth = month ? Number(month) : now.getMonth() + 1;
     const targetYear = year ? Number(year) : now.getFullYear();
 
-    const data = await this.getCashFlowByCostCenter.execute(userId, targetMonth, targetYear, organization_id, { start_date, end_date });
+    const data = await this.getCashFlowByCostCenter.execute(userId, targetMonth, targetYear, organization_id, { start_date, end_date }, walletFilter.wallet_ids);
     return this.success(reply, data);
   }
 
   async expensesByCategory(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { month, year, organization_id, start_date, end_date } = request.query as {
+    const { month, year, organization_id, start_date, end_date, wallet_ids } = request.query as {
       month: string;
       year: string;
       organization_id?: string;
       start_date?: string;
       end_date?: string;
+      wallet_ids?: string;
     };
     this.assertOrganizationAccess(request, organization_id);
     ReportDateRangeDTO.parse({ start_date, end_date });
+    const walletFilter = ReportWalletFilterDTO.parse({ wallet_ids });
 
     const now = new Date();
     const targetMonth = month ? Number(month) : now.getMonth() + 1;
     const targetYear = year ? Number(year) : now.getFullYear();
 
-    const data = await this.getExpenses.execute(userId, targetMonth, targetYear, organization_id, { start_date, end_date });
+    const data = await this.getExpenses.execute(userId, targetMonth, targetYear, organization_id, { start_date, end_date }, walletFilter.wallet_ids);
     return this.success(reply, data);
   }
 
   async evolution(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.user.sub;
-    const { organization_id, start_date, end_date } = request.query as { organization_id?: string; start_date?: string; end_date?: string };
+    const { organization_id, start_date, end_date, wallet_ids } = request.query as { organization_id?: string; start_date?: string; end_date?: string; wallet_ids?: string };
     this.assertOrganizationAccess(request, organization_id);
     ReportDateRangeDTO.parse({ start_date, end_date });
-    const data = await this.getEvolution.execute(userId, organization_id, { start_date, end_date });
+    const walletFilter = ReportWalletFilterDTO.parse({ wallet_ids });
+    const data = await this.getEvolution.execute(userId, organization_id, { start_date, end_date }, walletFilter.wallet_ids);
     return this.success(reply, data);
   }
 }

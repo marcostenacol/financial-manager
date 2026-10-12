@@ -12,9 +12,10 @@ export class GetExpensesByCategoryService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange): Promise<ExpenseByCategoryData[]> {
-    if (organizationId) {
-      return this.reportRepository.getExpensesByCategory(userId, month, year, organizationId, range);
+  async execute(userId: string, month: number, year: number, organizationId?: string, range?: DashboardOverviewRange, walletIds?: string[]): Promise<ExpenseByCategoryData[]> {
+    // Resultado filtrado por carteira não é cacheado: a invalidação das escritas só conhece as chaves sem filtro
+    if (organizationId || walletIds?.length) {
+      return this.reportRepository.getExpensesByCategory(userId, month, year, organizationId, range, walletIds);
     }
 
     const cacheKey = CacheKeys.reports.expensesByCategory(userId, month, year, range);

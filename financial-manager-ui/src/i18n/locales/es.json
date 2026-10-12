@@ -106,6 +106,12 @@
       "startDate": "Fecha inicial",
       "endDate": "Fecha final"
     },
+    "walletFilter": {
+      "all": "Todas las carteras",
+      "selected": "{{count}} carteras",
+      "clear": "Limpiar selección",
+      "label": "Filtrar por cartera"
+    },
     "periods": {
       "month": "Este Mes",
       "7days": "7 días",

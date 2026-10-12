@@ -26,6 +26,23 @@ describe('ExportReportService', () => {
     exportReportService = new ExportReportService(listTransactions);
   });
 
+  it('should export only the transactions of the selected wallets', async () => {
+    const transactions = [
+      { ...sampleTransactions[0], description: 'Conta corrente', walletId: 'wallet-1' },
+      { ...sampleTransactions[0], description: 'Cartão', walletId: 'wallet-2' },
+    ];
+    vi.spyOn(listTransactions, 'execute').mockResolvedValue({ transactions, total: 2 } as any);
+
+    const buffer = await exportReportService.execute('user-1', { format: 'excel', wallet_ids: ['wallet-1'] });
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+    const sheet = workbook.getWorksheet('Relatório');
+
+    expect(sheet!.rowCount).toBe(2);
+    expect(sheet!.getRow(2).getCell(2).value).toBe('Conta corrente');
+  });
+
   it('should generate a valid Excel workbook with translated type and formatted values', async () => {
     vi.spyOn(listTransactions, 'execute').mockResolvedValue({ transactions: sampleTransactions, total: sampleTransactions.length } as any);
 

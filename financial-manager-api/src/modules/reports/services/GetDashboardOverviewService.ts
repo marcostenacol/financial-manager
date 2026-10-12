@@ -12,9 +12,10 @@ export class GetDashboardOverviewService {
     private cache: CacheTrait,
   ) {}
 
-  async execute(userId: string, range?: DashboardOverviewRange, scope?: string, organizationId?: string): Promise<DashboardOverviewData> {
-    if (organizationId) {
-      return this.reportRepository.getDashboardOverview(userId, range, scope, organizationId);
+  async execute(userId: string, range?: DashboardOverviewRange, scope?: string, organizationId?: string, walletIds?: string[]): Promise<DashboardOverviewData> {
+    // Resultado filtrado por carteira não é cacheado: a invalidação das escritas só conhece as chaves sem filtro
+    if (organizationId || walletIds?.length) {
+      return this.reportRepository.getDashboardOverview(userId, range, scope, organizationId, walletIds);
     }
 
     const cacheKey = CacheKeys.reports.overview(userId, range, scope);
