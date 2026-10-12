@@ -134,9 +134,53 @@ describe('DeleteTransactionService', () => {
 
     expect(personRepository.update).toHaveBeenCalledWith(
       'person-1',
-      { theyOweMe: { decrement: 150 } },
+      { theyOweMe: { decrement: new Prisma.Decimal(150) } },
       expect.anything(),
     );
+  });
+
+  it('should decrease the linked person theyOweMe when deleting a pending expense with person_id', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const transaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.PENDING,
+      amount: 150,
+      personId: 'person-1',
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(transaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 400 } as any);
+
+    await deleteTransactionService.execute('tx-1', userId);
+
+    expect(personRepository.update).toHaveBeenCalledWith(
+      'person-1',
+      { theyOweMe: { decrement: new Prisma.Decimal(150) } },
+      expect.anything(),
+    );
+  });
+
+  it('should not touch the person debt when deleting a cancelled expense with person_id', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const transaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.CANCELLED,
+      amount: 150,
+      personId: 'person-1',
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(transaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 400 } as any);
+
+    await deleteTransactionService.execute('tx-1', userId);
+
+    expect(personRepository.update).not.toHaveBeenCalled();
   });
 
   it('should throw when the wallet does not belong to the authenticated user', async () => {

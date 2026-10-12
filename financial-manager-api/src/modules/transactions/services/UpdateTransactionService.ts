@@ -10,6 +10,7 @@ import { PersonRepositoryInterface } from '@/modules/people/repositories/contrac
 import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
 import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
 import { UpdateTransactionDTOType } from '../dtos/UpdateTransactionDTO';
+import { personDebtOf } from '../utils/personDebt';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
@@ -113,13 +114,8 @@ export class UpdateTransactionService {
       }
     }
 
-    // Dívida antiga só existiu de fato se a transação estava concluída, era despesa e tinha pessoa vinculada
-    const oldPersonDebt = (wasCompleted && oldPersonId && transaction.type === TransactionTypeEnum.EXPENSE)
-      ? new Prisma.Decimal(transaction.amount)
-      : new Prisma.Decimal(0);
-    const newPersonDebt = (willBeCompleted && newPersonId && newType === TransactionTypeEnum.EXPENSE)
-      ? newAmount
-      : new Prisma.Decimal(0);
+    const oldPersonDebt = personDebtOf({ type: transaction.type, status: transaction.status, personId: oldPersonId, amount: transaction.amount });
+    const newPersonDebt = personDebtOf({ type: newType, status: newStatus, personId: newPersonId, amount: newAmount });
 
     if (data.invoice_id) {
       if (wallet.type !== WalletTypeEnum.CREDIT) {

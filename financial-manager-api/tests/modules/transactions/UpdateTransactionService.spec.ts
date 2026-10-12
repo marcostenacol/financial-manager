@@ -131,6 +131,54 @@ describe('UpdateTransactionService', () => {
     );
   });
 
+  it('should keep the person debt when a linked expense goes back to pending', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const existingTransaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.COMPLETED,
+      amount: 100,
+      personId: 'person-1',
+      occurredAt: new Date('2026-10-01T00:00:00.000Z'),
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(existingTransaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 500 } as any);
+    vi.spyOn(transactionRepository, 'update').mockResolvedValue(existingTransaction as any);
+
+    await updateTransactionService.execute('tx-1', { status: TransactionStatusEnum.PENDING } as any, userId);
+
+    expect(personRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('should remove the person debt when a linked expense is cancelled', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const existingTransaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.PENDING,
+      amount: 100,
+      personId: 'person-1',
+      occurredAt: new Date('2026-10-01T00:00:00.000Z'),
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(existingTransaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 500 } as any);
+    vi.spyOn(transactionRepository, 'update').mockResolvedValue(existingTransaction as any);
+
+    await updateTransactionService.execute('tx-1', { status: TransactionStatusEnum.CANCELLED } as any, userId);
+
+    expect(personRepository.update).toHaveBeenCalledWith(
+      'person-1',
+      { theyOweMe: { increment: new Prisma.Decimal(-100) } },
+      expect.anything(),
+    );
+  });
+
   it('should not touch the wallet balance when nothing relevant changes and delta is zero', async () => {
     const userId = 'user-1';
     const walletId = 'wallet-1';

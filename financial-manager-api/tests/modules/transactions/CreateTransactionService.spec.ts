@@ -216,6 +216,33 @@ describe('CreateTransactionService', () => {
     );
   });
 
+  it('should count the person debt on a pending expense and on every installment', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const data = {
+      description: 'Notebook da Maria',
+      amount: 300,
+      type: TransactionTypeEnum.EXPENSE,
+      status: TransactionStatusEnum.COMPLETED,
+      wallet_id: walletId,
+      person_id: 'person-1',
+      installments: 3,
+      occurred_at: '2024-05-01',
+    };
+
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 500, scope: 'personal' } as any);
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({ id: 'person-1', userId, scope: 'personal' } as any);
+    vi.spyOn(transactionRepository, 'create').mockResolvedValue({ id: 'tx-5', ...data } as any);
+
+    await createTransactionService.execute(data as any, userId);
+
+    const increments = (personRepository.update as any).mock.calls.map((call: any[]) => call[1].theyOweMe.increment);
+    const total = increments.reduce((sum: Prisma.Decimal, value: Prisma.Decimal) => sum.plus(value), new Prisma.Decimal(0));
+
+    expect(increments).toHaveLength(3);
+    expect(total).toEqual(new Prisma.Decimal(300));
+  });
+
   it('should reject person_id on an income transaction', async () => {
     const userId = 'user-1';
     const walletId = 'wallet-1';

@@ -10,6 +10,7 @@ import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/
 import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
 import { addMonthsClamped } from '@/modules/credit-cards/utils/computeInvoicePeriod';
 import { CreateTransactionDTOType } from '../dtos/CreateTransactionDTO';
+import { personDebtOf } from '../utils/personDebt';
 import { AppError } from '@/shared/errors/AppError';
 import { TransactionStatusEnum } from '../enums/TransactionStatusEnum';
 import { TransactionTypeEnum } from '../enums/TransactionTypeEnum';
@@ -117,7 +118,6 @@ export class CreateTransactionService {
         const status = i === 0 ? data.status : TransactionStatusEnum.PENDING;
         const isCompleted = status === TransactionStatusEnum.COMPLETED;
         const balanceDelta = data.type === TransactionTypeEnum.INCOME ? installmentAmount : installmentAmount.negated();
-        const affectsPersonDebt = isCompleted && !!data.person_id;
 
         const occurredAt = addMonthsClamped(baseOccurredAt, i);
 
@@ -146,9 +146,11 @@ export class CreateTransactionService {
           }, tx);
         }
 
-        if (affectsPersonDebt) {
+        const personDebt = personDebtOf({ type: data.type, status, personId: data.person_id, amount: installmentAmount });
+
+        if (!personDebt.isZero()) {
           await this.personRepository.update(data.person_id as string, {
-            theyOweMe: { increment: installmentAmount },
+            theyOweMe: { increment: personDebt },
           }, tx);
         }
 
