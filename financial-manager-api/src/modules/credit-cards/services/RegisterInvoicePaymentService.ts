@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { InvoicePayment, Prisma } from '@prisma/client';
+import { prisma } from '@/shared/database/PrismaClient';
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { InvoiceRepositoryInterface } from '../repositories/contracts/InvoiceRepositoryInterface';
 import { InvoicePaymentRepositoryInterface } from '../repositories/contracts/InvoicePaymentRepositoryInterface';
@@ -8,6 +9,9 @@ import { TransactionTypeEnum } from '@/modules/transactions/enums/TransactionTyp
 import { RegisterInvoicePaymentDTOType } from '../dtos/RegisterInvoicePaymentDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { isOwnedByActor } from '@/shared/authorization/ownership';
+import { CacheTrait } from '@/base/traits/CacheTrait';
+import { CacheKeys } from '@/shared/cache/CacheKeys';
+import { resolveOwnerKey } from '@/shared/lib/resolveOwnerKey';
 
 @injectable()
 export class RegisterInvoicePaymentService {
@@ -23,6 +27,8 @@ export class RegisterInvoicePaymentService {
 
     @inject('TransactionRepository')
     private transactionRepository: TransactionRepositoryInterface,
+
+    private cache: CacheTrait,
   ) {}
 
   async execute(
@@ -66,11 +72,29 @@ export class RegisterInvoicePaymentService {
       throw new AppError('O valor informado é maior que o saldo pendente da fatura', 422);
     }
 
-    return this.invoicePaymentRepository.create({
-      invoiceId,
-      amount: new Prisma.Decimal(data.amount),
-      paidAt: data.paid_at ? new Date(data.paid_at) : new Date(),
-      note: data.note,
+    const paymentAmount = new Prisma.Decimal(data.amount);
+
+    // A origem do pagamento é externa ao sistema: só o saldo do cartão sobe, nenhuma outra carteira é debitada.
+    const payment = await prisma.$transaction(async (tx) => {
+      const created = await this.invoicePaymentRepository.create({
+        invoiceId,
+        amount: paymentAmount,
+        paidAt: data.paid_at ? new Date(data.paid_at) : new Date(),
+        note: data.note,
+      }, tx);
+
+      await this.walletRepository.update(walletId, { balance: { increment: paymentAmount } }, tx);
+
+      return created;
     });
+
+    await this.cache.del(CacheKeys.wallets.detail(walletId));
+    if (wallet.organizationId) {
+      await this.cache.delPattern(CacheKeys.wallets.listAllPattern());
+    } else {
+      await this.cache.delPattern(CacheKeys.wallets.listPattern(resolveOwnerKey(wallet)));
+    }
+
+    return payment;
   }
 }

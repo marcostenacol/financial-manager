@@ -5,8 +5,8 @@ import { InvoicePaymentRepositoryInterface } from './contracts/InvoicePaymentRep
 
 @injectable()
 export class InvoicePaymentRepository implements InvoicePaymentRepositoryInterface {
-  async create(data: Prisma.InvoicePaymentUncheckedCreateInput): Promise<InvoicePayment> {
-    return prisma.invoicePayment.create({ data });
+  async create(data: Prisma.InvoicePaymentUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<InvoicePayment> {
+    return (tx ?? prisma).invoicePayment.create({ data });
   }
 
   async findAllByInvoiceId(invoiceId: string): Promise<InvoicePayment[]> {
@@ -27,7 +27,7 @@ export class InvoicePaymentRepository implements InvoicePaymentRepositoryInterfa
     return prisma.invoicePayment.findUnique({ where: { id } });
   }
 
-  async delete(id: string): Promise<void> {
-    await prisma.invoicePayment.delete({ where: { id } });
+  async delete(id: string, tx?: Prisma.TransactionClient): Promise<void> {
+    await (tx ?? prisma).invoicePayment.delete({ where: { id } });
   }
 }
