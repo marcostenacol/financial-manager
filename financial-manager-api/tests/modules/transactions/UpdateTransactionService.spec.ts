@@ -153,6 +153,75 @@ describe('UpdateTransactionService', () => {
     expect(personRepository.update).not.toHaveBeenCalled();
   });
 
+  it('should allow editing a receipt that is already linked to a person without touching the debt', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const existingTransaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.INCOME,
+      status: TransactionStatusEnum.COMPLETED,
+      amount: 100,
+      personId: 'person-1',
+      occurredAt: new Date('2026-10-01T00:00:00.000Z'),
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(existingTransaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 500 } as any);
+    vi.spyOn(transactionRepository, 'update').mockResolvedValue(existingTransaction as any);
+
+    await updateTransactionService.execute('tx-1', { description: 'ajuste' } as any, userId);
+
+    expect(personRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('should adjust the person debt by the difference when a linked receipt amount changes', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const existingTransaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.INCOME,
+      status: TransactionStatusEnum.COMPLETED,
+      amount: 100,
+      personId: 'person-1',
+      occurredAt: new Date('2026-10-01T00:00:00.000Z'),
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(existingTransaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 500 } as any);
+    vi.spyOn(transactionRepository, 'update').mockResolvedValue(existingTransaction as any);
+
+    await updateTransactionService.execute('tx-1', { amount: 60 } as any, userId);
+
+    expect(personRepository.update).toHaveBeenCalledWith(
+      'person-1',
+      { theyOweMe: { increment: new Prisma.Decimal(40) } },
+      expect.anything(),
+    );
+  });
+
+  it('should still reject linking a person to an income that is not already linked', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const existingTransaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.INCOME,
+      status: TransactionStatusEnum.COMPLETED,
+      amount: 100,
+      personId: null,
+      occurredAt: new Date('2026-10-01T00:00:00.000Z'),
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(existingTransaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 500 } as any);
+
+    await expect(
+      updateTransactionService.execute('tx-1', { person_id: 'person-1' } as any, userId),
+    ).rejects.toThrow('Só é possível vincular uma pessoa a uma despesa');
+  });
+
   it('should remove the person debt when a linked expense is cancelled', async () => {
     const userId = 'user-1';
     const walletId = 'wallet-1';

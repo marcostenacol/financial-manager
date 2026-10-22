@@ -10,9 +10,14 @@ interface PersonDebtSource {
 }
 
 export function personDebtOf(source: PersonDebtSource): Prisma.Decimal {
-  const isDebt = !!source.personId
-    && source.type === TransactionTypeEnum.EXPENSE
-    && source.status !== TransactionStatusEnum.CANCELLED;
+  if (!source.personId || source.status === TransactionStatusEnum.CANCELLED) {
+    return new Prisma.Decimal(0);
+  }
 
-  return isDebt ? new Prisma.Decimal(source.amount) : new Prisma.Decimal(0);
+  const amount = new Prisma.Decimal(source.amount);
+
+  if (source.type === TransactionTypeEnum.EXPENSE) return amount;
+  if (source.type === TransactionTypeEnum.INCOME) return amount.negated();
+
+  return new Prisma.Decimal(0);
 }

@@ -139,6 +139,30 @@ describe('DeleteTransactionService', () => {
     );
   });
 
+  it('should give the debt back to the person when deleting a receipt linked to them', async () => {
+    const userId = 'user-1';
+    const walletId = 'wallet-1';
+    const transaction = {
+      id: 'tx-1',
+      walletId,
+      type: TransactionTypeEnum.INCOME,
+      status: TransactionStatusEnum.COMPLETED,
+      amount: 150,
+      personId: 'person-1',
+    };
+
+    vi.spyOn(transactionRepository, 'findById').mockResolvedValue(transaction as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: walletId, userId, balance: 400 } as any);
+
+    await deleteTransactionService.execute('tx-1', userId);
+
+    expect(personRepository.update).toHaveBeenCalledWith(
+      'person-1',
+      { theyOweMe: { decrement: new Prisma.Decimal(-150) } },
+      expect.anything(),
+    );
+  });
+
   it('should decrease the linked person theyOweMe when deleting a pending expense with person_id', async () => {
     const userId = 'user-1';
     const walletId = 'wallet-1';

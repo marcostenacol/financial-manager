@@ -21,7 +21,15 @@ describe('personDebtOf', () => {
     expect(personDebtOf({ ...base, personId: null }).isZero()).toBe(true);
   });
 
-  it('ignores income', () => {
-    expect(personDebtOf({ ...base, type: 'income' }).isZero()).toBe(true);
+  it('counts a linked income as negative debt, since it is a receipt from the person', () => {
+    expect(personDebtOf({ ...base, type: 'income' })).toEqual(new Prisma.Decimal(-80));
+  });
+
+  it('ignores a cancelled income', () => {
+    expect(personDebtOf({ ...base, type: 'income', status: 'cancelled' }).isZero()).toBe(true);
+  });
+
+  it('ignores an income without person', () => {
+    expect(personDebtOf({ ...base, type: 'income', personId: null }).isZero()).toBe(true);
   });
 });

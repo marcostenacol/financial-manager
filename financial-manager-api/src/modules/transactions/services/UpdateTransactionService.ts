@@ -98,7 +98,7 @@ export class UpdateTransactionService {
     const oldPersonId = transaction.personId;
     const newPersonId = data.person_id !== undefined ? data.person_id : oldPersonId;
 
-    if (newPersonId && newType !== TransactionTypeEnum.EXPENSE) {
+    if (newPersonId && newPersonId !== oldPersonId && newType !== TransactionTypeEnum.EXPENSE) {
       throw new AppError('Só é possível vincular uma pessoa a uma despesa', 422);
     }
 
