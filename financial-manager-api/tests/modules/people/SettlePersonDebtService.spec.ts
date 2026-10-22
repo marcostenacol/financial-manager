@@ -89,6 +89,77 @@ describe('SettlePersonDebtService', () => {
     expect(personRepository.update).toHaveBeenCalledWith('person-1', { theyOweMe: 0 }, expect.anything());
   });
 
+  it('should link the INCOME transaction to the person when they owe me', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'Maria',
+      theyOweMe: new Prisma.Decimal(150),
+      iOweThem: new Prisma.Decimal(0),
+      paymentFrequency: 'ONE_TIME',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal' } as any);
+
+    await settlePersonDebtService.execute('person-1', baseData, 'user-1');
+
+    expect(transactionRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'income', personId: 'person-1' }),
+      expect.anything(),
+    );
+  });
+
+  it('should mention who actually paid in the description when paid_by is informed', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'Maria',
+      theyOweMe: new Prisma.Decimal(150),
+      iOweThem: new Prisma.Decimal(0),
+      paymentFrequency: 'ONE_TIME',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal' } as any);
+
+    await settlePersonDebtService.execute('person-1', { ...baseData, amount: 50, paid_by: 'Carlos' }, 'user-1');
+
+    const createdArgs = (transactionRepository.create as any).mock.calls[0][0];
+    expect(createdArgs.description).toBe('Recebimento parcial de Maria (pago por Carlos)');
+    expect(createdArgs.personId).toBe('person-1');
+  });
+
+  it('should keep the default description when paid_by is not informed', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'Maria',
+      theyOweMe: new Prisma.Decimal(150),
+      iOweThem: new Prisma.Decimal(0),
+      paymentFrequency: 'ONE_TIME',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal' } as any);
+
+    await settlePersonDebtService.execute('person-1', baseData, 'user-1');
+
+    const createdArgs = (transactionRepository.create as any).mock.calls[0][0];
+    expect(createdArgs.description).toBe('Recebimento de Maria');
+  });
+
+  it('should not link the EXPENSE transaction to the person when I owe them', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'João',
+      theyOweMe: new Prisma.Decimal(0),
+      iOweThem: new Prisma.Decimal(900),
+      paymentFrequency: 'ONE_TIME',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal' } as any);
+
+    await settlePersonDebtService.execute('person-1', { ...baseData, direction: 'i_owe_them' }, 'user-1');
+
+    const createdArgs = (transactionRepository.create as any).mock.calls[0][0];
+    expect(createdArgs.personId).toBeUndefined();
+  });
+
   it('should create an EXPENSE transaction and update both iOweThem and lastPaidPeriod for a MONTHLY person', async () => {
     vi.spyOn(personRepository, 'findById').mockResolvedValue({
       id: 'person-1',

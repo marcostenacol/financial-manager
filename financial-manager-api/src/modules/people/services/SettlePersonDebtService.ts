@@ -61,8 +61,9 @@ export class SettlePersonDebtService {
     const type = data.direction === 'they_owe_me' ? TransactionTypeEnum.INCOME : TransactionTypeEnum.EXPENSE;
     const isPartial = settleAmount.lessThan(pendingAmount);
     const balanceDelta = type === TransactionTypeEnum.INCOME ? settleAmount : settleAmount.negated();
+    const paidBySuffix = data.direction === 'they_owe_me' && data.paid_by ? ` (pago por ${data.paid_by})` : '';
     const description = data.direction === 'they_owe_me'
-      ? `Recebimento${isPartial ? ' parcial' : ''} de ${person!.name}`
+      ? `Recebimento${isPartial ? ' parcial' : ''} de ${person!.name}${paidBySuffix}`
       : `Pagamento${isPartial ? ' parcial' : ''} para ${person!.name}`;
 
     const isOneTime = person!.paymentFrequency === 'ONE_TIME';
@@ -80,6 +81,8 @@ export class SettlePersonDebtService {
         status: TransactionStatusEnum.COMPLETED,
         occurredAt,
         invoiceId,
+        // Só a receita leva a pessoa: personDebtOf trata despesa com pessoa como dívida, então a baixa de "eu devo" não pode ser vinculada.
+        personId: type === TransactionTypeEnum.INCOME ? person!.id : undefined,
       }, tx);
 
       await this.walletRepository.update(wallet.id, {

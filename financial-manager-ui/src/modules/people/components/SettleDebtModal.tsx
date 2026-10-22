@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { X, Check, Wallet as WalletIcon, Tag, DollarSign } from 'lucide-react';
+import { X, Check, Wallet as WalletIcon, Tag, DollarSign, User } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { usePeople, type Person, type SettleDirection } from '../hooks/usePeople';
 import { useWallets } from '../../wallets/hooks/useWallets';
@@ -28,6 +28,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [settleAmount, setSettleAmount] = useState(0);
+  const [paidBy, setPaidBy] = useState('');
   const [loading, setLoading] = useState(false);
 
   const pendingAmount = person && direction
@@ -41,6 +42,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setWalletId('');
       setCategoryId('');
+      setPaidBy('');
       setSettleAmount(pendingAmount);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,7 +59,13 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
     setLoading(true);
 
     try {
-      await settlePersonDebt(person.id, { direction, wallet_id: walletId, category_id: categoryId, amount: settleAmount });
+      await settlePersonDebt(person.id, {
+        direction,
+        wallet_id: walletId,
+        category_id: categoryId,
+        amount: settleAmount,
+        paid_by: direction === 'they_owe_me' && paidBy.trim() ? paidBy.trim() : undefined,
+      });
       onSuccess();
       onClose();
     } catch (err) {
@@ -148,6 +156,22 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
               ))}
             </select>
           </div>
+
+          {direction === 'they_owe_me' && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-app-muted ml-1 flex items-center gap-2">
+                <User className="w-4 h-4" /> {t('people.settle.paidByLabel')}
+              </label>
+              <input
+                type="text"
+                maxLength={80}
+                value={paidBy}
+                onChange={(e) => setPaidBy(e.target.value)}
+                placeholder={t('people.settle.paidByPlaceholder')}
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50"
+              />
+            </div>
+          )}
 
           <button
             type="submit"

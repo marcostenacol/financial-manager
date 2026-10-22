@@ -471,7 +471,9 @@
       "selectWallet": "Seleccionar billetera",
       "categoryLabel": "Categoría",
       "selectCategory": "Seleccionar categoría",
-      "confirm": "Confirmar"
+      "confirm": "Confirmar",
+      "paidByLabel": "Pagado por (opcional)",
+      "paidByPlaceholder": "Ej: nombre de quien hizo el pago"
     },
     "pix": {
       "titlePrefix": "PIX — {{name}}",

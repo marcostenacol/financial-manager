@@ -471,7 +471,9 @@
       "selectWallet": "Select wallet",
       "categoryLabel": "Category",
       "selectCategory": "Select category",
-      "confirm": "Confirm"
+      "confirm": "Confirm",
+      "paidByLabel": "Paid by (optional)",
+      "paidByPlaceholder": "Ex: name of who made the payment"
     },
     "pix": {
       "titlePrefix": "PIX — {{name}}",
