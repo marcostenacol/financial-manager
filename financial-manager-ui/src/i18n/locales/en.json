@@ -473,7 +473,11 @@
       "selectCategory": "Select category",
       "confirm": "Confirm",
       "paidByLabel": "Paid by (optional)",
-      "paidByPlaceholder": "Ex: name of who made the payment"
+      "paidByPlaceholder": "Ex: name of who made the payment",
+      "invoiceLabel": "Starting invoice",
+      "invoiceHint": "The amount is applied to the invoices in order from this one, and any excess goes to the next.",
+      "invoicePending": "pending {{amount}}",
+      "invoiceNoPending": "nothing pending"
     },
     "pix": {
       "titlePrefix": "PIX — {{name}}",

@@ -12,6 +12,7 @@ import { TransactionRepositoryInterface } from '@/modules/transactions/repositor
 import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contracts/WalletRepositoryInterface';
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
+import { ListWalletInvoicesService } from '@/modules/credit-cards/services/ListWalletInvoicesService';
 import { CacheTrait } from '@/base/traits/CacheTrait';
 import { AppError } from '@/shared/errors/AppError';
 import { Prisma } from '@prisma/client';
@@ -22,6 +23,7 @@ describe('SettlePersonDebtService', () => {
   let walletRepository: WalletRepositoryInterface;
   let categoryRepository: CategoryRepositoryInterface;
   let invoiceRepository: InvoiceRepositoryInterface;
+  let listWalletInvoicesService: ListWalletInvoicesService;
   let cacheTrait: CacheTrait;
   let settlePersonDebtService: SettlePersonDebtService;
 
@@ -51,6 +53,10 @@ describe('SettlePersonDebtService', () => {
       findOrCreate: vi.fn().mockResolvedValue({ id: 'invoice-1' }),
     } as any;
 
+    listWalletInvoicesService = {
+      execute: vi.fn().mockResolvedValue([]),
+    } as any;
+
     cacheTrait = {
       del: vi.fn(),
       delPattern: vi.fn(),
@@ -62,6 +68,7 @@ describe('SettlePersonDebtService', () => {
       walletRepository,
       categoryRepository,
       invoiceRepository,
+      listWalletInvoicesService,
       cacheTrait,
     );
   });
@@ -287,5 +294,124 @@ describe('SettlePersonDebtService', () => {
     vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'other-user', scope: 'personal' } as any);
 
     await expect(settlePersonDebtService.execute('person-1', baseData, 'user-1')).rejects.toBeInstanceOf(AppError);
+  });
+
+  describe('receipt on a credit card wallet', () => {
+    const creditWallet = { id: 'wallet-1', userId: 'user-1', scope: 'personal', type: 'credit', closingDay: 15, dueDay: 22 };
+    const invoiceSummaries = [
+      { id: 'inv-sep', referenceMonth: '2026-09', remainingAmount: 400 },
+      { id: 'inv-oct', referenceMonth: '2026-10', remainingAmount: 800 },
+      { id: 'inv-nov', referenceMonth: '2026-11', remainingAmount: 0 },
+    ];
+
+    beforeEach(() => {
+      vi.spyOn(personRepository, 'findById').mockResolvedValue({
+        id: 'person-1',
+        userId: 'user-1',
+        name: 'Maria',
+        theyOweMe: new Prisma.Decimal(5000),
+        iOweThem: new Prisma.Decimal(0),
+        paymentFrequency: 'ONE_TIME',
+      } as any);
+      vi.spyOn(walletRepository, 'findById').mockResolvedValue(creditWallet as any);
+      vi.spyOn(listWalletInvoicesService, 'execute').mockResolvedValue(invoiceSummaries as any);
+    });
+
+    it('should split the receipt across invoices in order, starting at the selected one', async () => {
+      const result = await settlePersonDebtService.execute(
+        'person-1',
+        { ...baseData, amount: 1000, invoice_id: 'inv-sep' },
+        'user-1',
+      );
+
+      const created = (transactionRepository.create as any).mock.calls.map((call: any[]) => call[0]);
+      expect(created).toHaveLength(2);
+      expect(created[0]).toMatchObject({ invoiceId: 'inv-sep', type: 'income', personId: 'person-1' });
+      expect(created[0].amount.toNumber()).toBe(400);
+      expect(created[0].description).toBe('Recebimento parcial de Maria (fatura 2026-09)');
+      expect(created[1]).toMatchObject({ invoiceId: 'inv-oct', type: 'income', personId: 'person-1' });
+      expect(created[1].amount.toNumber()).toBe(600);
+      expect(created[1].description).toBe('Recebimento parcial de Maria (fatura 2026-10)');
+      expect((result as any).transactions).toHaveLength(2);
+    });
+
+    it('should raise the wallet balance and lower the person debt only once, by the total', async () => {
+      await settlePersonDebtService.execute('person-1', { ...baseData, amount: 1000, invoice_id: 'inv-sep' }, 'user-1');
+
+      expect(walletRepository.update).toHaveBeenCalledTimes(1);
+      const [, walletData] = (walletRepository.update as any).mock.calls[0];
+      expect(walletData.balance.increment.toNumber()).toBe(1000);
+
+      expect(personRepository.update).toHaveBeenCalledTimes(1);
+      expect(personRepository.update).toHaveBeenCalledWith('person-1', { theyOweMe: 4000 }, expect.anything());
+    });
+
+    it('should keep a single transaction without invoice suffix when one invoice absorbs everything', async () => {
+      await settlePersonDebtService.execute('person-1', { ...baseData, amount: 300, invoice_id: 'inv-sep' }, 'user-1');
+
+      const created = (transactionRepository.create as any).mock.calls.map((call: any[]) => call[0]);
+      expect(created).toHaveLength(1);
+      expect(created[0].invoiceId).toBe('inv-sep');
+      expect(created[0].description).toBe('Recebimento parcial de Maria');
+    });
+
+    it('should start at the oldest invoice with a pending balance when none is selected', async () => {
+      await settlePersonDebtService.execute('person-1', { ...baseData, amount: 500 }, 'user-1');
+
+      const created = (transactionRepository.create as any).mock.calls.map((call: any[]) => call[0]);
+      expect(created.map((c: any) => c.invoiceId)).toEqual(['inv-sep', 'inv-oct']);
+    });
+
+    it('should fall back to the invoice of the receipt date when no invoice has a pending balance', async () => {
+      vi.spyOn(listWalletInvoicesService, 'execute').mockResolvedValue([
+        { id: 'inv-sep', referenceMonth: '2026-09', remainingAmount: 0 },
+      ] as any);
+
+      await settlePersonDebtService.execute('person-1', { ...baseData, amount: 100 }, 'user-1');
+
+      expect(invoiceRepository.findOrCreate).toHaveBeenCalled();
+      const created = (transactionRepository.create as any).mock.calls.map((call: any[]) => call[0]);
+      expect(created).toHaveLength(1);
+      expect(created[0].invoiceId).toBe('invoice-1');
+    });
+
+    it('should throw 404 when the selected invoice does not belong to the wallet', async () => {
+      await expect(
+        settlePersonDebtService.execute('person-1', { ...baseData, invoice_id: 'inv-other' }, 'user-1'),
+      ).rejects.toMatchObject({ status_code: 404 });
+      expect(transactionRepository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should throw 422 when an invoice is informed for a wallet that is not a credit card', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'Maria',
+      theyOweMe: new Prisma.Decimal(150),
+      iOweThem: new Prisma.Decimal(0),
+      paymentFrequency: 'ONE_TIME',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal', type: 'checking' } as any);
+
+    await expect(
+      settlePersonDebtService.execute('person-1', { ...baseData, invoice_id: '11111111-1111-4111-8111-111111111111' }, 'user-1'),
+    ).rejects.toMatchObject({ status_code: 422 });
+  });
+
+  it('should throw 422 when an invoice is informed while paying a debt of mine', async () => {
+    vi.spyOn(personRepository, 'findById').mockResolvedValue({
+      id: 'person-1',
+      userId: 'user-1',
+      name: 'João',
+      theyOweMe: new Prisma.Decimal(0),
+      iOweThem: new Prisma.Decimal(900),
+      paymentFrequency: 'ONE_TIME',
+    } as any);
+    vi.spyOn(walletRepository, 'findById').mockResolvedValue({ id: 'wallet-1', userId: 'user-1', scope: 'personal', type: 'credit' } as any);
+
+    await expect(
+      settlePersonDebtService.execute('person-1', { ...baseData, direction: 'i_owe_them', invoice_id: '11111111-1111-4111-8111-111111111111' }, 'user-1'),
+    ).rejects.toMatchObject({ status_code: 422 });
   });
 });

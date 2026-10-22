@@ -7,6 +7,9 @@ import { WalletRepositoryInterface } from '@/modules/wallets/repositories/contra
 import { CategoryRepositoryInterface } from '@/modules/categories/repositories/contracts/CategoryRepositoryInterface';
 import { InvoiceRepositoryInterface } from '@/modules/credit-cards/repositories/contracts/InvoiceRepositoryInterface';
 import { resolveInvoiceId } from '@/modules/credit-cards/utils/resolveInvoiceId';
+import { ListWalletInvoicesService } from '@/modules/credit-cards/services/ListWalletInvoicesService';
+import { allocateAcrossInvoices, pickDefaultStartInvoice, InvoiceAllocation } from '@/modules/credit-cards/utils/allocateAcrossInvoices';
+import { WalletTypeEnum } from '@/modules/wallets/enums/WalletTypeEnum';
 import { SettlePersonDebtDTOType } from '../dtos/SettlePersonDebtDTO';
 import { AppError } from '@/shared/errors/AppError';
 import { assertOwnership, isOwnedByActor } from '@/shared/authorization/ownership';
@@ -25,10 +28,11 @@ export class SettlePersonDebtService {
     @inject('WalletRepository') private walletRepository: WalletRepositoryInterface,
     @inject('CategoryRepository') private categoryRepository: CategoryRepositoryInterface,
     @inject('InvoiceRepository') private invoiceRepository: InvoiceRepositoryInterface,
+    @inject('ListWalletInvoicesService') private listWalletInvoicesService: ListWalletInvoicesService,
     private cache: CacheTrait,
   ) {}
 
-  async execute(id: string, data: SettlePersonDebtDTOType, userId: string, organizationIds: string[] = []): Promise<{ person: unknown; transaction: Transaction }> {
+  async execute(id: string, data: SettlePersonDebtDTOType, userId: string, organizationIds: string[] = []): Promise<{ person: unknown; transaction: Transaction; transactions: Transaction[] }> {
     const person = await this.personRepository.findById(id);
     assertOwnership(person, userId, organizationIds, 'Pessoa não encontrada');
 
@@ -58,6 +62,18 @@ export class SettlePersonDebtService {
       throw new AppError('Esta categoria não é compatível com o escopo da carteira', 422);
     }
 
+    if (data.invoice_id && data.direction !== 'they_owe_me') {
+      throw new AppError('A fatura só pode ser escolhida ao registrar um recebimento', 422);
+    }
+
+    if (data.invoice_id && wallet.type !== WalletTypeEnum.CREDIT) {
+      throw new AppError('Fatura só pode ser definida em carteira do tipo cartão de crédito', 422);
+    }
+
+    const allocations = data.direction === 'they_owe_me' && wallet.type === WalletTypeEnum.CREDIT
+      ? await this.allocateReceiptAcrossInvoices(wallet.id, settleAmount, data.invoice_id, userId, organizationIds)
+      : [];
+
     const type = data.direction === 'they_owe_me' ? TransactionTypeEnum.INCOME : TransactionTypeEnum.EXPENSE;
     const isPartial = settleAmount.lessThan(pendingAmount);
     const balanceDelta = type === TransactionTypeEnum.INCOME ? settleAmount : settleAmount.negated();
@@ -68,22 +84,28 @@ export class SettlePersonDebtService {
 
     const isOneTime = person!.paymentFrequency === 'ONE_TIME';
 
-    const { transaction, updatedPerson } = await prisma.$transaction(async (tx) => {
+    const { transactions, updatedPerson } = await prisma.$transaction(async (tx) => {
       const occurredAt = new Date();
-      const invoiceId = await resolveInvoiceId(wallet, occurredAt, this.invoiceRepository, tx);
+      const parts: Array<Pick<InvoiceAllocation, 'amount'> & { invoiceId?: string; referenceMonth?: string }> = allocations.length > 0
+        ? allocations
+        : [{ invoiceId: await resolveInvoiceId(wallet, occurredAt, this.invoiceRepository, tx), amount: settleAmount }];
+      const isSplit = parts.length > 1;
 
-      const createdTransaction = await this.transactionRepository.create({
-        walletId: data.wallet_id,
-        categoryId: data.category_id,
-        type,
-        amount: settleAmount,
-        description,
-        status: TransactionStatusEnum.COMPLETED,
-        occurredAt,
-        invoiceId,
-        // Só a receita leva a pessoa: personDebtOf trata despesa com pessoa como dívida, então a baixa de "eu devo" não pode ser vinculada.
-        personId: type === TransactionTypeEnum.INCOME ? person!.id : undefined,
-      }, tx);
+      const createdTransactions: Transaction[] = [];
+      for (const part of parts) {
+        createdTransactions.push(await this.transactionRepository.create({
+          walletId: data.wallet_id,
+          categoryId: data.category_id,
+          type,
+          amount: part.amount,
+          description: isSplit ? `${description} (fatura ${part.referenceMonth})` : description,
+          status: TransactionStatusEnum.COMPLETED,
+          occurredAt,
+          invoiceId: part.invoiceId,
+          // Só a receita leva a pessoa: personDebtOf trata despesa com pessoa como dívida, então a baixa de "eu devo" não pode ser vinculada.
+          personId: type === TransactionTypeEnum.INCOME ? person!.id : undefined,
+        }, tx));
+      }
 
       await this.walletRepository.update(wallet.id, {
         balance: { increment: balanceDelta },
@@ -97,7 +119,7 @@ export class SettlePersonDebtService {
         ...(person!.paymentFrequency === 'MONTHLY' ? { lastPaidPeriod: getCurrentPeriod() } : {}),
       }, tx);
 
-      return { transaction: createdTransaction, updatedPerson: personUpdated };
+      return { transactions: createdTransactions, updatedPerson: personUpdated };
     });
 
     await this.cache.del(CacheKeys.wallets.detail(wallet.id));
@@ -115,6 +137,24 @@ export class SettlePersonDebtService {
       await this.cache.delPattern(CacheKeys.reports.cashFlowByCostCenterPattern(userId));
     }
 
-    return { person: updatedPerson, transaction };
+    return { person: updatedPerson, transaction: transactions[0], transactions };
+  }
+
+  private async allocateReceiptAcrossInvoices(
+    walletId: string,
+    amount: Prisma.Decimal,
+    startInvoiceId: string | undefined,
+    userId: string,
+    organizationIds: string[],
+  ): Promise<InvoiceAllocation[]> {
+    const invoices = await this.listWalletInvoicesService.execute(walletId, userId, organizationIds);
+
+    if (startInvoiceId && !invoices.some((invoice) => invoice.id === startInvoiceId)) {
+      throw new AppError('Fatura não encontrada', 404);
+    }
+
+    const startId = startInvoiceId ?? pickDefaultStartInvoice(invoices)?.id;
+
+    return startId ? allocateAcrossInvoices(amount, invoices, startId) : [];
   }
 }

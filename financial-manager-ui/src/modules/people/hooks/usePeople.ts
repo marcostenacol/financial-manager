@@ -49,6 +49,7 @@ export interface SettlePersonDebtInput {
   wallet_id: string;
   category_id: string;
   amount?: number;
+  invoice_id?: string;
   paid_by?: string;
 }
 

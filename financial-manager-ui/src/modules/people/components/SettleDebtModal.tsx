@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { X, Check, Wallet as WalletIcon, Tag, DollarSign, User } from 'lucide-react';
+import { X, Check, Wallet as WalletIcon, Tag, DollarSign, User, CreditCard } from 'lucide-react';
 import { useToast } from '../../../shared/components/useToast';
 import { usePeople, type Person, type SettleDirection } from '../hooks/usePeople';
 import { useWallets } from '../../wallets/hooks/useWallets';
 import { useCategories } from '../../categories/hooks/useCategories';
+import { useCreditCards, type CreditCardInvoice } from '../../credit-cards/hooks/useCreditCards';
 import { useScope } from '../../../contexts/useScope';
 import { getErrorMessage } from '../../../shared/lib/getErrorMessage';
 import { CurrencyInput } from '../../../shared/components/CurrencyInput';
@@ -25,10 +26,13 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
   const { scope } = useScope();
   const { wallets, loadWallets } = useWallets(scope);
   const { categories, loadCategories } = useCategories(scope);
+  const { loadInvoices } = useCreditCards();
   const [walletId, setWalletId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [settleAmount, setSettleAmount] = useState(0);
   const [paidBy, setPaidBy] = useState('');
+  const [invoices, setInvoices] = useState<CreditCardInvoice[]>([]);
+  const [invoiceId, setInvoiceId] = useState('');
   const [loading, setLoading] = useState(false);
 
   const pendingAmount = person && direction
@@ -48,9 +52,41 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, person, direction]);
 
+  const selectedWallet = wallets.find((wallet) => wallet.id === walletId);
+  const needsInvoice = direction === 'they_owe_me' && selectedWallet?.type === 'credit';
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setInvoices([]);
+    setInvoiceId('');
+    if (!isOpen || !needsInvoice) return;
+
+    let cancelled = false;
+    loadInvoices(walletId)
+      .then((loaded) => {
+        if (cancelled) return;
+        const sorted = [...loaded].sort((a, b) => a.referenceMonth.localeCompare(b.referenceMonth));
+        setInvoices(sorted);
+        setInvoiceId((sorted.find((invoice) => invoice.remainingAmount > 0) ?? sorted[0])?.id ?? '');
+      })
+      .catch(() => {});
+
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, walletId, needsInvoice]);
+
   if (!isOpen || !person || !direction) return null;
 
   const title = direction === 'they_owe_me' ? t('people.settle.receiveTitle') : t('people.settle.payTitle');
+  const formatInvoiceOption = (invoice: CreditCardInvoice) => {
+    const [year, month] = invoice.referenceMonth.split('-');
+    const status = invoice.remainingAmount > 0
+      ? t('people.settle.invoicePending', {
+        amount: invoice.remainingAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+      })
+      : t('people.settle.invoiceNoPending');
+    return `${month}/${year}, ${status}`;
+  };
   const remainingAfter = Math.max(0, pendingAmount - settleAmount);
   const isPartial = settleAmount > 0 && settleAmount < pendingAmount;
 
@@ -64,6 +100,7 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
         wallet_id: walletId,
         category_id: categoryId,
         amount: settleAmount,
+        invoice_id: needsInvoice && invoiceId ? invoiceId : undefined,
         paid_by: direction === 'they_owe_me' && paidBy.trim() ? paidBy.trim() : undefined,
       });
       onSuccess();
@@ -156,6 +193,26 @@ export const SettleDebtModal = ({ isOpen, onClose, onSuccess, person, direction 
               ))}
             </select>
           </div>
+
+          {needsInvoice && invoices.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-app-muted ml-1 flex items-center gap-2">
+                <CreditCard className="w-4 h-4" /> {t('people.settle.invoiceLabel')}
+              </label>
+              <select
+                value={invoiceId}
+                onChange={(e) => setInvoiceId(e.target.value)}
+                className="w-full bg-app-surface-2 border border-app-border rounded-2xl py-3 px-4 text-app-ink focus:outline-none focus:ring-2 focus:ring-app-accent/50 appearance-none"
+              >
+                {invoices.map((invoice) => (
+                  <option key={invoice.id} value={invoice.id} className="bg-app-surface">
+                    {formatInvoiceOption(invoice)}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-app-muted ml-1">{t('people.settle.invoiceHint')}</p>
+            </div>
+          )}
 
           {direction === 'they_owe_me' && (
             <div className="space-y-2">

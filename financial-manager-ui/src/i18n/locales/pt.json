@@ -473,7 +473,11 @@
       "selectCategory": "Selecionar categoria",
       "confirm": "Confirmar",
       "paidByLabel": "Pago por (opcional)",
-      "paidByPlaceholder": "Ex: nome de quem fez o pagamento"
+      "paidByPlaceholder": "Ex: nome de quem fez o pagamento",
+      "invoiceLabel": "Fatura inicial",
+      "invoiceHint": "O valor abate as faturas em ordem a partir desta, e o que passar vai para a seguinte.",
+      "invoicePending": "pendente {{amount}}",
+      "invoiceNoPending": "sem saldo pendente"
     },
     "pix": {
       "titlePrefix": "PIX — {{name}}",
